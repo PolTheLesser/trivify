@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rh.ptp.wrap.trivify.model.request.*;
 import rh.ptp.wrap.trivify.service.AuthService;
 
 @RestController
@@ -19,27 +20,29 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        return
+        User registeredUser = authService.register(request);
+        return ResponseEntity.ok().body(registeredUser);
+
     }
 
     @PostMapping("/verifyemail")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-
+    public ResponseEntity<?> verifyEmail(@RequestBody VerifyEmailRequest request) {
+        return authService.verifyEmail(request);
     }
 
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
+        return authService.login(request);
     }
 
     @PostMapping("/forgotpassword")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-
+        return authService.forgotPassword(request);
     }
 
     @PostMapping("/resetpassword")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-
+        return authService.resetPassword(request);
     }
 }

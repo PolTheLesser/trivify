@@ -1,19 +1,18 @@
-package rh.ptp.wrap.trivify.model.dto;
+package rh.ptp.wrap.trivify.model.request;
 
-import jakarta.persistence.ElementCollection;
 import lombok.Getter;
 import lombok.Setter;
 import rh.ptp.wrap.trivify.annotations.PasswordMatches;
 import rh.ptp.wrap.trivify.annotations.ValidEmail;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
 
 @PasswordMatches
 @Getter
 @Setter
-public class UserDto {
+public class RegisterRequest {
 
     @NotNull
     @NotEmpty
@@ -26,20 +25,6 @@ public class UserDto {
 
     @NotNull
     @NotEmpty
-    private String firstName;
-
-    @NotNull
-    @NotEmpty
-    private String lastName;
-
-    @NotNull
-    @NotEmpty
     private String password;
-
-    @NotNull
-    @NotEmpty
     private String matchingPassword;
-
-    @ElementCollection
-    private Collection<String> roles;
 }
