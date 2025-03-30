@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
+import rh.ptp.wrap.trivify.exception.UsernameAlreadyExistsException;
 import rh.ptp.wrap.trivify.model.dto.UserDto;
 import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.*;
@@ -19,17 +20,25 @@ public class AuthService {
     }
 
 
-    public User register(RegisterRequest request) throws Exception{
+    public User register(RegisterRequest request) throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
         if (emailExists(request.getEmail())) {
-            throw new Exception();
+            throw new EmailAlreadyExistsException("A User with the given Email already exists");
         }
+        if (userExists(request.getUsername())) {
+            throw new UsernameAlreadyExistsException("A User with the given Username already exists");
+        }
+
         User pendingUser = new User()
                 .setUsername(request.getUsername())
-                .set
+                .setEmail(request.getEmail())
+                .setPassword(request.getPassword());
         return userRepository.save(pendingUser);
     }
 
+
+
     public ResponseEntity<?> verifyEmail(VerifyEmailRequest request) {
+
     }
 
     public ResponseEntity<?> login(LoginRequest request) {
@@ -42,6 +51,9 @@ public class AuthService {
     }
 
     private boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userRepository.findByEmail(email).isPresent();
+    }
+    private boolean userExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 }

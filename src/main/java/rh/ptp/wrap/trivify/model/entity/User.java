@@ -40,4 +40,12 @@ public class User {
 
     @Column
     private LocalDateTime lastLogin;
+
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    public User() {
+        super();
+        this.enabled=false;
+    }
 }

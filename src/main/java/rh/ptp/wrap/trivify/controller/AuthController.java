@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
+import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.*;
 import rh.ptp.wrap.trivify.service.AuthService;
 
@@ -22,7 +24,6 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         User registeredUser = authService.register(request);
         return ResponseEntity.ok().body(registeredUser);
-
     }
 
     @PostMapping("/verifyemail")
