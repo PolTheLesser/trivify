@@ -1,7 +1,6 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,6 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class VerificationToken {
     private static final int EXPIRATION = 60;
 
@@ -24,10 +22,16 @@ public class VerificationToken {
     private String token;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User user;
+    @JoinColumn(nullable = false, name = "users_id")
+    private User quizUser;
 
     private OffsetDateTime expiryDate;
+
+    public VerificationToken(String token, User user) {
+        this.quizUser = user;
+        this.token = token;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
+    }
 
     public OffsetDateTime calculateExpiryDate(int expiryTimeInMinutes) {
         return OffsetDateTime.now().plusMinutes(expiryTimeInMinutes);

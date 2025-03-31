@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -31,15 +32,15 @@ public class User {
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "users_id"))
     @Column(name = "role_name")
     private Collection<String> roles;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column
-    private LocalDateTime lastLogin;
+    private OffsetDateTime lastLogin;
 
     @Column(name = "enabled")
     private boolean enabled;
