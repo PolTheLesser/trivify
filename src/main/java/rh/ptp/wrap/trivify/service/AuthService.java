@@ -67,11 +67,25 @@ public class AuthService {
     }
 
     public void createVerificationToken(User user, String token) {
+        VerificationToken existingToken = tokenRepository.findByQuizUser(user);
+        if (existingToken != null) {
+            tokenRepository.delete(existingToken);
+        }
         VerificationToken myToken = new VerificationToken(token, user);
         tokenRepository.save(myToken);
     }
-    public VerificationToken getVerificationToken(String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
+
+    public VerificationToken getVerificationToken(String token) {
+        VerificationToken verificationToken = tokenRepository.findByToken(token);
+        if (verificationToken == null) {
+            throw new InvalidOneTimeTokenException("The provided token is invalid.");
+        }
+        return verificationToken;
+    }
+
+    public User getUserByToken(String token) {
+        VerificationToken verificationToken = getVerificationToken(token);
+        return verificationToken.getQuizUser();
     }
 
     private boolean emailExists(String email) {
@@ -80,6 +94,7 @@ public class AuthService {
     private boolean userExists(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
+
 
     /*public ResponseEntity<?> login(LoginRequest request) {
     }

@@ -37,6 +37,14 @@ public class AuthController {
         return ResponseEntity.ok().body(registeredUser);
     }
 
+    @GetMapping("/register/resendVerificationToken")
+    public ResponseEntity<?> resendVerificationToken(@RequestParam("token") String token) {
+        User registeredUser = authService.getUserByToken(token);
+        String appUrl = "http://localhost:8080/auth/register/confirm";
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(registeredUser, appUrl));
+        return ResponseEntity.ok().body(registeredUser);
+    }
+
     //TODO change and reset password
 
     /*@PostMapping("/login")
