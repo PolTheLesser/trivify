@@ -1,6 +1,7 @@
 package rh.ptp.wrap.trivify.service;
 
 import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
@@ -23,12 +24,14 @@ public class AuthService {
 
     private UserRepository userRepository;
 
-
     private TokenRepository tokenRepository;
 
-    AuthService(UserRepository userRepository, TokenRepository tokenRepository) {
+    private PasswordEncoder passwordEncoder;
+
+    AuthService(UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -43,7 +46,7 @@ public class AuthService {
         User pendingUser = new User()
                 .setUsername(request.getUsername())
                 .setEmail(request.getEmail())
-                .setPassword(request.getPassword())
+                .setPassword(passwordEncoder.encode(request.getPassword()))
                 .setRoles(Arrays.asList("ROLE_USER"))
                 .setCreatedAt(OffsetDateTime.now());
         return userRepository.save(pendingUser);

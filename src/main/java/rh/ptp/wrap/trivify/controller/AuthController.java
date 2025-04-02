@@ -37,6 +37,8 @@ public class AuthController {
         return ResponseEntity.ok().body(registeredUser);
     }
 
+    //TODO change and reset password
+
     /*@PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return authService.login(request);
