@@ -12,3 +12,15 @@ spring:
     console:
       enabled: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: webworksachenbach@gmail.com
+    password: xnet thyc pjtt yvua
+    name: Paul Achenbach
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

@@ -8,10 +8,9 @@ import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.RegisterRequest;
 import rh.ptp.wrap.trivify.service.AuthService;
 
-import javax.validation.Valid;
-
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     private final AuthService authService;
@@ -24,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         User registeredUser = authService.register(request);
         String appUrl = "http://localhost:8080/auth/register/confirm";
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(registeredUser, appUrl));
