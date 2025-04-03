@@ -1,5 +1,6 @@
 package rh.ptp.wrap.trivify.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,11 +23,11 @@ public class ExceptionController {
 
     @ExceptionHandler(InvalidOneTimeTokenException.class)
     public ResponseEntity<String> handleInvalidOneTimeToken(InvalidOneTimeTokenException e) {
-        return ResponseEntity.ok().body(e.getMessage()); //TODO Seite, die einen Button hat, welcher ein neues Token sendet; User und token werden mitgesendet? oder nur token?
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ExpiredTokenException.class)
-    public ResponseEntity<String> handleExpiredToken (ExpiredTokenException e) {
-        return ResponseEntity.ok().body(e.getMessage()); //TODO Seite, die einen Button hat, welcher ein neues Token sendet; User und token werden mitgesendet? oder nur token?
+    public ResponseEntity<String> handleExpiredToken(ExpiredTokenException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); //TODO Seite, die einen Button hat, welcher ein neues Token sendet; User und token werden mitgesendet? oder nur token?
     }
 }

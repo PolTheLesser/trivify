@@ -2,13 +2,13 @@ package rh.ptp.wrap.trivify.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import rh.ptp.wrap.trivify.model.entity.AuthenticationToken;
 import rh.ptp.wrap.trivify.model.entity.User;
-import rh.ptp.wrap.trivify.model.entity.VerificationToken;
 
 @Repository
-public interface TokenRepository extends JpaRepository<VerificationToken, Long> {
+public interface TokenRepository extends JpaRepository<AuthenticationToken, Long> {
 
-    VerificationToken findByToken(String token);
+    AuthenticationToken findByToken(String token);
 
-    VerificationToken findByQuizUser(User user);
+    AuthenticationToken findByQuizUser(User user);
 }

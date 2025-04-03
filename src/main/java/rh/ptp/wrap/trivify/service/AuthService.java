@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
 import rh.ptp.wrap.trivify.exception.ExpiredTokenException;
 import rh.ptp.wrap.trivify.exception.UsernameAlreadyExistsException;
+import rh.ptp.wrap.trivify.model.entity.AuthenticationToken;
 import rh.ptp.wrap.trivify.model.entity.User;
-import rh.ptp.wrap.trivify.model.entity.VerificationToken;
 import rh.ptp.wrap.trivify.model.request.RegisterRequest;
 import rh.ptp.wrap.trivify.repository.TokenRepository;
 import rh.ptp.wrap.trivify.repository.UserRepository;
@@ -47,45 +47,41 @@ public class AuthService {
                 .setUsername(request.getUsername())
                 .setEmail(request.getEmail())
                 .setPassword(passwordEncoder.encode(request.getPassword()))
-                .setRoles(Arrays.asList("ROLE_USER"))
+                .setRoles(Arrays.asList("ROLE_USER"))// TODO evtl rolle für not enabled
                 .setCreatedAt(OffsetDateTime.now());
         return userRepository.save(pendingUser);
     }
 
     public User confirmRegistration(String token) {
-        VerificationToken verificationToken = getVerificationToken(token);
-        if (verificationToken == null) {
+        AuthenticationToken authenticationToken = getAuthenticationToken(token);
+        if (authenticationToken == null) {
             throw new InvalidOneTimeTokenException("The provided token is invalid.");
         }
-        User user = verificationToken.getQuizUser();
+        User user = authenticationToken.getQuizUser();
         Calendar cal = Calendar.getInstance();
-        if (verificationToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
+        if (authenticationToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
             throw new ExpiredTokenException("The provided token is expired.");
         }
         user.setEnabled(true);
         return userRepository.save(user);
     }
 
-    public void createVerificationToken(User user, String token) {
-        VerificationToken existingToken = tokenRepository.findByQuizUser(user);
-        if (existingToken != null) {
-            tokenRepository.delete(existingToken);
-        }
-        VerificationToken myToken = new VerificationToken(token, user);
+    public void createAuthenticationToken(User user, String token) {
+        AuthenticationToken myToken = new AuthenticationToken(token, user);
         tokenRepository.save(myToken);
     }
 
-    public VerificationToken getVerificationToken(String token) {
-        VerificationToken verificationToken = tokenRepository.findByToken(token);
-        if (verificationToken == null) {
+    public AuthenticationToken getAuthenticationToken(String token) {
+        AuthenticationToken authenticationToken = tokenRepository.findByToken(token);
+        if (authenticationToken == null) {
             throw new InvalidOneTimeTokenException("The provided token is invalid.");
         }
-        return verificationToken;
+        return authenticationToken;
     }
 
     public User getUserByToken(String token) {
-        VerificationToken verificationToken = getVerificationToken(token);
-        return verificationToken.getQuizUser();
+        AuthenticationToken authenticationToken = getAuthenticationToken(token);
+        return authenticationToken.getQuizUser();
     }
 
     private boolean emailExists(String email) {
@@ -93,6 +89,10 @@ public class AuthService {
     }
     private boolean userExists(String username) {
         return userRepository.findByUsername(username).isPresent();
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 

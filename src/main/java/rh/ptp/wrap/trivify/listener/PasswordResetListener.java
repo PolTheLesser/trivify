@@ -10,31 +10,31 @@ import rh.ptp.wrap.trivify.service.AuthService;
 import java.util.UUID;
 
 @Component
-public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+public class PasswordResetListener implements ApplicationListener<OnPasswordResetCompleteEvent> {
 
     private final AuthService authService;
 
     private final JavaMailSender javaMailSender;
 
-    public RegistrationListener(AuthService authService, JavaMailSender javaMailSender) {
+    public PasswordResetListener(AuthService authService, JavaMailSender javaMailSender) {
         this.authService = authService;
         this.javaMailSender = javaMailSender;
     }
 
     @Override
-    public void onApplicationEvent(OnRegistrationCompleteEvent event) {
-        this.confirmRegistration(event);
+    public void onApplicationEvent(OnPasswordResetCompleteEvent event) {
+        this.confirmReset(event);
     }
 
-    private void confirmRegistration(OnRegistrationCompleteEvent event) {
+    private void confirmReset(OnPasswordResetCompleteEvent event) {
         User user = event.getUser();
         String token = UUID.randomUUID().toString();
         authService.createAuthenticationToken(user, token);
 
         String recipientAddress = user.getEmail();
-        String subject = "Registration Confirmation";
+        String subject = "Password Reset";
         String confirmationUrl = event.getAppUrl() + "?token=" + token;
-        String message = "Registration Successful";
+        String message = "Password Reset";
 
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);

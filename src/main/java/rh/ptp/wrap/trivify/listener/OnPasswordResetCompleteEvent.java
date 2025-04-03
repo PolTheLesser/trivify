@@ -7,13 +7,12 @@ import rh.ptp.wrap.trivify.model.entity.User;
 
 @Getter
 @Setter
-public class OnRegistrationCompleteEvent extends ApplicationEvent {
+public class OnPasswordResetCompleteEvent extends ApplicationEvent {
 
     private String appUrl;
     private User user;
 
-
-    public OnRegistrationCompleteEvent(
+    public OnPasswordResetCompleteEvent(
             User user, String appUrl) {
         super(user);
 
