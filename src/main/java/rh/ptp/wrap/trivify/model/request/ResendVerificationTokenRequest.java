@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VerifyEmailRequest {
-
-    String authenticationToken;
+public class ResendVerificationTokenRequest {
+    private String token;
 }

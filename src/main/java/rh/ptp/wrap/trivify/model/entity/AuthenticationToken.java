@@ -11,9 +11,9 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VerificationToken {
-    private static final int EXPIRATION = 60;
+public class AuthenticationToken {
 
+    private static final int EXPIRATION = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,7 +27,7 @@ public class VerificationToken {
 
     private OffsetDateTime expiryDate;
 
-    public VerificationToken(String token, User user) {
+    public AuthenticationToken(String token, User user) {
         this.quizUser = user;
         this.token = token;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
