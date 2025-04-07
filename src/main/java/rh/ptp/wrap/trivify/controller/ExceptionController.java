@@ -5,29 +5,47 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import rh.ptp.wrap.trivify.exception.AuthenticationException;
 import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
 import rh.ptp.wrap.trivify.exception.ExpiredTokenException;
 import rh.ptp.wrap.trivify.exception.UsernameAlreadyExistsException;
+import rh.ptp.wrap.trivify.model.response.ErrorResponse;
 
 @RestControllerAdvice
 public class ExceptionController {
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
-        return ResponseEntity.ok().body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
+        ErrorResponse error = new ErrorResponse("EMAIL_EXISTS", e.getMessage(), HttpStatus.CONFLICT.value());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<String> handleUsernameAlreadyExists(UsernameAlreadyExistsException e) {
-        return ResponseEntity.ok().body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UsernameAlreadyExistsException e) {
+        ErrorResponse error = new ErrorResponse("USERNAME_EXISTS", e.getMessage(), HttpStatus.CONFLICT.value());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(InvalidOneTimeTokenException.class)
-    public ResponseEntity<String> handleInvalidOneTimeToken(InvalidOneTimeTokenException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleInvalidOneTimeToken(InvalidOneTimeTokenException e) {
+        ErrorResponse error = new ErrorResponse("INVALID_TOKEN", e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ExpiredTokenException.class)
-    public ResponseEntity<String> handleExpiredToken(ExpiredTokenException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()); //TODO Seite, die einen Button hat, welcher ein neues Token sendet; User und token werden mitgesendet? oder nur token?
+    public ResponseEntity<ErrorResponse> handleExpiredToken(ExpiredTokenException e) {
+        ErrorResponse error = new ErrorResponse("EXPIRED_TOKEN", e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException e) {
+        ErrorResponse error = new ErrorResponse("AUTHENTICATION_FAILED", e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAll(Exception e) {
+        ErrorResponse error = new ErrorResponse("INTERNAL_ERROR", "Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

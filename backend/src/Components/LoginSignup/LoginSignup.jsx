@@ -33,7 +33,7 @@ const LoginSignup = () => {
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(registerRequest)
             })
-        } else if (hasSubmitted.current && action === "Sign Up"){
+        } else if (hasSubmitted.current && action === "Login"){
             console.log("fecthing login api")
             const loginRequest = {username,password}
             fetch("http://localhost:8080/auth/login", {
@@ -61,7 +61,7 @@ const LoginSignup = () => {
             </div>
 
             <form className="inputs" onSubmit={handleSubmit}>
-                {action === "Login" ? <div></div> : <div className="input">
+                <div className="input">
                     <img src={user_icon} alt=""/>
                     <input
                         type="text"
@@ -69,16 +69,17 @@ const LoginSignup = () => {
                         placeholder="Username"
                         onChange={(e) => setUsername(e.target.value)}
                     />
-                </div>}
+                </div>
 
-                <div className="input">
+                {action === "Sign Up" ? <div className="input">
                     <img src={email_icon} alt=""/>
                     <input
                         type="email"
                         value={email}
                         placeholder="Email"
                         onChange={(e) => setEmail(e.target.value)}/>
-                </div>
+                </div> : <div></div>}
+
                 <div className="input">
                     <img src={password_icon} alt=""/>
                     <input

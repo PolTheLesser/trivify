@@ -5,13 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.wrap.trivify.listener.OnPasswordResetCompleteEvent;
 import rh.ptp.wrap.trivify.listener.OnRegistrationCompleteEvent;
-import rh.ptp.wrap.trivify.listener.PasswordResetListener;
 import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.ForgotPasswordRequest;
 import rh.ptp.wrap.trivify.model.request.LoginRequest;
 import rh.ptp.wrap.trivify.model.request.RegisterRequest;
 import rh.ptp.wrap.trivify.model.request.ResendVerificationTokenRequest;
+import rh.ptp.wrap.trivify.model.response.AuthResponse;
 import rh.ptp.wrap.trivify.service.AuthService;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -51,7 +53,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
-
+        AuthResponse authResponse = authService.login(request);
+        return ResponseEntity.ok().body(authResponse);
     }
 
     @PostMapping("/login/forgotPassword")
@@ -62,18 +65,13 @@ public class AuthController {
         return ResponseEntity.ok().body(forgotPasswordUser);
     }
 
-    @GetMapping("/login/changeForgotPassword")
+    //@GetMapping("/login/changeForgotPassword")
     //TODO die Methode validiert das token; sofern validiert, so wird der user weitergeleitet um ein neues passwort zu erstellen
 
-    @PostMapping("/login/savePassword")
+    //@PostMapping("/login/savePassword")
     //TODO neues Passwort wird entgegengenommen und gespeichert
 
-
-
-    /*@PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        return authService.login(request);
-    }
+    /*
 
     @PostMapping("/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {

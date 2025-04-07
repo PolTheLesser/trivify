@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AuthenticationToken {
+public class EmailAuthenticationToken {
 
     private static final int EXPIRATION = 60;
 
@@ -27,7 +27,7 @@ public class AuthenticationToken {
 
     private OffsetDateTime expiryDate;
 
-    public AuthenticationToken(String token, User user) {
+    public EmailAuthenticationToken(String token, User user) {
         this.quizUser = user;
         this.token = token;
         this.expiryDate = calculateExpiryDate(EXPIRATION);
