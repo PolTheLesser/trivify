@@ -2,6 +2,7 @@ package rh.ptp.wrap.trivify.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,18 +31,15 @@ public class JwtService {
         }
     }
 
-    public AuthResponse generateToken(String username) {
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        String token = Jwts.builder()
-                .claims()
-                .add(claims)
+        return Jwts.builder()
+                .claims(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_ONE_HOUR))
-                .and()
-                .signWith(getKey())
+                .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
-        return new AuthResponse(token);
     }
 
     private SecretKey getKey() {

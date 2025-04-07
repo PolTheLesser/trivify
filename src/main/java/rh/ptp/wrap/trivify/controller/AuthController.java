@@ -34,7 +34,7 @@ public class AuthController {
         User registeredUser = authService.register(request);
         String appUrl = "http://localhost:8080/auth/register/confirm";
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(registeredUser, appUrl));
-        return ResponseEntity.ok().body(registeredUser);
+        return ResponseEntity.ok().body(registeredUser); // TODO nachdem die request erfolgreich returned wurde, so muss der user auf die seite weitergeleitet werden, auf der er den 6mdigit code eingeben kann (muss er das wirklich?)
     }
 
     @GetMapping("/register/confirm")
@@ -45,7 +45,7 @@ public class AuthController {
 
     @PostMapping("/register/resendVerificationToken")
     public ResponseEntity<?> resendVerificationToken(@RequestBody @Valid ResendVerificationTokenRequest request) {
-        User registeredUser = authService.getUserByToken(request.getToken());
+        User registeredUser = authService.getUserByEmail(request.getEmail());
         String appUrl = "http://localhost:8080/auth/register/confirm";
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(registeredUser, appUrl));
         return ResponseEntity.ok().body(registeredUser);

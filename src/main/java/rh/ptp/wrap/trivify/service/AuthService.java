@@ -22,11 +22,18 @@ import rh.ptp.wrap.trivify.repository.UserRepository;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.logging.Logger;
 
 @Service
 @Transactional
 public class AuthService {
+
+    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     private UserRepository userRepository;
 
@@ -76,7 +83,8 @@ public class AuthService {
         if (!authentication.isAuthenticated()) {
             throw  new AuthenticationException("User could not be authenticated.");
         }
-        return jwtService.generateToken(request.getUsername());
+        String token = jwtService.generateToken(request.getUsername());
+        return new AuthResponse(token);
     }
 
     public void createAuthenticationToken(User user, String token) {
@@ -101,7 +109,7 @@ public class AuthService {
         return userRepository.findByEmail(email) != null;
     }
     private boolean userExists(String username) {
-        return userRepository.findByUsername(username).isPresent();
+        return userRepository.findByUsername(username) != null;
     }
 
     public User getUserByEmail(String email) {

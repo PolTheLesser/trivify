@@ -43,9 +43,9 @@ public class ExceptionController {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(Exception.class)
+    /*@ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception e) {
         ErrorResponse error = new ErrorResponse("INTERNAL_ERROR", "Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    }*/
 }
