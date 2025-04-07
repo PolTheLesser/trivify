@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ott.InvalidOneTimeTokenException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import rh.ptp.wrap.trivify.exception.AuthenticationException;
-import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
-import rh.ptp.wrap.trivify.exception.ExpiredTokenException;
-import rh.ptp.wrap.trivify.exception.UsernameAlreadyExistsException;
+import rh.ptp.wrap.trivify.exception.*;
 import rh.ptp.wrap.trivify.model.response.ErrorResponse;
 
 @RestControllerAdvice
@@ -43,9 +40,9 @@ public class ExceptionController {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    /*@ExceptionHandler(Exception.class)
+    @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception e) {
-        ErrorResponse error = new ErrorResponse("INTERNAL_ERROR", "Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
+        ErrorResponse error = new ErrorResponse("INVALID_CREDENTIALS", e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
 }

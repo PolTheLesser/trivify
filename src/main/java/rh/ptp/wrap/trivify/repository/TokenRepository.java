@@ -11,4 +11,6 @@ public interface TokenRepository extends JpaRepository<EmailAuthenticationToken,
     EmailAuthenticationToken findByToken(String token);
 
     EmailAuthenticationToken findByQuizUser(User user);
+
+    boolean existsByQuizUser(User user);
 }

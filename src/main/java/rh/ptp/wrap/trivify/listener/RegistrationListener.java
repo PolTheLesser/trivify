@@ -40,7 +40,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         String confirmationUrl = event.getAppUrl() + "?token=" + token;
 
         // Example of inserting the code into the HTML template
-        String emailContent = buildHtmlEmail(token, confirmationUrl);
+        String emailContent = buildHtmlEmail(confirmationUrl);
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -57,25 +57,24 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
             e.printStackTrace();
         }
     }
-    private String buildHtmlEmail(String otpCode, String link) {
+    private String buildHtmlEmail(String link) {
         return """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head><meta charset="UTF-8"></head>
-    <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
-        <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
-            <h2 style="color: #3c009d;">Verify Your Email</h2>
-            <p>Thanks for signing up! Use the code below to complete your registration:</p>
-            <div style="margin: 20px 0; font-size: 32px; font-weight: bold; color: #3c009d;">"""
-                + otpCode + """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head><meta charset="UTF-8"></head>
+        <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                <h2 style="color: #3c009d;">Verify Your Email</h2>
+                <p>Thank you for signing up! Please click the button below to complete your registration:</p>
+                <a href='"""
+                    + link + """
+                ' style="display: inline-block; margin-top: 10px; padding: 12px 24px; background: #4c00b4; color: #fff; text-decoration: none; border-radius: 8px; text-align: center;">Confirm Email</a>
+                <p style="margin-top: 15px; font-size: 14px; color: #888;">If the button above doesn't work, please <a href='"""
+                    + link + """
+            ' style="color: #4c00b4; text-decoration: none;">click here</a>.</p>
             </div>
-            <p>Or click the link to confirm:</p>
-            <a href='"""
-                + link + """
-        ' style="display: inline-block; margin-top: 10px; padding: 12px 24px; background: #4c00b4; color: #fff; text-decoration: none; border-radius: 8px;">Confirm Email</a>
-        </div>
-    </body>
-    </html>
-    """;
+        </body>
+        </html>
+        """;
     }
 }

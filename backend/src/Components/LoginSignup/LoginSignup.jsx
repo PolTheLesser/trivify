@@ -36,11 +36,33 @@ const LoginSignup = () => {
         } else if (hasSubmitted.current && action === "Login"){
             console.log("fecthing login api")
             const loginRequest = {username,password}
+
+            console.log("Sending loginRequest:", loginRequest);
+
             fetch("http://localhost:8080/auth/login", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(loginRequest)
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
             })
+                .then(async res => {
+                    if (!res.ok) {
+                        const errorText = await res.text();
+                        throw new Error("Server error: " + errorText);
+                    }
+
+                    const contentType = res.headers.get("Content-Type");
+                    if (contentType && contentType.includes("application/json")) {
+                        return res.json();
+                    } else {
+                        throw new Error("Unexpected response content type or empty body");
+                    }
+                })
+                .then(data => {
+                    console.log("Login response:", data);
+                })
+                .catch(err => {
+                    console.error("Login error:", err.message);
+                });
         }
     }
 

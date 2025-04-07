@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.OffsetDateTime;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class EmailAuthenticationToken {
 
@@ -36,4 +38,6 @@ public class EmailAuthenticationToken {
     public OffsetDateTime calculateExpiryDate(int expiryTimeInMinutes) {
         return OffsetDateTime.now().plusMinutes(expiryTimeInMinutes);
     }
+
+
 }
