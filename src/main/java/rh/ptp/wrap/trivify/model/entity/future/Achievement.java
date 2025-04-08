@@ -1,4 +1,4 @@
-package rh.ptp.wrap.trivify.model.entity;
+/*package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,3 +27,4 @@ public class Achievement {
     @OneToMany(mappedBy = "achievement", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAchievement> unlockedByUsers = new HashSet<>();
 }
+*/
