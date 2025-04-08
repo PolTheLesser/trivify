@@ -1,4 +1,4 @@
-package rh.ptp.wrap.trivify.model.entity;
+package rh.ptp.wrap.trivify.model.entity.old;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -3,50 +3,52 @@ package rh.ptp.wrap.trivify.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Collection;
-
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-@Accessors(chain = true)
 public class User {
-
     @Id
-    private String username;
-
-    @Column
-    private String firstName;
-
-    @Column
-    private String lastName;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "users_id"))
-    @Column(name = "role_name")
-    private Collection<String> roles;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Column(nullable = false)
+    private String displayName;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String profilePictureUrl;
+
     private OffsetDateTime createdAt;
 
-    @Column
     private OffsetDateTime lastLogin;
 
-    @Column(name = "enabled")
-    private boolean enabled;
+    private boolean isEnabled;
 
-    public User() {
-        super();
-        this.enabled=false;
-    }
+    private String phoneNumber;
+
+    private LocalDate dateOfBirth;
+
+    private Language preferredLanguage;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserAchievement> unlockedAchievements = new HashSet<>();
+
+
 }
