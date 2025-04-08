@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rh.ptp.wrap.trivify.model.entity.old.User;
+import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.repository.UserRepository;
 
 import java.util.ArrayList;
