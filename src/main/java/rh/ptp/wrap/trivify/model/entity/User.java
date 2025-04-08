@@ -43,7 +43,7 @@ public class User {
     private OffsetDateTime lastLogin;
 
     @Column(name = "enabled")
-    private boolean enabled;
+    private boolean enabled; // TODO temporären user, der noch nicht enabled ist in anderer db speichern und nach ablauf des tokens löschen
 
     public User() {
         super();

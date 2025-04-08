@@ -38,6 +38,4 @@ public class EmailAuthenticationToken {
     public OffsetDateTime calculateExpiryDate(int expiryTimeInMinutes) {
         return OffsetDateTime.now().plusMinutes(expiryTimeInMinutes);
     }
-
-
 }

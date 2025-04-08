@@ -26,7 +26,7 @@ const LoginSignup = () => {
         }
 
         if (hasSubmitted.current && action === "Sign Up") {
-            console.log("fecthing register api")
+            console.log("fetching register api")
             const registerRequest = {username,email,password,matchingPassword}
             fetch("http://localhost:8080/auth/register", {
                 method: "POST",
