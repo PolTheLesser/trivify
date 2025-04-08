@@ -1,13 +1,13 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "answers")
-@Getter
-@Setter
+@Data
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

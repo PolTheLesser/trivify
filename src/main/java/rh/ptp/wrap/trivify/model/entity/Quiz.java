@@ -1,6 +1,7 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "quiz")
-@Getter
-@Setter
+@Data
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,5 +40,10 @@ public class Quiz {
     private int timeToComplete;
 
     // TODO rating?
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = OffsetDateTime.now();
+    }
 
 }

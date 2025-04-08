@@ -1,18 +1,17 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
+@Accessors(chain = true)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +25,11 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "users_id"))
+    @Column(name = "role_name")
+    private Collection<String> roles;
 
     private String displayName;
 
@@ -45,10 +49,14 @@ public class User {
 
     private LocalDate dateOfBirth;
 
+    @Enumerated(EnumType.STRING)
     private Language preferredLanguage;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserAchievement> unlockedAchievements = new HashSet<>();
+    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private Set<UserAchievement> unlockedAchievements = new HashSet<>();
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = OffsetDateTime.now();
+    }
 }

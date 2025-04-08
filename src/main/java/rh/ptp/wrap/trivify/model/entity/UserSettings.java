@@ -1,21 +1,21 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "user_settings")
-@Getter
-@Setter
+@Data
 public class UserSettings {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private PrivacyLevel receiveFriendRequestsFrom;
+    //private PrivacyLevel receiveFriendRequestsFrom;
 
-    private PrivacyLevel receiveMessagesFrom;
+    //private PrivacyLevel receiveMessagesFrom;
 
     private ColorScheme colorScheme;
 

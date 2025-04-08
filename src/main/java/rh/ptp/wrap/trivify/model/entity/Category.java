@@ -1,6 +1,7 @@
 package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "categories")
-@Getter
-@Setter
+@Data
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
