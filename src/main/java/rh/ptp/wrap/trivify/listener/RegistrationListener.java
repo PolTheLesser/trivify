@@ -3,15 +3,12 @@ package rh.ptp.wrap.trivify.listener;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.context.ApplicationListener;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import rh.ptp.wrap.trivify.model.entity.User;
+import rh.ptp.wrap.trivify.model.entity.old.User;
 import rh.ptp.wrap.trivify.service.AuthService;
 import rh.ptp.wrap.trivify.service.OtpGenerator;
-
-import java.util.UUID;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
