@@ -6,9 +6,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import rh.ptp.wrap.trivify.model.entity.old.User;
+import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.service.AuthService;
-import rh.ptp.wrap.trivify.service.OtpGenerator;
+
+import java.util.UUID;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
@@ -29,7 +30,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         User user = event.getUser();
-        String token = OtpGenerator.generate6DigitCode();
+        String token = UUID.randomUUID().toString();
         authService.createAuthenticationToken(user, token);
 
         String recipientAddress = user.getEmail();

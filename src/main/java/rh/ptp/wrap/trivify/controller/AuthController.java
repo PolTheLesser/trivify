@@ -3,9 +3,9 @@ package rh.ptp.wrap.trivify.controller;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rh.ptp.wrap.trivify.listener.OnPasswordResetCompleteEvent;
+import rh.ptp.wrap.trivify.listener.OnPasswordResetEvent;
 import rh.ptp.wrap.trivify.listener.OnRegistrationCompleteEvent;
-import rh.ptp.wrap.trivify.model.entity.old.User;
+import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.ForgotPasswordRequest;
 import rh.ptp.wrap.trivify.model.request.LoginRequest;
 import rh.ptp.wrap.trivify.model.request.RegisterRequest;
@@ -61,7 +61,7 @@ public class AuthController {
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         User forgotPasswordUser = authService.getUserByEmail(request.getEmail());
         String appUrl = "http://localhost:8080/auth/login/changeForgotPassword";
-        applicationEventPublisher.publishEvent(new OnPasswordResetCompleteEvent(forgotPasswordUser, appUrl));
+        applicationEventPublisher.publishEvent(new OnPasswordResetEvent(forgotPasswordUser, appUrl));
         return ResponseEntity.ok().body(forgotPasswordUser);
     }
 

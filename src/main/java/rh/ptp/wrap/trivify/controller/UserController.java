@@ -1,4 +1,4 @@
-package rh.ptp.wrap.trivify.controller;
+/*package rh.ptp.wrap.trivify.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,3 +14,4 @@ public class UserController {
 
     }
 }
+*/

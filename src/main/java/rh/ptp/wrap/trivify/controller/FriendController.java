@@ -1,4 +1,5 @@
-package rh.ptp.wrap.trivify.controller;
+/*package rh.ptp.wrap.trivify.controller;
 
 public class FriendController {
 }
+*/
