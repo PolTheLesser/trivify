@@ -13,16 +13,14 @@ spring:
       enabled: true
 
   mail:
-    host: mail.gmx.net
+    host: smtp.gmail.com
     port: 587
-    username: quiz_rh@gmx.de
-    password: deinPasswort
-    from: Trivify
-
+    username: webworksachenbach@gmail.com
+    password: xnet thyc pjtt yvua
+    name: Paul Achenbach
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-        debug: true

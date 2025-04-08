@@ -13,7 +13,7 @@ import static java.lang.annotation.ElementType.TYPE;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({TYPE,ANNOTATION_TYPE})
-@Constraint(validatedBy = PasswordMatchesValidator.class)
+@Constraint(validatedBy = PasswordMatchesValidator.class) //TODO not working properly yet, needs fixing
 public @interface PasswordMatches {
     String message() default "Passwords don't match";
     Class<?>[] groups() default {};

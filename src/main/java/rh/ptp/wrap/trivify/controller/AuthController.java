@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         User registeredUser = authService.register(request);
         String appUrl = "http://localhost:8080/auth/register/confirm";
         applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(registeredUser, appUrl));
