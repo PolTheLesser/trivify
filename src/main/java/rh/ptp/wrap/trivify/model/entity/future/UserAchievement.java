@@ -1,4 +1,4 @@
-package rh.ptp.wrap.trivify.model.entity;
+/*package rh.ptp.wrap.trivify.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,3 +25,4 @@ public class UserAchievement {
 
     private OffsetDateTime unlockedAt;
 }
+*/

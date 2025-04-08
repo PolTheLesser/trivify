@@ -1,4 +1,4 @@
-package rh.ptp.wrap.trivify.model.entity.future;
+/*package rh.ptp.wrap.trivify.model.entity.future;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,3 +27,4 @@ public class UserFriends {
 
     private OffsetDateTime updatedAt;
 }
+*/
