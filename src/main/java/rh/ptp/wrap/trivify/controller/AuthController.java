@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import rh.ptp.wrap.trivify.listener.OnPasswordResetEvent;
 import rh.ptp.wrap.trivify.listener.OnRegistrationCompleteEvent;
 import rh.ptp.wrap.trivify.model.entity.User;
-import rh.ptp.wrap.trivify.model.request.ForgotPasswordRequest;
-import rh.ptp.wrap.trivify.model.request.LoginRequest;
-import rh.ptp.wrap.trivify.model.request.RegisterRequest;
-import rh.ptp.wrap.trivify.model.request.ResendVerificationTokenRequest;
+import rh.ptp.wrap.trivify.model.request.*;
 import rh.ptp.wrap.trivify.model.response.AuthResponse;
+import rh.ptp.wrap.trivify.model.response.MessageResponse;
 import rh.ptp.wrap.trivify.service.AuthService;
 
 import javax.validation.Valid;
@@ -53,32 +51,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
-        AuthResponse authResponse = authService.login(request);
+        AuthResponse authResponse = new AuthResponse(authService.login(request));
         return ResponseEntity.ok().body(authResponse);
     }
 
-    @PostMapping("/login/forgotPassword")
+    @PostMapping("/forgotPassword") // kann auch in den Einstellungen benutzt werden, die email muss nur imtgesendet werden
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
-        User forgotPasswordUser = authService.getUserByEmail(request.getEmail());
-        String appUrl = "http://localhost:8080/auth/login/changeForgotPassword";
-        applicationEventPublisher.publishEvent(new OnPasswordResetEvent(forgotPasswordUser, appUrl));
-        return ResponseEntity.ok().body(forgotPasswordUser);
+        if (authService.userExistsByEmail(request.getEmail())) {
+            User forgotPasswordUser = authService.getUserByEmail(request.getEmail());
+            String appUrl = "http://localhost:8080/auth/login/changeForgotPassword";
+            applicationEventPublisher.publishEvent(new OnPasswordResetEvent(forgotPasswordUser, appUrl));
+        }
+        return ResponseEntity.ok().body(new MessageResponse("If a user with the email exists, a password reset link has been sent."));
     }
 
-    //@GetMapping("/login/changeForgotPassword")
-    //TODO die Methode validiert das token; sofern validiert, so wird der user weitergeleitet um ein neues passwort zu erstellen
 
-    //@PostMapping("/login/savePassword")
-    //TODO neues Passwort wird entgegengenommen und gespeichert
-
-    /*
-
-    @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        return authService.forgotPassword(request);
+    @PostMapping("/login/savePassword")
+    public ResponseEntity<?> savePassword(@RequestBody @Valid ResetPasswordRequest request, @RequestParam("token") String token) {
+        authService.saveNewPassword(request, token);
+        return ResponseEntity.ok().body(new MessageResponse("Password changed successfully"));
     }
 
-    @PostMapping("/resetPassword")
+    /*@PostMapping("/resetPassword")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
     }*/

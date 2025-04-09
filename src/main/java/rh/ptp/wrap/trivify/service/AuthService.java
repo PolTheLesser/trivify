@@ -7,14 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rh.ptp.wrap.trivify.exception.AuthenticationException;
-import rh.ptp.wrap.trivify.exception.EmailAlreadyExistsException;
-import rh.ptp.wrap.trivify.exception.ExpiredTokenException;
-import rh.ptp.wrap.trivify.exception.UsernameAlreadyExistsException;
+import rh.ptp.wrap.trivify.exception.*;
 import rh.ptp.wrap.trivify.model.entity.EmailAuthenticationToken;
 import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.model.request.LoginRequest;
 import rh.ptp.wrap.trivify.model.request.RegisterRequest;
+import rh.ptp.wrap.trivify.model.request.ResetPasswordRequest;
 import rh.ptp.wrap.trivify.model.response.AuthResponse;
 import rh.ptp.wrap.trivify.repository.TokenRepository;
 import rh.ptp.wrap.trivify.repository.UserRepository;
@@ -69,7 +67,6 @@ public class AuthService {
             throw new InvalidOneTimeTokenException("The provided token is invalid.");
         }
         User user = emailAuthenticationToken.getQuizUser();
-        Calendar cal = Calendar.getInstance();
         if (emailAuthenticationToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
             throw new ExpiredTokenException("The provided token is expired.");
         }
@@ -77,17 +74,39 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        if (!authentication.isAuthenticated()) {
-            throw  new AuthenticationException("User could not be authenticated.");
+    public String login(LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            if (!authentication.isAuthenticated()) {
+                throw new AuthenticationException("User could not be authenticated.");
+            }
+            String token = jwtService.generateToken(request.getUsername());
+            return token;
+        } catch (Exception e) {
+            throw new InvalidCredentialsException("Invalid credentials.");
         }
-        String token = jwtService.generateToken(request.getUsername());
-        return new AuthResponse(token);
+    }
+
+    public void saveNewPassword(ResetPasswordRequest request, String token) {
+
+        User user = getUserByResetToken(token);
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid or expired reset token.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        user.setPassword(encodedPassword);
+
+        userRepository.save(user);
     }
 
     public void createAuthenticationToken(User user, String token) {
+        EmailAuthenticationToken existingToken = tokenRepository.findByQuizUser(user);
+        if (existingToken != null) {
+            tokenRepository.delete(existingToken);
+        }
         EmailAuthenticationToken myToken = new EmailAuthenticationToken(token, user);
         tokenRepository.save(myToken);
     }
@@ -114,6 +133,19 @@ public class AuthService {
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    private boolean userExistsByUsername(String username) {
+        return userRepository.findByUsername(username) != null;
+    }
+
+    public boolean userExistsByEmail(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
+
+    private User getUserByResetToken(String token) {
+        EmailAuthenticationToken resetToken = tokenRepository.findByToken(token);
+        return resetToken != null ? resetToken.getQuizUser() : null;
     }
 
 
