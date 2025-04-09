@@ -56,7 +56,7 @@ public class AuthService {
                 .setUsername(request.getUsername())
                 .setEmail(request.getEmail())
                 .setPassword(passwordEncoder.encode(request.getPassword()))
-                .setRoles(Arrays.asList("ROLE_USER"))// TODO evtl rolle für not enabled
+                .setRoles(Arrays.asList("USER"))
                 .setCreatedAt(OffsetDateTime.now());
         return userRepository.save(pendingUser);
     }
@@ -147,14 +147,4 @@ public class AuthService {
         EmailAuthenticationToken resetToken = tokenRepository.findByToken(token);
         return resetToken != null ? resetToken.getQuizUser() : null;
     }
-
-
-    /*public  login(LoginRequest request) {
-    }
-
-    public ResponseEntity<?> forgotPassword(ForgotPasswordRequest request) {
-    }
-
-    public ResponseEntity<?> resetPassword(ResetPasswordRequest request) {
-    }*/
 }

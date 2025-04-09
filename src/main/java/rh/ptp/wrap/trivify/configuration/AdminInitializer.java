@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import rh.ptp.wrap.trivify.model.entity.User;
 import rh.ptp.wrap.trivify.repository.UserRepository;
 
+import java.util.Arrays;
+
 @Component
 public class AdminInitializer implements CommandLineRunner {
 
@@ -23,6 +25,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .setUsername("Admin")
                     .setEmail("quiz_rh@gmx.de")
                     .setPassword(passwordEncoder.encode("admin123"))
+                    .setRoles(Arrays.asList("ADMIN"))
                     .setEnabled(true);
             userRepository.save(admin);
         }
