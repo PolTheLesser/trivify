@@ -155,7 +155,7 @@ const Welcome = () => {
                                                     <li key={i}>
                                                         <a href={`/quizzes/${q.id}`} style={{ color: '#90caf9' }}>
                                                             {q.title}
-                                                        </a> – {q.score} Punkte
+                                                        </a> – {q.score} {q.score === 1 ? 'Punkt' : 'Punkte'}
                                                     </li>
                                                 ))}
                                             </ul>

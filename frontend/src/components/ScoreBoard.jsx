@@ -17,7 +17,7 @@ const ScoreBoard = ({ userId }) => {
             <ol className="list-decimal list-inside space-y-1">
                 {topScores.map((entry, index) => (
                     <li key={index}>
-                        <span className="font-medium">{entry.username}</span>: {entry.score} Punkte
+                        <span className="font-medium">{entry.username}</span>: {entry.score} {entry.score === 1 ? 'Punkt' : 'Punkte'}
                     </li>
                 ))}
             </ol>
@@ -26,7 +26,7 @@ const ScoreBoard = ({ userId }) => {
                 <div className="mt-6 bg-blue-50 p-3 rounded border border-blue-200" color="text.secondary" align="center">
                     {myScore.rank !== -1 ? (
                         <>
-                            <strong>Dein Score:</strong> {myScore.score} Punkte. Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
+                            <strong>Dein Score:</strong> {myScore.score} {myScore.score === 1 ? 'Punkt' : 'Punkte'}. Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
                             <br />
                             <p>Mehrfache Quiz-Teilnahmen & Teilnahmen an eigenen Quizzen werden nicht gezählt!</p>
                         </>
