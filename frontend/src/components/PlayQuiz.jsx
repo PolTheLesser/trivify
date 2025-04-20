@@ -162,7 +162,7 @@ const PlayQuiz = () => {
               Quiz beendet!
             </Typography>
             <Typography variant="h5" gutterBottom>
-              Dein Ergebnis: {score} von {quiz.questions.length} Punkten
+              Dein Ergebnis: {score} von {quiz.questions.length} {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
             </Typography>
             <Typography variant="body1" gutterBottom>
               Prozent: {((score / quiz.questions.length) * 100).toFixed(1)}%
