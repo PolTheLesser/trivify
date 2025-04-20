@@ -1,0 +1,59 @@
+# Anwendung
+spring:
+  application:
+    name: quizapp
+  datasource:
+    url: jdbc:postgresql://localhost:5432/quizapp
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    format_sql: true
+    hibernate:
+      ddl-auto: update
+  mail:
+    host: mail.gmx.net
+    port: 587
+    username: quiz_rh@gmx.de
+    password: F~}rL%xSYiux=3H
+    from: quiz_rh@gmx.de
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
+  thymeleaf:
+    cache: false
+  security:
+    filter:
+      order: 10
+
+# Server
+server:
+  port: 9090
+
+# Proxy
+http:
+  proxyHost: 127.0.0.1
+  proxyPort: 3128
+
+# Application Secrets
+app:
+  jwt-secret: YourSuperSecretKey123!@#
+  jwt-expiration-in-ms: 86400000
+recaptcha.secret-key: 6Lfl_SsaAAAAACAe2Ip7xMvZpYrXdemCNGLxUPwM
+recaptcha.site-key: 6Lfl_SsaAAAAALfv0EykvRPBTEkpHQdHDXt7-zEw
+frontend.url: http://localhost:3000
+
+# Logging
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+    rh:
+      ptp:
+        quizapp: DEBUG 
