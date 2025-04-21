@@ -3,9 +3,9 @@ spring:
   application:
     name: quizapp
   datasource:
-    url: jdbc:postgresql://localhost:5432/quizapp
-    username: sa
-    password: password
+    url: jdbc:postgresql://quizapp-db:5432/quizapp
+    username: quizuser
+    password: quizpass
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -35,11 +35,6 @@ spring:
 server:
   port: 9090
 
-# Proxy
-http:
-  proxyHost: 127.0.0.1
-  proxyPort: 3128
-
 # Application Secrets
 app:
   jwt-secret: YourSuperSecretKey123!@#
@@ -53,7 +48,7 @@ logging:
   level:
     org:
       springframework:
-        security: DEBUG
+        security: WARN
     rh:
       ptp:
-        quizapp: DEBUG 
+        quizapp: INFO
