@@ -86,23 +86,22 @@ const DailyQuiz = () => {
                 setCurrentQuestionIndex(prev => prev + 1);
                 setSelectedAnswer('');
             } else {
-                const finalScore = score + (isCorrect ? 1 : 0); // ⬅️ letzter Punkt wird direkt dazugerechnet
+                const finalScore = score + (isCorrect ? 1 : 0); // letzter Punkt wird direkt dazugerechnet
 
                 setCompleted(true);
-
-                await axios.post(process.env.REACT_APP_API_URL + '/users/daily-quiz/completed');
 
                 const userId = user?.id;
                 const quizId = quiz?.id;
                 const maxPossibleScore = quiz?.questions?.length;
-
-                await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
-                    userId,
-                    quizId,
-                    score: finalScore,
-                    maxPossibleScore
-                });
-
+                if(user) {
+                    await axios.post(process.env.REACT_APP_API_URL + '/users/daily-quiz/completed');
+                    await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
+                        userId,
+                        quizId,
+                        score: finalScore,
+                        maxPossibleScore
+                    });
+                }
                 console.log('Tägliches Quiz abgeschlossen & Score gespeichert');
             }
         } catch (err) {
