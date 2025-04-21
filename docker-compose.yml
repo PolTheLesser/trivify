@@ -26,6 +26,7 @@ services:
       - "9090:9090"
     environment:
       - TZ=Europe/Berlin
+      - JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin
       - SPRING_DATASOURCE_URL=jdbc:postgresql://quizapp-db:5432/quizapp
       - SPRING_DATASOURCE_USERNAME=quizuser
       - SPRING_DATASOURCE_PASSWORD=quizpass
