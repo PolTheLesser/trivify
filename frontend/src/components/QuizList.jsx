@@ -158,7 +158,7 @@ const QuizList = () => {
             );
             setFilteredQuizzes(filtered);
         } catch (error) {
-            console.error(err.response?.data?.message || 'Fehler beim Favorisieren:', error);
+            console.error(error.response?.data?.message || 'Fehler beim Favorisieren:', error);
         }
     };
 
