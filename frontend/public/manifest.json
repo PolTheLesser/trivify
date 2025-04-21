@@ -1,6 +1,6 @@
 {
-  "short_name": "Quiz-App",
-  "name": "Quiz-App - Testen Sie Ihr Wissen!",
+  "short_name": "Trivify",
+  "name": "Trivify - Testen Sie Ihr Wissen!",
   "icons": [
     {
       "src": "favicon.ico",
