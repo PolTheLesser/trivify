@@ -1,6 +1,8 @@
-# Beispiel für Dockerfile (frontend)
 FROM node:20 AS build
-
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package*.json ./

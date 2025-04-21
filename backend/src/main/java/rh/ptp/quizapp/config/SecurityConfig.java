@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,12 +18,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import rh.ptp.quizapp.security.JwtAuthenticationFilter;
 import rh.ptp.quizapp.service.CustomUserDetailsService;
 
@@ -47,19 +50,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/verify-email/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/api/quizzes/daily").permitAll()
+                        .requestMatchers("/api/quizzes", "/api/quizzes/my-quizzes", "/api/quizzes/daily").permitAll()
                         .requestMatchers("/api/{id}/submit").permitAll()
                         .requestMatchers("/auth/**", "/error").permitAll()
-                        .requestMatchers("/api/quizzes").permitAll()
-                        .requestMatchers("/api/quizzes/my-quizzes").authenticated()
                         .requestMatchers("/api/quizzes/{id}").permitAll()
                         .requestMatchers("/api/quizzes/{id}/submit").permitAll()
                         .requestMatchers("/api/quizzes/{id}/rate").permitAll()
-                        .requestMatchers("/api/daily").permitAll()
-                        .requestMatchers("/api/daily/**").permitAll()
+                        .requestMatchers("/api/daily", "/api/daily/**").permitAll()
                         .requestMatchers("/api/{id}").permitAll()
                         .requestMatchers("/api/quiz-results/scores/top").permitAll()
                         .anyRequest().authenticated()

@@ -1,7 +1,6 @@
-version: "3.8"
-
+version: "3.9"
 services:
-  postgres:
+  quizapp-db:
     image: postgres:latest
     restart: always
     container_name: quizapp-db
@@ -9,12 +8,18 @@ services:
       POSTGRES_DB: quizapp
       POSTGRES_USER: quizuser
       POSTGRES_PASSWORD: quizpass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quizuser -d quizapp"]  # Prüft DB-Verfügbarkeit
+      interval: 10s         # alle 10s prüfen
+      timeout: 5s           # jeder Check höchstens 5s warten
+      retries: 5            # nach 5 Fehlversuchen als "unhealthy" markieren
+      start_period: 30s     # 30s Aufwärmzeit geben, bevor Checks als Fehlversuch zählen
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  backend:
+  quizapp-backend:
     image: lesommer2019/quizapp-backend:latest
     container_name: quizapp-backend
     ports:
@@ -25,29 +30,25 @@ services:
       - SPRING_DATASOURCE_PASSWORD=quizpass
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
-      - REACT_APP_API_URL=http://quizapp-backend:9090/api
-      - VITE_API_URL=http://quizapp-backend:9090/api
-    depends_on:
-      postgres:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://quizapp-backend:9090/api/daily"]
+      test: [ "CMD-SHELL", "wget -q -O - http://localhost:9090/actuator/health | grep -q 'UP'" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
+    depends_on:
+      quizapp-db:
+        condition: service_healthy
 
-  frontend:
+  quizapp-frontend:
     image: lesommer2019/quizapp-frontend:latest
     container_name: quizapp-frontend
     ports:
       - "3000:80"
-    environment:
-      - REACT_APP_API_URL=http://quizapp-backend:9090/api
-      - VITE_API_URL=http://quizapp-backend:9090/api
-      - WDS_SOCKET_HOST=http://quizapp-frontend
-      - WDS_SOCKET_PORT=3000
     depends_on:
-      - backend
+      quizapp-backend:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   pgdata:

@@ -41,7 +41,16 @@ app:
   jwt-expiration-in-ms: 86400000
 recaptcha.secret-key: 6Lfl_SsaAAAAACAe2Ip7xMvZpYrXdemCNGLxUPwM
 recaptcha.site-key: 6Lfl_SsaAAAAALfv0EykvRPBTEkpHQdHDXt7-zEw
-frontend.url: http://quizapp-frontend:3000
+frontend.url: http://127.0.0.1:3000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+      base-path: /actuator
+    health:
+      show-details: never
 
 # Logging
 logging:
