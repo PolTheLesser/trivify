@@ -135,7 +135,7 @@ const CreateQuiz = () => {
       }]);
       navigate('/quizzes/my-quizzes');
     } catch (err) {
-      setError('Fehler beim Erstellen des Quiz');
+      setError(err.response?.data?.message || 'Fehler beim Erstellen des Quiz');
     }
   };
 

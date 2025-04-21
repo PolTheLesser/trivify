@@ -47,7 +47,7 @@ const Settings = () => {
       setProfile(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Fehler beim Laden des Profils');
+      setError(err.response?.data?.message || 'Fehler beim Laden des Profils');
       setLoading(false);
     }
   };
@@ -58,7 +58,7 @@ const Settings = () => {
       await axios.put(process.env.REACT_APP_API_URL+'/users/profile', profile);
       setSuccess('Profil erfolgreich aktualisiert, bitte melde dich ab und erneut an, um die Änderungen zu sehen.');
     } catch (err) {
-      setError('Fehler beim Aktualisieren des Profils');
+      setError(err.response?.data?.message || 'Fehler beim Aktualisieren des Profils');
     }
   };
 
@@ -82,7 +82,7 @@ const Settings = () => {
         confirmPassword: ''
       });
     } catch (err) {
-      setError('Fehler beim Ändern des Passworts');
+      setError(err.response?.data?.message || 'Fehler beim Ändern des Passworts');
     }
   };
 
@@ -92,7 +92,7 @@ const Settings = () => {
       logout();
       navigate('/login');
     } catch (err) {
-      setError('Fehler beim Löschen des Accounts');
+      setError(err.response?.data?.message || 'Fehler beim Löschen des Accounts');
     }
   };
 
@@ -112,7 +112,7 @@ const Settings = () => {
       }));
       setSuccess('Erinnerungseinstellung erfolgreich aktualisiert');
     } catch (err) {
-      setError('Fehler beim Aktualisieren der Erinnerungseinstellung');
+      setError(err.response?.data?.message || 'Fehler beim Aktualisieren der Erinnerungseinstellung');
     }
   };
 

@@ -3,7 +3,7 @@ setlocal
 
 REM ==== FRONTEND ====
 echo Building frontend...
-docker build --build-arg REACT_APP_API_URL=http://localhost:9090/api -t quiz-frontend ./frontend
+docker build --build-arg REACT_APP_API_URL=http://quizapp-backend:9090/api -t quiz-frontend ./frontend
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...

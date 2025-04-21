@@ -40,7 +40,7 @@ const EditQuiz = () => {
       setQuestions(response.data.questions);
       setLoading(false);
     } catch (err) {
-      setError("Quiz konnte nicht geladen werden");
+      setError(err.response?.data?.message || "Quiz konnte nicht geladen werden");
       setLoading(false);
     }
   };
@@ -106,7 +106,7 @@ const EditQuiz = () => {
         navigate("/quizzes");
       }, 2000);
     } catch (err) {
-      setError("Fehler beim Aktualisieren des Quiz");
+      setError(err.response?.data?.message || "Fehler beim Aktualisieren des Quiz");
     }
   };
 

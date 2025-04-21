@@ -1,15 +1,23 @@
-package rh.ptp.quizapp.repository;
+package rh.ptp.quizapp.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rh.ptp.quizapp.repository.RegistrationRequestRepository;
 
-@Repository
-public class AccountCleanupRepository {
+import java.time.LocalDateTime;
+
+@Service
+public class CleanupRepositoryService {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Autowired
+    private RegistrationRequestRepository registrationRequestRepository;
 
     /**
      * 0) Delete all quiz results of this user
@@ -79,4 +87,11 @@ public class AccountCleanupRepository {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
+
+    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    public void cleanupOldRegistrations() {
+        LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
+        registrationRequestRepository.deleteByCreatedAtBefore(expiryTime);
+    }
+
 }

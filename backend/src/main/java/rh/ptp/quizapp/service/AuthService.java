@@ -37,6 +37,9 @@ public class AuthService {
     private String frontendUrl;
 
     public RegistrationRequest register(RegisterRequest request) {
+        if (userRepository.existsByName(request.getName()) || registrationRequestRepository.existsByName(request.getName())) {
+            throw new RuntimeException("Benutzername ist bereits vergeben");
+        }
         if (userRepository.existsByEmail(request.getEmail()) || 
             registrationRequestRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("E-Mail-Adresse wird bereits verwendet");

@@ -49,8 +49,8 @@
   },
   "devServer": {
     "allowedHosts": [
-      "localhost"
+      "0.0.0.0"
     ],
-    "proxy": "http://localhost:9090"
+    "proxy": "http://quizapp-backend:9090"
   }
 }

@@ -127,7 +127,7 @@ const QuizList = () => {
                 setFilteredQuizzes(quizzesWithFavorites);
             }
         } catch (err) {
-            setError('Fehler beim Laden der Quizze');
+            setError(err.response?.data?.message ||'Fehler beim Laden der Quizze');
         } finally {
             setLoading(false);
         }
@@ -140,7 +140,7 @@ const QuizList = () => {
             setQuizzes(updated);
             setFilteredQuizzes(updated);
         } catch (err) {
-            setError('Fehler beim Löschen des Quiz');
+            setError(err.response?.data?.message || 'Fehler beim Löschen des Quiz');
         }
     };
 
@@ -158,7 +158,7 @@ const QuizList = () => {
             );
             setFilteredQuizzes(filtered);
         } catch (error) {
-            console.error('Fehler beim Favorisieren:', error);
+            console.error(err.response?.data?.message || 'Fehler beim Favorisieren:', error);
         }
     };
 

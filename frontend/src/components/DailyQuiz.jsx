@@ -43,7 +43,7 @@ const DailyQuiz = () => {
                 setQuiz(data);
                 setLoading(false);
             } catch (err) {
-                setError('Fehler beim Laden des täglichen Quiz');
+                setError(err.response?.data?.message || 'Fehler beim Laden des täglichen Quiz');
                 setLoading(false);
             }
         };
@@ -106,8 +106,8 @@ const DailyQuiz = () => {
                 console.log('Tägliches Quiz abgeschlossen & Score gespeichert');
             }
         } catch (err) {
-            console.error('Fehler beim Einreichen der Antwort oder Speichern des Scores:', err);
-            setError('Fehler beim Einreichen der Antwort');
+            console.error(err.response?.data?.message || 'Fehler beim Einreichen der Antwort oder Speichern des Scores:', err);
+            setError(err.response?.data?.message || 'Fehler beim Einreichen der Antwort');
         }
     };
 

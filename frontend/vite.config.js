@@ -4,7 +4,7 @@ export default {
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:9090',
+        target: 'http://quizapp-backend:9090',
         changeOrigin: true,
         secure: false
       }

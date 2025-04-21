@@ -40,7 +40,7 @@ const MeineQuizze = () => {
             setQuizzes(ownQuizzes);
             setFiltered(ownQuizzes);
         } catch (err) {
-            setError('Fehler beim Laden der Quizze');
+            setError(err.response?.data?.message || 'Fehler beim Laden der Quizze');
         } finally {
             setLoading(false);
         }

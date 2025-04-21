@@ -25,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final AccountCleanupRepository cleanupRepo;
+    private final CleanupRepositoryService cleanupRepo;
     private final QuizResultRepository     quizResultRepo;
     private final UserRepository           userRepo;
     private final Logger log = LoggerFactory.getLogger(UserService.class);

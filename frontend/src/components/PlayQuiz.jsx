@@ -149,7 +149,7 @@ const PlayQuiz = () => {
       // Optional: nach dem Raten zurück zur Liste
       navigate('/quizzes', { state: { justRated: true } });
     } catch (err) {
-      setError('Fehler beim Absenden der Bewertung');
+      setError(err.response?.data?.message || 'Fehler beim Absenden der Bewertung');
       setSubmitting(false);
     }
   };
