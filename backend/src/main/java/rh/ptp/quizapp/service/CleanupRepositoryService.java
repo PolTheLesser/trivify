@@ -108,11 +108,7 @@ public class CleanupRepositoryService {
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + request.getVerificationToken());
             emailService.sendEmail(request.getEmail(),"Erinnerung: Registrierung", "registration-delete-warning", variables);
         }
-    }
-
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde
-    public void cleanupOldRegistrations() {
-        LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
+        expiryTime = LocalDateTime.now().minusHours(24);
         registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
     }
 
