@@ -97,18 +97,16 @@ public class CleanupRepositoryService {
                 .executeUpdate();
     }
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
-    public void cleanupOldRegistrationsWarning() {
-        LocalDateTime expiryTime = LocalDateTime.now().minusHours(23);
-        List<RegistrationRequest> requests = registrationRequestRepository.findAllByCreatedAtBefore(expiryTime);
+    public void cleanupOldRegistrations() {
+        LocalDateTime warningTime = LocalDateTime.now().minusHours(23);
+        List<RegistrationRequest> requests = registrationRequestRepository.findAllByCreatedAtBefore(warningTime);
         for (RegistrationRequest request : requests) {
-            // Hier können Sie eine Warnung oder Benachrichtigung an den Benutzer senden
-            // z.B. per E-Mail oder in der App
             Map<String, Object> variables = new HashMap<>();
             variables.put("username", request.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + request.getVerificationToken());
             emailService.sendEmail(request.getEmail(),"Erinnerung: Registrierung", "registration-delete-warning", variables);
         }
-        expiryTime = LocalDateTime.now().minusHours(24);
+        LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
         registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
     }
 
