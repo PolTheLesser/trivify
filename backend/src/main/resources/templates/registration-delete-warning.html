@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Konto wird bald gelöscht</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 40px;
+    }
+
+    h1 {
+      color: #dc3545;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #0d6efd;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>⏳ Deine Registrierungsanfrage wird bald gelöscht</h1>
+
+  <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
+
+  <p>du hast dein Benutzerkonto bei Trivify noch nicht bestätigt.</p>
+
+  <p>Ohne Bestätigung wird dein Konto in <strong>1 Stunde</strong> automatisch gelöscht.</p>
+
+  <p>Falls du möchtest, kannst du dein Konto ganz einfach jetzt noch aktivieren:</p>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <a th:href="${verificationUrl}" class="cta-button">
+      Konto jetzt aktivieren
+    </a>
+  </div>
+
+  <p>Falls du dich nicht registriert hast, kannst du diese Nachricht einfach ignorieren.</p>
+
+  <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+  <p style="font-size: 0.9em; color: #666;">
+    Mit freundlichen Grüßen<br>
+    Das Trivify‑Team
+  </p>
+
+  <div class="footer">
+    © 2025 Trivify – Alle Rechte vorbehalten.
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Streak verloren – Tägliches Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 40px;
+        }
+        h1 {
+            color: #dc3545;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .icon {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="icon">💤</div>
+    <h1>Du hast deine Streak verloren 😢</h1>
+
+    <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
+
+    <p>du hast gestern kein tägliches Quiz absolviert – dadurch wurde dein Streak zurückgesetzt.</p>
+
+    <p>Dein vorheriger Streak: <strong><span th:text="${oldStreak}">0</span> Tage</strong></p>
+
+    <p>Aber kein Grund zur Sorge – heute ist ein neuer Tag, um wieder durchzustarten! 🚀</p>
+
+    <div style="text-align: center;">
+        <a th:href="${quizUrl}" class="cta-button">Tägliches Quiz starten</a>
+    </div>
+
+    <p style="margin-top: 20px;">Oder öffne diesen Link direkt:<br/>
+        <span style="color: #666; word-break: break-word;" th:text="${quizUrl}">http://localhost:3000/daily-quiz</span>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+    <p style="font-size: 0.9em; color: #666;">
+        Mit freundlichen Grüßen<br/>
+        Dein Trivify-Team
+    </p>
+
+    <div class="footer">
+        © 2025 Trivify – Automatisch generierte E-Mail
+    </div>
+</div>
+</body>
+</html>

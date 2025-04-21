@@ -3,12 +3,17 @@ package rh.ptp.quizapp.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rh.ptp.quizapp.model.RegistrationRequest;
 import rh.ptp.quizapp.repository.RegistrationRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class CleanupRepositoryService {
@@ -18,6 +23,10 @@ public class CleanupRepositoryService {
 
     @Autowired
     private RegistrationRequestRepository registrationRequestRepository;
+    @Autowired
+    private EmailService emailService;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     /**
      * 0) Delete all quiz results of this user
@@ -87,11 +96,24 @@ public class CleanupRepositoryService {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
+    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    public void cleanupOldRegistrationsWarning() {
+        LocalDateTime expiryTime = LocalDateTime.now().minusHours(23);
+        List<RegistrationRequest> requests = registrationRequestRepository.findAllByCreatedAtBefore(expiryTime);
+        for (RegistrationRequest request : requests) {
+            // Hier können Sie eine Warnung oder Benachrichtigung an den Benutzer senden
+            // z.B. per E-Mail oder in der App
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("username", request.getName());
+            variables.put("verificationUrl", frontendUrl + "/verify-email/" + request.getVerificationToken());
+            emailService.sendEmail(request.getEmail(),"Erinnerung: Registrierung", "registration-delete-warning", variables);
+        }
+    }
 
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
     public void cleanupOldRegistrations() {
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
-        registrationRequestRepository.deleteByCreatedAtBefore(expiryTime);
+        registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
     }
 
 }

@@ -80,6 +80,9 @@ public class UserService {
     }
 
     public void deleteAccount(Long userId) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("username", userRepository.findUserById(userId).getName());
+        emailService.sendEmail(userRepository.findUserById(userId).getEmail(), "Konto gelöscht", "account-deleted", variables);
         // a) Cleanup aller element‑tables und parent‑tables per Native SQL
         cleanupRepo.deleteAllQuizRatingsByUser(userId);
         cleanupRepo.deleteAllQuestionAnswersByUser(userId);

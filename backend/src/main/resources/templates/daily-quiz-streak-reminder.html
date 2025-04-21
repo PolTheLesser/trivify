@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Deine Streak ist in Gefahr!</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafb;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 40px;
+    }
+    h1 {
+      color: #fd7e14;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .cta-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #fd7e14;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    .icon {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="icon">⏳</div>
+  <h1>Deine Streak ist in Gefahr!</h1>
+
+  <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
+
+  <p>du hast dein tägliches Quiz heute noch nicht gespielt – deine Streak (<span th:text="${streak}">0</span>) steht auf dem Spiel! 😱</p>
+
+  <p>Du hast noch ein bisschen Zeit, um dir deinen Fortschritt zu sichern. Klick einfach hier:</p>
+
+  <div style="text-align: center;">
+    <a th:href="@{${quizUrl}}" class="cta-button">Tägliches Quiz starten</a>
+  </div>
+
+  <p style="margin-top: 20px;">Wir drücken dir die Daumen – du schaffst das! 💪</p>
+
+  <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+  <p style="font-size: 0.9em; color: #666;">
+    Viele Grüße<br/>
+    Dein Trivify-Team
+  </p>
+
+  <div class="footer">
+    © 2025 Trivify – Automatische Erinnerung
+  </div>
+</div>
+</body>
+</html>

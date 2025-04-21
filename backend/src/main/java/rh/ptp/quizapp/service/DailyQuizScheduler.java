@@ -48,7 +48,6 @@ public class DailyQuizScheduler {
     /**
      * Pfad zur Daily-Quiz-Datei.
      */
-    private static final Path DAILY_QUIZ_PATH = Paths.get("src/main/resources/daily.json");
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -106,13 +105,45 @@ public class DailyQuizScheduler {
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
 
             for (User user : usersToRemind) {
-                variables.put("username", user.getName());
-                emailService.sendEmail(user.getEmail(), "Tägliche Quiz-Erinnerung", "daily-quiz-reminder", variables);
+                LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
+                        ? user.getLastDailyQuizPlayed().toLocalDate()
+                        : null;
+                LocalDate yesterday = LocalDate.now().minusDays(1);
+                boolean missedYesterday = lastPlayed == null || lastPlayed.isBefore(yesterday);
+                if (user.getDailyStreak() > 0 && missedYesterday) {
+                    int oldStreak = user.getDailyStreak();
+                    user.setDailyStreak(0);
+                    userRepository.save(user);
+                    variables.put("username", user.getName());
+                    variables.put("oldStreak", oldStreak);
+                    emailService.sendEmail(user.getEmail(), "Daily-Streak verloren 😔", "daily-quiz-streak-lost" ,variables);
+                } else{
+                    variables.put("username", user.getName());
+                    emailService.sendEmail(user.getEmail(), "Tägliche Quiz-Erinnerung ⁉️", "daily-quiz-reminder", variables);
+                }
             }
 
         } catch (Exception e) {
             log.error("Fehler bei der Generierung des täglichen Quiz: {}", e.getMessage());
         }
     }
+
+    @Scheduled(cron = "0 0 18 * * ?") // Täglich um 18 Uhr
+    public void dailyQuizStreakReminder() {
+        for (User user : userRepository.findByDailyQuizReminderIsNotNull()) {
+            LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
+                    ? user.getLastDailyQuizPlayed().toLocalDate()
+                    : null;
+            boolean missedUntilNow = lastPlayed == null || lastPlayed.isBefore(LocalDate.now());
+            if (user.getDailyStreak() > 0 && missedUntilNow) {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("username", user.getName());
+                variables.put("quizUrl", frontendUrl+"/daily-quiz");
+                variables.put("streak", user.getDailyStreak());
+                emailService.sendEmail(user.getEmail(), "Deine Streak ist in Gefahr! ⏳", "daily-quiz-streak-reminder", variables);
+            }
+        }
+    }
+
 }
 
