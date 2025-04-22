@@ -141,8 +141,10 @@ public class UserService {
         log.info("Incrementing daily quiz streak for user: {}", user.getEmail());
         boolean alreadyPlayedToday = quizResultRepository
                 .existsByUserIdAndQuizIsDailyQuizTrueAndPlayedAtAfter(user.getId(), today.atStartOfDay());
+        user.setLastDailyQuizPlayed(LocalDateTime.now());
 
         if (alreadyPlayedToday) {
+            userRepository.save(user);
             return user.getDailyStreak();
         }
         user.setDailyStreak(user.getDailyStreak() + 1);
