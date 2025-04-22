@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.QuestionType;
 import rh.ptp.quizapp.model.Quiz;
@@ -16,6 +17,7 @@ import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.QuizService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,10 @@ public class QuizController {
     @GetMapping("/quizzes")
     public ResponseEntity<List<Quiz>> getQuizzes() {
         List<Quiz> quizze = quizService.findAllWithRatings();
+        LocalDate today = LocalDate.now();
+
+        quizze.removeIf(quiz -> quiz.isDailyQuiz() && today.equals(quiz.getDate()));
+
         for (Quiz quiz : quizze) {
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
                 quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
@@ -48,6 +54,9 @@ public class QuizController {
     public ResponseEntity<Quiz> getQuiz(@PathVariable Long quizId) {
         Quiz quiz = quizService.getQuizById(quizId);
         if (quiz != null) {
+            if (quiz.isDailyQuiz() && quiz.getDate().equals(LocalDate.now())) {
+                getDailyQuiz();
+            }
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
                 quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
             }

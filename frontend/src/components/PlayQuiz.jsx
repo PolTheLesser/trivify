@@ -47,8 +47,8 @@ const PlayQuiz = () => {
     try {
       const response = await axios.get(process.env.REACT_APP_API_URL +`/${id}`);
       setQuiz(response.data);
-    } catch {
-      setError('Quiz konnte nicht geladen werden');
+    } catch (err){
+      setError(err.response?.data?.message || 'Quiz konnte nicht geladen werden');
     } finally {
       setLoading(false);
     }
