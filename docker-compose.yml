@@ -8,6 +8,7 @@ services:
       POSTGRES_DB: quizapp
       POSTGRES_USER: quizuser
       POSTGRES_PASSWORD: quizpass
+      PGTZ: Europe/Berlin
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U quizuser -d quizapp"]  # Prüft DB-Verfügbarkeit
       interval: 10s         # alle 10s prüfen
