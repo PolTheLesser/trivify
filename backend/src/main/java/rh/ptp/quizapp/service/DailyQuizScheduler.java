@@ -96,7 +96,7 @@ public class DailyQuizScheduler {
                 }
             }
 
-            quizService.updateDailyQuiz(fragen); // Übergib direkt statt von Datei zu lesen
+            quizService.updateDailyQuiz(fragen);
 
             log.info("Tägliches Quiz wurde aktualisiert");
 
@@ -108,9 +108,9 @@ public class DailyQuizScheduler {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
                         ? user.getLastDailyQuizPlayed().toLocalDate()
                         : null;
-                LocalDate yesterday = LocalDate.now().minusDays(1);
-                boolean missedYesterday = lastPlayed == null || lastPlayed.isBefore(yesterday);
+                boolean missedYesterday = lastPlayed == null || !lastPlayed.equals(LocalDate.now().minusDays(1));
                 if (user.getDailyStreak() > 0 && missedYesterday) {
+                    log.info("User {} hat zuletzt gespielt am: {} und verliert seine Streak.", user.getId(), lastPlayed);
                     int oldStreak = user.getDailyStreak();
                     user.setDailyStreak(0);
                     userRepository.save(user);
