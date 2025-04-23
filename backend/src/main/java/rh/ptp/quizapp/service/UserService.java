@@ -81,9 +81,9 @@ public class UserService {
     }
 
     public void deleteAccount(Long userId) {
+        User user = userRepository.findUserById(userId);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("username", userRepository.findUserById(userId).getName());
-        emailService.sendEmail(userRepository.findUserById(userId).getEmail(), "Konto gelöscht", "account-deleted", variables);
+
         // a) Cleanup aller element‑tables und parent‑tables per Native SQL
         cleanupRepo.deleteAllQuizRatingsByUser(userId);
         cleanupRepo.deleteAllQuestionAnswersByUser(userId);
@@ -95,6 +95,8 @@ public class UserService {
 
         // c) User selbst zuletzt
         userRepo.deleteById(userId);
+        variables.put("username", user.getName());
+        emailService.sendEmail(user.getEmail(), "Konto gelöscht", "account-deleted", variables);
     }
 
     public void updateDailyQuizReminder(Long userId, boolean reminder) {
