@@ -66,12 +66,13 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
+        User user = userRepository.findUserById(userId);
         Map<String, Object> variables = new HashMap<>();
         variables.put("logoUrl", frontendUrl + "/logo192.png");
-        variables.put("username", userRepository.findUserById(userId).getName());
+        variables.put("username", user.getName());
         variables.put("loginUrl", frontendUrl + "/login");
-        emailService.sendEmail(userRepository.findUserById(userId).getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
-        userService.deleteAccount(userId); //ToDO : implement account status, put user in deletion query
+        emailService.sendEmail(user.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
+        //user.setStatus(TODELETE); //ToDO : implement account status, put user in deletion query
         return ResponseEntity.ok().build();
     }
 

@@ -118,7 +118,6 @@ public class CleanupRepositoryService {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl+"/logo192.png");
             variables.put("username", request.getName());
-            // if(user.status="toDelete"){ emailService.sendEmail(request.getEmail(),"Accountlöschung", "account-deleted", variables);}
         }
         registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
     }
