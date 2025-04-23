@@ -59,6 +59,7 @@ public class UserService {
         userRepository.save(user);
 
         Map<String, Object> variables = new HashMap<>();
+        variables.put("logoUrl", frontendUrl+"/logo192.png");
         variables.put("username", user.getName());
         variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
 

@@ -1,5 +1,6 @@
 package rh.ptp.quizapp.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -8,22 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import rh.ptp.quizapp.model.Quiz;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.util.CreateAiRequest;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * Service zur automatischen Erstellung und Speicherung eines täglichen Quiz.
@@ -103,6 +98,7 @@ public class DailyQuizScheduler {
             List<User> usersToRemind = userRepository.findByDailyQuizReminderIsNotNull();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
 
             for (User user : usersToRemind) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -137,9 +133,11 @@ public class DailyQuizScheduler {
             boolean missedUntilNow = lastPlayed == null || lastPlayed.isBefore(LocalDate.now());
             if (user.getDailyStreak() > 0 && missedUntilNow) {
                 Map<String, Object> variables = new HashMap<>();
+                variables.put("logoUrl", frontendUrl+"/logo192.png");
                 variables.put("username", user.getName());
                 variables.put("quizUrl", frontendUrl+"/daily-quiz");
                 variables.put("streak", user.getDailyStreak());
+                variables.put("logoUrl", frontendUrl+"/logo192.png");
                 emailService.sendEmail(user.getEmail(), "Deine Streak ist in Gefahr! ⏳", "daily-quiz-streak-reminder", variables);
             }
         }

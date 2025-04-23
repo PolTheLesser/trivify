@@ -1,104 +1,97 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Daily Quiz Reminder</title>
-  
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9fafb;
-    color: #333;
-  }
-  .container {
-    max-width: 600px;
-    margin: 40px auto;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    padding: 40px;
-  }
-  h1 {
-    color: #0d6efd;
-    font-size: 24px;
-    margin-bottom: 16px;
-  }
-  p {
-    font-size: 16px;
-    line-height: 1.6;
-  }
-  .cta-button {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 12px 24px;
-    background-color: #0d6efd;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
-  }
-  .icon {
-    text-align: center;
-    margin-bottom: 16px;
-  }
-  .footer {
-    text-align: center;
-    font-size: 12px;
-    color: #999;
-    margin-top: 40px;
-  }
-</style>
-
-</head>
-<body>
-  <div class="container">
-    <div class="icon">🕒</div>
-    <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
     <meta charset="UTF-8">
     <title>Tägliche Quizerinnerung</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo img {
+            max-width: 120px;
+            height: auto;
+        }
+        .icon {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        h1 {
+            color: #0d6efd;
+            font-size: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            margin: 30px auto;
+            padding: 12px 24px;
+            background-color: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 40px;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-    <h2 style="color: #007bff;">Tägliche Quizerinnerung</h2>
+<body>
+<div class="container">
+    <div class="logo">
+        <img th:src="${logoUrl}" alt="Trivify Logo">
+    </div>
+
+    <div class="icon">🕒</div>
+    <h1>Erinnerung: Dein tägliches Quiz wartet!</h1>
 
     <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
 
-    <p>es ist Zeit für dein tägliches Quiz bei Trivify! Klicke auf den folgenden Link, um direkt zum Quiz zu gelangen:</p>
+    <p>du hast dein heutiges Quiz bei <strong>Trivify</strong> noch nicht gespielt – aber keine Sorge, du hast noch Zeit! Nutze deine Chance, deine Streak zu halten 🔥</p>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <button class="button"> <a th:href="${quizUrl}"
-                                   style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Zum Quiz
-        </a></button>
-    </div>
-
-    <p>Falls der Button nicht funktioniert, kannst du auch diesen Link in deinen Browser kopieren:</p>
-    <p style="word-break: break-all; color: #666;">
-        <span th:text="${quizUrl}"></span>
+    <p style="text-align: center;">
+        <a class="cta-button" th:href="${quizUrl}">Jetzt Quiz starten</a>
     </p>
 
-    <p>Viel Spaß beim Quizzen!</p>
+    <p>Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
+    <p style="word-break: break-all; color: #666;">
+        <span th:text="${quizUrl}">Link</span>
+    </p>
 
-    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 
     <p style="font-size: 0.9em; color: #666;">
         Mit freundlichen Grüßen<br>
-        Das Trivify-Team
+        Dein Trivify-Team
     </p>
-    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-    <p style="font-size: 12px; color: #666;">
-        Diese E-Mail wurde automatisch versendet. Bitte antworten Sie nicht auf diese E-Mail.
-    </p>
+
     <div class="footer">
-        © 2025 Trivify – Alle Rechte vorbehalten.
+        © 2025 Trivify – Diese E-Mail wurde automatisch generiert.
     </div>
 </div>
-</body>
-</html>
-  </div>
 </body>
 </html>

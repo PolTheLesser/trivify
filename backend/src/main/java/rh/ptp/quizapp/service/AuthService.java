@@ -1,6 +1,8 @@
 package rh.ptp.quizapp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,13 +16,11 @@ import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.repository.RegistrationRequestRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.security.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +108,7 @@ public class AuthService {
 
     private void sendVerificationEmail(String email, String name, String token) {
         Map<String, Object> variables = new HashMap<>();
+        variables.put("logoUrl", frontendUrl+"/logo192.png");
         variables.put("username", name);
         variables.put("verificationUrl", frontendUrl + "/verify-email/" + token);
         emailService.sendEmail(email, "E-Mail-Adresse verifizieren", "verification-email", variables);
