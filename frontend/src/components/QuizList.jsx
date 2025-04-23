@@ -20,8 +20,11 @@ import {
     MenuItem,
     Select,
     InputLabel,
-    FormControl
+    FormControl,
+    InputAdornment,
+    Paper
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import axios from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
 import StarIcon from '@mui/icons-material/Star';
@@ -32,7 +35,6 @@ const QuizList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // State
     const [quizzes, setQuizzes] = useState([]);
     const [filteredQuizzes, setFilteredQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -44,12 +46,9 @@ const QuizList = () => {
     const [sortOrder, setSortOrder] = useState('desc');
     const [playedQuizIds, setPlayedQuizIds] = useState(new Set());
     const [onlyUnplayed, setOnlyUnplayed] = useState(false);
-    const [dailyFilter, setDailyFilter] = useState('all'); // 'all' | 'daily' | 'nonDaily'
-
-    // heutiges Datum in "YYYY-MM-DD"-Format
+    const [dailyFilter, setDailyFilter] = useState('all');
     const today = new Date().toISOString().split('T')[0];
 
-    // Quiz-History laden
     useEffect(() => {
         if (user) {
             axios.get(`${process.env.REACT_APP_API_URL}/users/quiz-history`)
@@ -58,7 +57,6 @@ const QuizList = () => {
         }
     }, [user]);
 
-    // Quizzes holen
     useEffect(() => {
         const fetchQuizzes = async () => {
             try {
@@ -74,7 +72,7 @@ const QuizList = () => {
                     ...q,
                     isFavorite: favoriteIds.has(q.id),
                     isDaily: !!q.dailyQuiz,
-                    date: q.date // erwartet 'YYYY-MM-DD'
+                    date: q.date
                 }));
                 setQuizzes(data);
                 setFilteredQuizzes(data);
@@ -87,7 +85,6 @@ const QuizList = () => {
         fetchQuizzes();
     }, [user]);
 
-    // Filter anwenden
     useEffect(() => {
         let filtered = quizzes
             .filter(q => q.title.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -98,7 +95,6 @@ const QuizList = () => {
 
         if (dailyFilter === 'daily')    filtered = filtered.filter(q => q.isDaily);
         else if (dailyFilter === 'nonDaily') filtered = filtered.filter(q => !q.isDaily);
-        // else 'all' => nichts weiter tun
 
         filtered = filtered.filter(q => q.questions.length >= minQuestions);
 
@@ -142,14 +138,20 @@ const QuizList = () => {
 
     return (
         <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
-            <Box sx={{ display:'flex', flexDirection:'column', gap:2, mb:4, px:2, mt:2 }}>
-
+            <Paper elevation={2} sx={{ display:'flex', flexDirection:'column', gap:2, mb:4, px:2, py:3, mx:2, mt:2 }}>
                 <TextField
-                    label="Suche"
+                    label="Quiz suchen"
                     variant="outlined"
                     size="small"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        )
+                    }}
                 />
 
                 <Box sx={{ display:'flex', flexWrap:'wrap', gap:2 }}>
@@ -182,17 +184,17 @@ const QuizList = () => {
                         </Select>
                     </FormControl>
 
-                    <Button variant="outlined" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
+                    <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
                         Zufälliges Quiz
                     </Button>
                 </Box>
-            </Box>
+            </Paper>
 
             <Grid container spacing={3} sx={{ px:2 }}>
                 {filteredQuizzes.map(q => (
                     <Grid item xs={12} sm={6} md={4} key={q.id}>
                         <Card sx={{ position:'relative' }}>
-                            <Box sx={{ position:'absolute', top:8, right:8 }}>
+                            <Box sx={{ position:'absolute', top:2, right:2 }}>
                                 {user && <IconButton size="small" color="warning" onClick={() => toggleFavorite(q.id)}>
                                     {q.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
                                 </IconButton>}

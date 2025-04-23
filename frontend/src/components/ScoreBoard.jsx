@@ -26,9 +26,12 @@ const ScoreBoard = ({ userId }) => {
                 <div className="mt-6 bg-blue-50 p-3 rounded border border-blue-200" color="text.secondary" align="center">
                     {myScore.rank !== -1 ? (
                         <>
-                            <strong>Dein Score:</strong> {myScore.score} {myScore.score === 1 ? 'Punkt' : 'Punkte'}. Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
+                            <p />
+                            <strong>Dein Score:</strong> {myScore.score} {myScore.score === 1 ? 'Punkt' : 'Punkte'}.
                             <br />
-                            <p>Mehrfache Quiz-Teilnahmen & Teilnahmen an eigenen Quizzen werden nicht gezählt!</p>
+                            Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
+                            <p />
+                            <p color="text.secondary">Mehrfache Quiz-Teilnahmen & Teilnahmen an eigenen Quizzen werden nicht gezählt!</p>
                         </>
                     ) : (
                         <div className="text-sm text-gray-500">

@@ -12,6 +12,7 @@ import ScoreBoard from './ScoreBoard';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import { de } from 'date-fns/locale';
+import CasinoIcon from '@mui/icons-material/Casino';
 
 const Welcome = () => {
     const { user } = useAuth();
@@ -239,6 +240,34 @@ const Welcome = () => {
                     </Paper>
                 </Grid>
             </Grid>
+            <Box
+                sx={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    backgroundColor: theme => theme.palette.background.default,
+                    padding: '1em 0',
+                    width: '100%',
+                    textAlign: 'center',
+                    borderTop: '1px solid #e7e7e7',
+                    zIndex: 1000,
+                    boxShadow: '0 -2px 8px rgba(0,0,0,0.05)'
+                }}
+            >
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<CasinoIcon />}
+                    onClick={() => {
+                        if (quizzes.length > 0) {
+                            const random = quizzes[Math.floor(Math.random() * quizzes.length)];
+                            navigate(`/quizzes/${random.id}`);
+                        }
+                    }}
+                >
+                    Zufälliges Quiz starten
+                </Button>
+            </Box>
         </Container>
     );
 };

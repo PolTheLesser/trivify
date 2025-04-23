@@ -6,11 +6,15 @@ const Footer = () => {
     return (
         <footer
             style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
                 backgroundColor: theme.palette.background.default,
                 padding: '1em 0',
                 width: '100%',
                 textAlign: 'center',
                 borderTop: '1px solid #e7e7e7',
+                zIndex: 1000,
             }}
         >
 

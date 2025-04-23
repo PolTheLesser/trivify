@@ -128,7 +128,7 @@
             <p>Hallo <span th:text="${username}"></span>,</p>
             <p>vielen Dank für deine Registrierung bei Trivify! Bitte klicke auf den folgenden Button, um deine E-Mail-Adresse zu verifizieren:</p>
             <div style="text-align: center;">
-                <a th:href="${verificationUrl}" class="button">E-Mail verifizieren</a>
+                <button class="button"> <a th:href="${verificationUrl}" >E-Mail verifizieren</a></button>
             </div>
             <p>Falls der Button nicht funktioniert, kannst du auch diesen Link kopieren und in deinem Browser öffnen:</p>
             <p style="word-break: break-all; color: #2563eb;" th:text="${verificationUrl}"></p>

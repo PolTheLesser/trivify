@@ -27,11 +27,6 @@ public class UserController {
     private final AccountCleanupService accountCleanupService;
     private final QuizFavoriteRepository quizFavoriteRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestParam String email, @RequestParam String password) {
-        return ResponseEntity.ok(userService.loginUser(email, password));
-    }
-
     @PostMapping("/reset-password-request")
     public ResponseEntity<?> resetPasswordRequest(@RequestBody PasswordResetRequest request) {
         try {
