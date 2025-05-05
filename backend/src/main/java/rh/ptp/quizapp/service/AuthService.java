@@ -11,53 +11,59 @@ import rh.ptp.quizapp.dto.AuthResponse;
 import rh.ptp.quizapp.dto.LoginRequest;
 import rh.ptp.quizapp.dto.RegisterRequest;
 import rh.ptp.quizapp.dto.UserDTO;
-import rh.ptp.quizapp.model.RegistrationRequest;
+import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
-import rh.ptp.quizapp.repository.RegistrationRequestRepository;
+import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.security.JwtService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final RegistrationRequestRepository registrationRequestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final AuthenticationTokenRepository authenticationTokenRepository;
     @Autowired
     private EmailService emailService;
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public RegistrationRequest register(RegisterRequest request) {
-        if (userRepository.existsByName(request.getName()) || registrationRequestRepository.existsByName(request.getName())) {
+    public User register(RegisterRequest request) {
+        if (userRepository.existsByName(request.getName())) {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
-        if (userRepository.existsByEmail(request.getEmail()) || 
-            registrationRequestRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("E-Mail-Adresse wird bereits verwendet");
         }
 
-        RegistrationRequest registrationRequest = new RegistrationRequest();
-        registrationRequest.setName(request.getName());
-        registrationRequest.setEmail(request.getEmail());
-        registrationRequest.setPassword(passwordEncoder.encode(request.getPassword()));
-        registrationRequest.setDailyQuizReminder(request.isDailyQuizReminder());
-        registrationRequest.setVerificationToken(UUID.randomUUID().toString());
-        registrationRequest.setExpiryDate(LocalDateTime.now().plusHours(24));
+        User pendingUser = new User()
+                .setName(request.getName())
+                .setEmail(request.getEmail())
+                .setPassword(passwordEncoder.encode(request.getPassword()))
+                .setEmailVerified(false)
+                .setDailyQuizReminder(request.isDailyQuizReminder());
 
-        registrationRequest = registrationRequestRepository.save(registrationRequest);
+        AuthenticationToken token = createAuthenticationToken(pendingUser);
 
-        sendVerificationEmail(request.getEmail(), request.getName(), registrationRequest.getVerificationToken());
+        sendVerificationEmail(request.getEmail(), request.getName(), token.getToken());
 
-        return registrationRequest;
+        return pendingUser;
+    }
+
+    private AuthenticationToken createAuthenticationToken(User user) {
+        AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
+        if (existingToken != null) {
+            authenticationTokenRepository.delete(existingToken);
+        }
+        AuthenticationToken newToken = new AuthenticationToken(user);
+        return authenticationTokenRepository.save(newToken);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -84,25 +90,18 @@ public class AuthService {
     }
 
     public User verifyEmail(String token) {
-        RegistrationRequest request = registrationRequestRepository.findByVerificationToken(token)
-            .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
+        AuthenticationToken authenticationToken = authenticationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
 
-        if (request.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (authenticationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Verifizierungslink ist abgelaufen");
         }
 
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        User user = authenticationToken.getQuizUser();
         user.setEmailVerified(true);
-        user.setDailyQuizReminder(request.isDailyQuizReminder());
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
 
-        user = userRepository.save(user);
-        registrationRequestRepository.delete(request);
-
+        userRepository.save(user);
+        authenticationTokenRepository.delete(authenticationToken);
         return user;
     }
 
