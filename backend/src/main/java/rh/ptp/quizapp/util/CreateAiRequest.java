@@ -45,7 +45,7 @@ public class CreateAiRequest {
 
     public JSONArray fetchQuizFromAPI(HttpClient httpClient, String prompt) throws IOException, InterruptedException {
         JSONObject requestBody = new JSONObject()
-                .put("model", "qwen2.5-72b-instruct")
+                .put("model", "qwen3-235b-a22b")
                 .put("messages", new JSONArray()
                         .put(new JSONObject()
                                 .put("role", "user")
