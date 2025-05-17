@@ -7,11 +7,11 @@ docker build --build-arg REACT_APP_API_URL=http://127.0.0.1:9090/api -t quiz-fro
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...
-docker save -o quiz-frontend.tar quiz-frontend:latest
+docker save -o quiz-frontend.tar quiz-frontend:beta
 
 echo Tagging and pushing frontend...
-docker tag quiz-frontend lesommer2019/quizapp-frontend:latest
-docker push lesommer2019/quizapp-frontend:latest
+docker tag quiz-frontend lesommer2019/quizapp-frontend:beta
+docker push lesommer2019/quizapp-frontend:beta
 
 REM ==== BACKEND ====
 echo Building backend...
@@ -20,15 +20,15 @@ call mvnw clean package
 if %errorlevel% neq 0 goto :error
 cd ..
 
-docker build -t quiz-backend:latest ./backend
+docker build -t quiz-backend:beta ./backend
 if %errorlevel% neq 0 goto :error
 
 echo Saving backend image...
-docker save -o quiz-backend.tar quiz-backend:latest
+docker save -o quiz-backend.tar quiz-backend:beta
 
 echo Tagging and pushing backend...
-docker tag quiz-backend lesommer2019/quizapp-backend:latest
-docker push lesommer2019/quizapp-backend:latest
+docker tag quiz-backend lesommer2019/quizapp-backend:beta
+docker push lesommer2019/quizapp-backend:beta
 
 echo All done!
 goto :eof

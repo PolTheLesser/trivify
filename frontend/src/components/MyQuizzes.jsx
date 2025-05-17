@@ -180,7 +180,6 @@ const MeineQuizze = () => {
                     <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
                     <Button color="error" onClick={() => {
                         handleDelete(toDeleteId);
-                        setConfirmDialogOpen(false);
                     }}>Löschen</Button>
                 </DialogActions>
             </Dialog>

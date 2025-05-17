@@ -18,13 +18,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 import SearchIcon from '@mui/icons-material/Search';
 import { TextField, InputAdornment } from '@mui/material';
-
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const handleToggle = () => setDarkMode(!darkMode);
-
+    const [searchTerm, setSearchTerm] = React.useState('');
     // Desktop‑User Menu
     const [anchorEl, setAnchorEl] = React.useState(null);
     const isUserMenuOpen = Boolean(anchorEl);
@@ -104,7 +103,7 @@ const Navbar = () => {
                                 </InputAdornment>
                             ),
                             sx: {
-                                backgroundColor: 'white',
+                                backgroundColor: darkMode ? 'black' : 'white',
                                 borderRadius: 1,
                                 minWidth: 200
                             }
@@ -179,34 +178,6 @@ const Navbar = () => {
                     Meine Quizze
                 </MenuItem>) : null}
             </Menu>
-            <MenuItem disableRipple>
-                <TextField
-                    size="small"
-                    variant="outlined"
-                    placeholder="Quiz suchen..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && searchTerm.trim()) {
-                            handleMobileMenuClose();
-                            navigate(`/quizzes?query=${encodeURIComponent(searchTerm.trim())}`);
-                        }
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                        sx: {
-                            backgroundColor: 'white',
-                            borderRadius: 1,
-                            width: '100%',
-                        }
-                    }}
-                    fullWidth
-                />
-            </MenuItem>
 
 
             {/* User Account Menu (Desktop & Mobile) */}

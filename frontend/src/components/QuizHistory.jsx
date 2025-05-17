@@ -88,7 +88,8 @@ const QuizHistory = () => {
                 {view === 'calendar' ? (
                         <Box sx={{p: 2,
                             minHeight: { xs: 400, sm: 500, md: 600 },
-                            overflowX: 'auto'}}>
+                            maxWidth: '100%',
+                            overflowX: 'hidden'}}>
                             {isMobile?(<Calendar
                                 localizer={localizer}
                                 events={quizHistory.map(quiz => ({
@@ -136,7 +137,7 @@ const QuizHistory = () => {
                                                 </Typography>
                                                 <br/>
                                                 <Typography component="span" variant="body2">
-                                                    Ergebnis: {quiz.score}/{quiz.maxPossibleScore} Punkte
+                                                    Ergebnis: {quiz.score}/{quiz.maxPossibleScore} {quiz.maxPossibleScore === 1 ? 'Punkt' : 'Punkten'}
                                                 </Typography>
                                             </>
                                         }

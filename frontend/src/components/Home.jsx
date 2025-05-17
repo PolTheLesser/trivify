@@ -1,27 +1,42 @@
-import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Container,
     Typography,
-    Button,
     Box,
     Paper,
     Grid,
 } from '@mui/material';
 import QuizIcon from '@mui/icons-material/Quiz';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import {useAuth} from '../contexts/AuthContext';
-import ScoreBoard from "./ScoreBoard";
 import CasinoIcon from '@mui/icons-material/Casino';
+import { useAuth } from '../contexts/AuthContext';
+import axios from '../api/api';
 
 const Welcome = () => {
-    const {user} = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
+
+    const startRandomQuiz = async () => {
+        try {
+            const quizRes = await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`);
+            const data = quizRes.data.map(q => ({
+                ...q,
+                isDaily: !!q.dailyQuiz,
+                date: q.date,
+            }));
+            if (data.length === 0) return;
+            const random = data[Math.floor(Math.random() * data.length)];
+            navigate(`/quizzes/${random.id}`);
+        } catch (error) {
+            console.error('Error starting random quiz:', error);
+        }
+    };
 
     return (
         <Container maxWidth="md">
-            <Box sx={{mt: 8, mb: 4}}>
-                <Paper elevation={3} sx={{p: 4}}>
+            <Box sx={{ mt: 8, mb: 4 }}>
+                <Paper elevation={3} sx={{ p: 4 }}>
                     <Typography variant="h4" component="h1" gutterBottom align="center">
                         Willkommen!
                     </Typography>
@@ -32,6 +47,7 @@ const Welcome = () => {
             </Box>
 
             <Grid container spacing={3}>
+                {/* Quiz Collection */}
                 <Grid item xs={12} md={6}>
                     <Paper
                         elevation={3}
@@ -42,13 +58,11 @@ const Welcome = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             cursor: 'pointer',
-                            '&:hover': {
-                                bgcolor: 'action.hover',
-                            },
+                            '&:hover': { bgcolor: 'action.hover' },
                         }}
                         onClick={() => navigate('/quizzes')}
                     >
-                        <QuizIcon sx={{fontSize: 60, color: 'primary.main', mb: 2}}/>
+                        <QuizIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
                         <Typography variant="h5" component="h2" gutterBottom>
                             Quizsammlung
                         </Typography>
@@ -58,6 +72,7 @@ const Welcome = () => {
                     </Paper>
                 </Grid>
 
+                {/* Daily Quiz */}
                 <Grid item xs={12} md={6}>
                     <Paper
                         elevation={3}
@@ -68,13 +83,11 @@ const Welcome = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             cursor: 'pointer',
-                            '&:hover': {
-                                bgcolor: 'action.hover',
-                            },
+                            '&:hover': { bgcolor: 'action.hover' },
                         }}
                         onClick={() => navigate('/daily-quiz')}
                     >
-                        <EmojiEventsIcon sx={{fontSize: 60, color: 'secondary.main', mb: 2}}/>
+                        <EmojiEventsIcon sx={{ fontSize: 60, color: 'secondary.main', mb: 2 }} />
                         <Typography variant="h5" component="h2" gutterBottom>
                             Tägliches Quiz
                         </Typography>
@@ -83,37 +96,34 @@ const Welcome = () => {
                         </Typography>
                     </Paper>
                 </Grid>
+
+                {/* Random Quiz (moved into grid) */}
+                <Grid item xs={12} md={12}>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: 'action.hover' },
+                        }}
+                        onClick={startRandomQuiz}
+                    >
+                        <CasinoIcon sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
+                        <Typography variant="h5" component="h2" gutterBottom>
+                            Zufälliges Quiz
+                        </Typography>
+                        <Typography color="text.secondary" align="center">
+                            Starten Sie ein zufälliges Quiz und testen Sie Ihr Wissen
+                        </Typography>
+                    </Paper>
+                </Grid>
             </Grid>
-            <Box
-                sx={{
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    backgroundColor: theme => theme.palette.background.default,
-                    padding: '1em 0',
-                    width: '100%',
-                    textAlign: 'center',
-                    borderTop: '1px solid #e7e7e7',
-                    zIndex: 1000,
-                    boxShadow: '0 -2px 8px rgba(0,0,0,0.05)'
-                }}
-            >
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<CasinoIcon />}
-                    onClick={() => {
-                        if (quizzes.length > 0) {
-                            const random = quizzes[Math.floor(Math.random() * quizzes.length)];
-                            navigate(`/quizzes/${random.id}`);
-                        }
-                    }}
-                >
-                    Zufälliges Quiz starten
-                </Button>
-            </Box>
         </Container>
     );
 };
 
-export default Welcome; 
+export default Welcome;
