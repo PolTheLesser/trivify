@@ -7,11 +7,11 @@ docker build --build-arg REACT_APP_API_URL=http://127.0.0.1:9090/api -t quiz-fro
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...
-docker save -o quiz-frontend.tar quiz-frontend:beta
+docker save -o quiz-frontend.tar quiz-frontend:latest
 
 echo Tagging and pushing frontend...
-docker tag quiz-frontend lesommer2019/quizapp-frontend:beta
-docker push lesommer2019/quizapp-frontend:beta
+docker tag quiz-frontend lesommer2019/quizapp-frontend:latest
+docker push lesommer2019/quizapp-frontend:latest
 
 REM ==== BACKEND ====
 echo Building backend...
@@ -24,11 +24,11 @@ docker build -t quiz-backend:beta ./backend
 if %errorlevel% neq 0 goto :error
 
 echo Saving backend image...
-docker save -o quiz-backend.tar quiz-backend:beta
+docker save -o quiz-backend.tar quiz-backend:latest
 
 echo Tagging and pushing backend...
-docker tag quiz-backend lesommer2019/quizapp-backend:beta
-docker push lesommer2019/quizapp-backend:beta
+docker tag quiz-backend lesommer2019/quizapp-backend:latest
+docker push lesommer2019/quizapp-backend:latest
 
 echo All done!
 goto :eof
