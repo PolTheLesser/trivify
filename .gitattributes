@@ -1,0 +1,2 @@
+# Never accept incoming changes to build.bat
+build.bat merge=ours
