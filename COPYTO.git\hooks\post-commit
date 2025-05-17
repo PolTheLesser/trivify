@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#
+# After each commit: build & push your Docker images
+#
+# Use Git Bash’s ‘cmd.exe /c’ to launch the .bat on Windows
+cmd.exe /c "%~dp0build-and-push.bat"
