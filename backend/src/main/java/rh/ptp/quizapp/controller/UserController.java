@@ -2,6 +2,7 @@ package rh.ptp.quizapp.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.repository.QuizFavoriteRepository;
+import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AccountCleanupService;
+import rh.ptp.quizapp.service.EmailService;
 import rh.ptp.quizapp.service.QuizService;
 import rh.ptp.quizapp.service.UserService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +30,11 @@ public class UserController {
     private final QuizService quizService;
     private final AccountCleanupService accountCleanupService;
     private final QuizFavoriteRepository quizFavoriteRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestParam String email, @RequestParam String password) {
-        return ResponseEntity.ok(userService.loginUser(email, password));
-    }
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @PostMapping("/reset-password-request")
     public ResponseEntity<?> resetPasswordRequest(@RequestBody PasswordResetRequest request) {
@@ -62,7 +66,13 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
-        userService.deleteAccount(userId);
+        User user = userRepository.findUserById(userId);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("logoUrl", frontendUrl + "/logo192.png");
+        variables.put("username", user.getName());
+        variables.put("loginUrl", frontendUrl + "/login");
+        emailService.sendEmail(user.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
+        //user.setStatus(TODELETE); //ToDO : implement account status, put user in deletion query
         return ResponseEntity.ok().build();
     }
 

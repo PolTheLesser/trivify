@@ -16,13 +16,14 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useAuth } from '../contexts/AuthContext';
 import { ThemeContext } from '../contexts/ThemeContext';
-
+import SearchIcon from '@mui/icons-material/Search';
+import { TextField, InputAdornment } from '@mui/material';
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const handleToggle = () => setDarkMode(!darkMode);
-
+    const [searchTerm, setSearchTerm] = React.useState('');
     // Desktop‑User Menu
     const [anchorEl, setAnchorEl] = React.useState(null);
     const isUserMenuOpen = Boolean(anchorEl);
@@ -46,7 +47,7 @@ const Navbar = () => {
                         variant={{ xs: 'subtitle1', md: 'h6' }}
                         sx={{ color: 'inherit', textDecoration: 'none', mr: 2 }}
                     >
-                        Trivify
+                        <img src="/logo192.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
                     {/* Hamburger nur auf xs–sm */}
@@ -84,6 +85,31 @@ const Navbar = () => {
 
                     {/* Spacer */}
                     <Box sx={{ flexGrow: 1 }} />
+                    <TextField
+                        size="small"
+                        variant="outlined"
+                        placeholder="Quiz suchen..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && searchTerm.trim()) {
+                                navigate(`/quizzes?query=${encodeURIComponent(searchTerm.trim())}`);
+                            }
+                        }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                            sx: {
+                                backgroundColor: darkMode ? 'black' : 'white',
+                                borderRadius: 1,
+                                minWidth: 200
+                            }
+                        }}
+                        sx={{ mx: 1 }}
+                    />
 
                     {/* Dark‑Mode Toggle */}
                     <IconButton
@@ -152,6 +178,7 @@ const Navbar = () => {
                     Meine Quizze
                 </MenuItem>) : null}
             </Menu>
+
 
             {/* User Account Menu (Desktop & Mobile) */}
             <Menu

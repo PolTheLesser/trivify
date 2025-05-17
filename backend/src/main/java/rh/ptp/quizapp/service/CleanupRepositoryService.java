@@ -96,17 +96,29 @@ public class CleanupRepositoryService {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+
+    @Scheduled(cron = "0 0 * * * *") // jede Stunde //ToDo: implement account status, implement rest of mails
     public void cleanupOldRegistrations() {
         LocalDateTime warningTime = LocalDateTime.now().minusHours(23);
         List<RegistrationRequest> requests = registrationRequestRepository.findAllByCreatedAtBefore(warningTime);
         for (RegistrationRequest request : requests) {
             Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
             variables.put("username", request.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + request.getVerificationToken());
-            emailService.sendEmail(request.getEmail(),"Erinnerung: Registrierung", "registration-delete-warning", variables);
+            variables.put("loginUrl", frontendUrl + "/login");
+            //if(user.status="registration"){
+            emailService.sendEmail(request.getEmail(), "Erinnerung: Registrierung", "registration-delete-warning", variables);
+            //} else{
+            //    emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables); }
         }
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
+        requests = registrationRequestRepository.findAllByCreatedAtBefore(expiryTime);
+        for (RegistrationRequest request : requests) {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("username", request.getName());
+        }
         registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
     }
 
