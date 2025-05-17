@@ -49,33 +49,7 @@ const Welcome = () => {
             </Box>
 
             <Grid container spacing={3}>
-                {/* Quiz Collection */}
-                <Grid item xs={12} md={4}>
-                    <Paper
-                        elevation={3}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            '&:hover': { bgcolor: 'action.hover' },
-                        }}
-                        onClick={() => navigate('/quizzes')}
-                    >
-                        <QuizIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Quizsammlung
-                        </Typography>
-                        <Typography color="text.secondary" align="center">
-                            Entdecken Sie unsere Sammlung von Quizzen und testen Sie Ihr Wissen
-                        </Typography>
-                    </Paper>
-                </Grid>
-
-                {/* Daily Quiz */}
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                     <Paper
                         elevation={3}
                         sx={{
@@ -99,32 +73,7 @@ const Welcome = () => {
                     </Paper>
                 </Grid>
 
-                {/* Highscore */}
-                <Grid item xs={12} md={4}>
-                    <Paper
-                        elevation={3}
-                        sx={{
-                            p: 3,
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            cursor: 'default',
-                            '&:hover': { bgcolor: 'action.hover' },
-                        }}
-                    >
-                        <EmojiEventsIcon sx={{ fontSize: 60, color: 'warning.main', mb: 2 }} />
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Highscore
-                        </Typography>
-                        <Box sx={{ width: '100%', mt: 2 }}>
-                            <ScoreBoard userId={user?.id} />
-                        </Box>
-                    </Paper>
-                </Grid>
-
-                {/* Random Quiz */}
-                <Grid item xs={12} md={12}>
+                <Grid item xs={12} md={6}>
                     <Paper
                         elevation={3}
                         sx={{
@@ -144,6 +93,55 @@ const Welcome = () => {
                         </Typography>
                         <Typography color="text.secondary" align="center">
                             Starten Sie ein zufälliges Quiz und testen Sie Ihr Wissen
+                        </Typography>
+                    </Paper>
+                </Grid>
+
+                {/* Highscore */}
+                <Grid item xs={12} md={6}>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            cursor: 'default',
+                            '&:hover': { bgcolor: 'action.hover' },
+                        }}
+                    >
+                        <EmojiEventsIcon sx={{ fontSize: 60, color: 'warning.main', mb: 2 }} />
+                        <Typography variant="h5" component="h2" gutterBottom>
+                            Highscore
+                        </Typography>
+                        <Box sx={{ width: '100%', mb: 2 }}>
+                            <ScoreBoard userId={user?.id} />
+                        </Box>
+                    </Paper>
+                </Grid>
+
+                {/* Random Quiz */}
+                <Grid item xs={12} md={6}>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: 'action.hover' },
+                        }}
+                        onClick={() => navigate('/quizzes')}
+                    >
+                        <QuizIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+                        <Typography variant="h5" component="h2" gutterBottom>
+                            Quizsammlung
+                        </Typography>
+                        <Typography color="text.secondary" align="center">
+                            Entdecken Sie unsere Sammlung von Quizzen und testen Sie Ihr Wissen
                         </Typography>
                     </Paper>
                 </Grid>
