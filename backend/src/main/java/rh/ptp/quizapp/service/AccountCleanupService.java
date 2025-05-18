@@ -20,9 +20,7 @@ public class AccountCleanupService {
         // 1. Lösche alle abhängigen Datensätze
         cleanupRepositoryService.deleteAllQuizResultsByUser(userId);
         cleanupRepositoryService.deleteAllQuizRatingsByUser(userId);
-        cleanupRepositoryService.deleteAllQuestionAnswersByUser(userId);
-        cleanupRepositoryService.deleteAllQuizQuestionsByUser(userId);
-        cleanupRepositoryService.deleteAllQuizzesByUser(userId);
+        cleanupRepositoryService.setAllCreatedQuizzesToAdmin(userId);
 
 
         // 2. Lösche den Benutzer

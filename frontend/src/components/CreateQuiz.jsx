@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -42,7 +42,7 @@ const CreateQuiz = () => {
     // tag state
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
-    
+
     const handleAddTag = () => {
         const t = tagInput.trim();
         if (t && !tags.includes(t) && tags.length < 3) {
@@ -57,7 +57,7 @@ const CreateQuiz = () => {
 
     const handleQuestionChange = (index, field, value) => {
         const newQuestions = [...questions];
-        newQuestions[index] = { ...newQuestions[index], [field]: value };
+        newQuestions[index] = {...newQuestions[index], [field]: value};
         setQuestions(newQuestions);
     };
 
@@ -120,8 +120,8 @@ const CreateQuiz = () => {
         try {
             await axios.post(
                 process.env.REACT_APP_API_URL,
-                { title, description, difficulty, questions },
-                { params: { userId } }
+                {title, description, difficulty, questions},
+                {params: {userId}}
             );
             setSuccess("Quiz erfolgreich erstellt!");
             setTitle("");
@@ -144,14 +144,14 @@ const CreateQuiz = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
+        <Container maxWidth="md" sx={{mt: 4}}>
+            <Paper elevation={3} sx={{p: 4}}>
                 <Typography variant="h4" component="h1" gutterBottom align="center">
                     Neues Quiz erstellen
                 </Typography>
 
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+                {error && <Alert severity="error" sx={{mb: 2}}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{mb: 2}}>{success}</Alert>}
 
                 <form onSubmit={handleSubmit}>
                     <TextField
@@ -174,59 +174,60 @@ const CreateQuiz = () => {
                     />
 
                     {/* Tags input */}
-                        <Box sx={{ mt: 2 }}>
-                            <Typography variant="subtitle1" gutterBottom>
-                                Tags
-                            </Typography>
-                            <Paper
-                                component="form"
-                                onSubmit={e => { e.preventDefault(); handleAddTag(); }}
-                                sx={{
-                                    p: '4px 8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    gap: 1,
-                                    border: '1px solid',
-                                    borderColor: 'grey.400',
-                                    borderRadius: 1,
-                                }}
-                            >
-                                <TextField
-                                    variant="outlined"
-                                    label="Tag"
-                                    value={tagInput}
-                                    onChange={e => setTagInput(e.target.value)}
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter' || e.key === ',') {
-                                            e.preventDefault();
-                                            handleAddTag();
-                                        }
-                                    }}
-                                    sx={{ flexGrow: 1 }}
-                                />
-                                <IconButton size="small" onClick={handleAddTag}>
-                                    <AddIcon />
-                                </IconButton>
-                            </Paper>
+                    <Typography variant="subtitle1" gutterBottom>
+                        Kategorien
+                    </Typography>
+                    <Paper
+                        component="form"
+                        onSubmit={e => {
+                            e.preventDefault();
+                            handleAddTag();
+                        }}
+                        sx={{
+                            p: '4px 8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 1,
+                            border: '1px solid',
+                            borderColor: 'grey.400',
+                            borderRadius: 1,
+                        }}
+                    >
+                        <TextField
+                            variant="outlined"
+                            label="Kategorie"
+                            value={tagInput}
+                            onChange={e => setTagInput(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' || e.key === ',') {
+                                    e.preventDefault();
+                                    handleAddTag();
+                                }
+                            }}
+                            sx={{flexGrow: 1}}
+                        />
+                        <IconButton size="small" onClick={handleAddTag}>
+                            <AddIcon/>
+                        </IconButton>
+                    </Paper>
 
-                        <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {tags.map(tag => (
-                                <Chip
-                                    key={tag}
-                                    label={tag}
-                                    onDelete={() => handleDeleteTag(tag)}
-                                    clickable
-                                    variant="outlined"
-                                />
-                            ))}
-                        </Box>
+                    <Box sx={{mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1}}>
+                        {tags.map(tag => (
+                            <Chip
+                                key={tag}
+                                label={tag}
+                                onDelete={() => handleDeleteTag(tag)}
+                                clickable
+                                variant="outlined"
+                            />
+                        ))}
                     </Box>
 
                     <List>
                         {questions.map((q, qi) => (
                             <ListItem key={qi} divider>
-                                <Box sx={{ width: '100%' }}>
+                                <Box sx={{width: '100%'}}>
                                     <Typography variant="h6" gutterBottom>
                                         Frage {qi + 1}
                                     </Typography>
@@ -288,17 +289,17 @@ const CreateQuiz = () => {
                                         onClick={() => removeQuestion(qi)}
                                         disabled={questions.length === 1}
                                     >
-                                        <DeleteIcon />
+                                        <DeleteIcon/>
                                     </IconButton>
                                 </ListItemSecondaryAction>
                             </ListItem>
                         ))}
                     </List>
 
-                    <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
                         <Button
                             variant="outlined"
-                            startIcon={<AddIcon />}
+                            startIcon={<AddIcon/>}
                             onClick={addQuestion}
                         >
                             Frage hinzufügen

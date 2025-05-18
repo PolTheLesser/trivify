@@ -5,13 +5,16 @@ REM ─── detect branch name ───────────────�
 for /f "delims=" %%B in ('git rev-parse --abbrev-ref HEAD') do set "BRANCH=%%B"
 for /f "delims=" %%S in ('git rev-parse --short HEAD')      do set "SHA=%%S"
 
+REM ─── normalize branch (replace any "/" with "-") ─────────────────────────
+set "BRANCH_SAFE=%BRANCH:/=-%"
+
 REM ─── choose the tag ────────────────────────────────────────────────────
-if /I "%BRANCH%"=="main" (
+if /I "%BRANCH_SAFE%"=="main" (
     set "TAG=latest"
-) else if /I "%BRANCH%"=="dev" (
+) else if /I "%BRANCH_SAFE%"=="dev" (
     set "TAG=beta"
 ) else (
-    set "TAG=dev-%BRANCH%-%SHA%"
+    set "TAG=dev-%BRANCH_SAFE%-%SHA%"
 )
 
 echo On branch "%BRANCH%", tagging images as :"%TAG%".

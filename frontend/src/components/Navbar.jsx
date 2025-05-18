@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { Link as RouterLink, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
     AppBar,
     Toolbar,
@@ -22,46 +22,64 @@ import { ThemeContext } from '../contexts/ThemeContext';
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
+
+    // lokaler State für das Eingabefeld
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Desktop user menu
-    const [anchorEl, setAnchorEl] = useState(null);
-    const isUserMenuOpen = Boolean(anchorEl);
-    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
-    const handleUserMenuClose = () => setAnchorEl(null);
+    // URL-Query → local State
+    useEffect(() => {
+        setSearchTerm(searchParams.get('query') || '');
+    }, [searchParams]);
 
-    // Mobile nav menu
-    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
-    const isMobileMenuOpen = Boolean(mobileAnchorEl);
-    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
-    const handleMobileMenuClose = () => setMobileAnchorEl(null);
+    // bei Eingabe: State updaten; auf /quizzes auch direkt den URL-Param
+    const handleSearchChange = e => {
+        const val = e.target.value;
+        setSearchTerm(val);
+        if (location.pathname === '/quizzes') {
+            if (val) setSearchParams({ query: val });
+            else setSearchParams({});
+        }
+    };
+
+    // bei Enter: immer (auch außerhalb /quizzes) zur QuizList mit Query navigieren
+    const handleSearchKeyDown = e => {
+        if (e.key === 'Enter') {
+            const q = searchTerm.trim();
+            navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
+        }
+    };
 
     const handleToggle = () => {
         setDarkMode(!darkMode);
     };
 
+    // User-Menu-Logik …
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isUserMenuOpen = Boolean(anchorEl);
+    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
+    const handleUserMenuClose = () => setAnchorEl(null);
+
+    // Mobile-Menu …
+    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
+    const isMobileMenuOpen = Boolean(mobileAnchorEl);
+    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
+    const handleMobileMenuClose = () => setMobileAnchorEl(null);
+
     return (
         <>
             <AppBar position="static">
                 <Toolbar>
-                    {/* Logo as burger icon on xs–sm */}
+                    {/* Logo / Burger on xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
-                        <IconButton
-                            size="large"
-                            aria-label="open navigation menu"
-                            onClick={handleMobileMenuOpen}
-                            color="inherit"
-                        >
-                            <img
-                                src="/logo192.png"
-                                alt="Trivify"
-                                style={{ height: 32, width: 32 }}
-                            />
+                        <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
+                            <img src="/logo192.png" alt="Trivify" style={{ height: 32, width: 32 }} />
                         </IconButton>
                     </Box>
 
-                    {/* Brand (visible md+) */}
+                    {/* Brand on md+ */}
                     <Typography
                         component={RouterLink}
                         to="/"
@@ -76,49 +94,26 @@ const Navbar = () => {
                         <img src="/logo192.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
-                    {/* Link buttons from md up */}
-                    <Box
-                        sx={{
-                            display: { xs: 'none', md: 'flex' },
-                            gap: 2,
-                            mx: 'auto',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Button component={RouterLink} to="/quizzes" color="inherit">
-                            Quizze
-                        </Button>
-                        <Button component={RouterLink} to="/daily-quiz" color="inherit">
-                            Tägliches Quiz (KI)
-                        </Button>
+                    {/* Nav-Buttons md+ */}
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, mx: 'auto', alignItems: 'center' }}>
+                        <Button component={RouterLink} to="/quizzes" color="inherit">Quizze</Button>
+                        <Button component={RouterLink} to="/daily-quiz" color="inherit">Tägliches Quiz (KI)</Button>
                         {user && (
-                            <Button
-                                component={RouterLink}
-                                to="/quizzes/my-quizzes"
-                                color="inherit"
-                            >
+                            <Button component={RouterLink} to="/quizzes/my-quizzes" color="inherit">
                                 Meine Quizze
                             </Button>
                         )}
                     </Box>
 
-                    {/* Spacer + Search always visible */}
+                    {/* Suchfeld */}
                     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
                         <TextField
                             size="small"
                             variant="outlined"
                             placeholder="Quiz suchen..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && searchTerm.trim()) {
-                                    navigate(
-                                        `/quizzes?query=${encodeURIComponent(
-                                            searchTerm.trim()
-                                        )}`
-                                    );
-                                }
-                            }}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -127,26 +122,22 @@ const Navbar = () => {
                                 ),
                                 sx: {
                                     backgroundColor: darkMode ? 'black' : 'white',
-                                    borderRadius: 1,
-                                },
+                                    borderRadius: 1
+                                }
                             }}
                             sx={{
                                 mx: 1,
-                                width: { xs: '100%', sm: 200 },
+                                width: { xs: '100%', sm: 200 }
                             }}
                         />
                     </Box>
 
-                    {/* Dark-Mode Toggle */}
-                    <IconButton
-                        color="inherit"
-                        onClick={handleToggle}
-                        sx={{ mr: 1, borderRadius: '50%', width: 40, height: 40 }}
-                    >
+                    {/* Dark Mode Toggle */}
+                    <IconButton color="inherit" onClick={handleToggle} sx={{ mr: 1, borderRadius: '50%', width: 40, height: 40 }}>
                         {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
 
-                    {/* User Icon / Auth */}
+                    {/* User Icon */}
                     {user ? (
                         <IconButton
                             size="medium"
@@ -155,13 +146,7 @@ const Navbar = () => {
                             aria-haspopup="true"
                             onClick={handleUserMenuOpen}
                             color="inherit"
-                            sx={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: '50%',
-                                backgroundColor: 'purple',
-                                color: 'white',
-                            }}
+                            sx={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'purple', color: 'white' }}
                         >
                             {user.name.charAt(0).toUpperCase()}
                         </IconButton>
@@ -181,7 +166,7 @@ const Navbar = () => {
                 </Toolbar>
             </AppBar>
 
-            {/* Mobile Navigation Menu */}
+            {/* Mobile Menu */}
             <Menu
                 anchorEl={mobileAnchorEl}
                 open={isMobileMenuOpen}
@@ -192,35 +177,12 @@ const Navbar = () => {
                 sx={{ display: { xs: 'block', md: 'none' } }}
             >
                 {!user && (
-                    <MenuItem
-                        onClick={() => {
-                            handleMobileMenuClose();
-                            navigate('/');
-                        }}
-                    >
-                        Startseite
-                    </MenuItem>
+                    <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Startseite</MenuItem>
                 )}
-                <MenuItem
-                    onClick={handleMobileMenuClose}
-                    component={RouterLink}
-                    to="/quizzes"
-                >
-                    Quizze
-                </MenuItem>
-                <MenuItem
-                    onClick={handleMobileMenuClose}
-                    component={RouterLink}
-                    to="/daily-quiz"
-                >
-                    Tägliches Quiz (KI)
-                </MenuItem>
+                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes">Quizze</MenuItem>
+                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/daily-quiz">Tägliches Quiz (KI)</MenuItem>
                 {user && (
-                    <MenuItem
-                        onClick={handleMobileMenuClose}
-                        component={RouterLink}
-                        to="/quizzes/my-quizzes"
-                    >
+                    <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes/my-quizzes">
                         Meine Quizze
                     </MenuItem>
                 )}
@@ -237,45 +199,14 @@ const Navbar = () => {
             >
                 {user ? (
                     <>
-                        <MenuItem
-                            component={RouterLink}
-                            to="/welcome"
-                            onClick={handleUserMenuClose}
-                        >
-                            Profil
-                        </MenuItem>
-                        <MenuItem
-                            component={RouterLink}
-                            to="/settings"
-                            onClick={handleUserMenuClose}
-                        >
-                            Einstellungen
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                handleUserMenuClose();
-                                logout();
-                            }}
-                        >
-                            Abmelden
-                        </MenuItem>
+                        <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
+                        <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
+                        <MenuItem onClick={() => { handleUserMenuClose(); logout(); }}>Abmelden</MenuItem>
                     </>
                 ) : (
                     <>
-                        <MenuItem
-                            component={RouterLink}
-                            to="/login"
-                            onClick={handleUserMenuClose}
-                        >
-                            Anmelden
-                        </MenuItem>
-                        <MenuItem
-                            component={RouterLink}
-                            to="/register"
-                            onClick={handleUserMenuClose}
-                        >
-                            Registrieren
-                        </MenuItem>
+                        <MenuItem component={RouterLink} to="/login" onClick={handleUserMenuClose}>Anmelden</MenuItem>
+                        <MenuItem component={RouterLink} to="/register" onClick={handleUserMenuClose}>Registrieren</MenuItem>
                     </>
                 )}
             </Menu>

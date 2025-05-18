@@ -1,0 +1,25 @@
+/* WelcomeCalendar.css */
+
+/* Kalender-Gesamt-Container: übernimmt den Hintergrund und Textfarbe des umgebenden Paper */
+.react-calendar {
+    width: 100%;
+    border: none;
+    background: inherit;
+}
+
+/* Entferne Rahmen um einzelne Tage und setze eckige Felder */
+.react-calendar__tile {
+    border: none;
+    border-radius: 0;
+}
+
+/* Tage mit Quiz-Einträgen hervorheben */
+.played-day {
+    background-color: #e3f2fd !important;
+    cursor: pointer;
+}
+
+/* Hover-Effekt */
+.played-day:hover {
+    background-color: #bbdefb !important;
+}

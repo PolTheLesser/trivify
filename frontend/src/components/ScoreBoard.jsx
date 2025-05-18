@@ -21,25 +21,35 @@ const ScoreBoard = ({ userId }) => {
                     </li>
                 ))}
             </ol>
+            {/* Eigener Score */}
+            <div className="deep-container">
+              {myScore && (
+                  <div className="mt-6 bg-blue-50 p-4 rounded border border-blue-200 w-full max-w-sm text-center">
+                      {myScore.rank !== -1 ? (
+                          <>
+                              <strong>Dein Score:</strong> {myScore.score}{' '}
+                              {myScore.score === 1 ? 'Punkt' : 'Punkte'}.
+                              <br />
+                              Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
+                          </>
+                      ) : (
+                          <div className="text-sm text-gray-500">
+                              Du hast noch keine Punkte gesammelt. Starte ein Quiz!
+                          </div>
+                      )}
+                  </div>
+              )}
 
-            {myScore && (
-                <div className="mt-6 bg-blue-50 p-3 rounded border border-blue-200" color="text.secondary" align="center">
-                    {myScore.rank !== -1 ? (
-                        <>
-                            <p />
-                            <strong>Dein Score:</strong> {myScore.score} {myScore.score === 1 ? 'Punkt' : 'Punkte'}.
-                            <br />
-                            Du bist Platz <strong>{myScore.rank}</strong> im Ranking!
-                            <p />
-                            <p color="text.secondary">Mehrfache Quiz-Teilnahmen & Teilnahmen an eigenen Quizzen werden nicht gezählt!</p>
-                        </>
-                    ) : (
-                        <div className="text-sm text-gray-500">
-                            Du hast noch keine Punkte gesammelt. Starte ein Quiz!
-                        </div>
-                    )}
-                </div>
-            )}
+              {/* Hinweis ganz unten */}
+                <br />
+                <br />
+                <br />
+                <br />
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                  Mehrfache Quiz-Teilnahmen &amp; Teilnahmen an eigenen Quizzen werden nicht
+                  gezählt!
+              </p>
+            </div>
         </div>
     );
 };
