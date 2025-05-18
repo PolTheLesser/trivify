@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.QuizFavoriteRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AccountCleanupService;
@@ -64,17 +65,6 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
-        User user = userRepository.findUserById(userId);
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl + "/logo192.png");
-        variables.put("username", user.getName());
-        variables.put("loginUrl", frontendUrl + "/login");
-        emailService.sendEmail(user.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
-        //user.setStatus(TODELETE); //ToDO : implement account status, put user in deletion query
-        return ResponseEntity.ok().build();
-    }
 
     @PutMapping("/{userId}/daily-quiz-reminder")
     public ResponseEntity<Void> updateDailyQuizReminder(@PathVariable Long userId, @RequestParam boolean reminder) {
@@ -112,8 +102,15 @@ public class UserController {
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteProfile(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            accountCleanupService.deleteUserAccount(userService.getUserFromUserDetails(userDetails).getId());
-            return ResponseEntity.ok().body(new MessageResponse("Account erfolgreich gelöscht"));
+            User user = userService.getUserFromUserDetails(userDetails);
+            user.setUserStatus(UserStatus.PENDING_DELETE);
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
+            variables.put("username",  user.getName());
+            variables.put("loginUrl", frontendUrl + "/login");
+            emailService.sendEmail(user.getEmail(), "Konto zur Löschung vorgemerkt", "account-delete-info", variables);
+            userRepository.save(user);
+            return ResponseEntity.ok().body(new MessageResponse("Account zur Löschung vorgemerkt"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Fehler beim Löschen des Accounts: "+e.getMessage()));
         }
