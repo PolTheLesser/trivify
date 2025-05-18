@@ -150,7 +150,7 @@ const Welcome = () => {
                                     Daily-Streak: <strong>{streak}</strong> {streak === 1 ? 'Tag' : 'Tage'}
                                 </Typography>
                                 <Typography variant="subtitle1" color="text.secondary" align="center" gutterBottom>
-                                    Deine Quiz-Aktivität im aktuellen Monat
+                                    Deine Quiz-Aktivität
                                 </Typography>
 
                                 <Box sx={{display: 'flex', justifyContent: 'center'}}>
