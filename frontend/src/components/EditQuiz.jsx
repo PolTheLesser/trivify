@@ -103,7 +103,7 @@ const EditQuiz = () => {
       });
       setSuccess("Quiz erfolgreich aktualisiert");
       setTimeout(() => {
-        navigate("/quizzes");
+        navigate("/quizzes/my-quizzes");
       }, 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Fehler beim Aktualisieren des Quiz");

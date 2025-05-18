@@ -72,7 +72,7 @@ const MeineQuizze = () => {
     // Tatsächliches Löschen
     const handleDelete = async () => {
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/quizzes/${toDeleteId}`);
+            await axios.delete(`${process.env.REACT_APP_API_URL}/${toDeleteId}`);
             const updated = quizzes.filter(q => q.id !== toDeleteId);
             setQuizzes(updated);
             setDialogOpen(false);
