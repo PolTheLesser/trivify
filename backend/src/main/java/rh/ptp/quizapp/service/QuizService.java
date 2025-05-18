@@ -191,7 +191,7 @@ public class QuizService {
                         newAdmin.setName("Admin");
                         newAdmin.setEmail("quiz_rh@gmx.de");
                         newAdmin.setPassword(passwordEncoder.encode("admin123"));
-                        newAdmin.setEmailVerified(true);
+                        newAdmin.setUserStatus(UserStatus.ACTIVE);
                         return userRepository.save(newAdmin);
                     });
             dailyQuiz.setCreator(adminUser);

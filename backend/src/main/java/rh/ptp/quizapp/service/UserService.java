@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.dto.UserDTO;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.*;
 
 import java.time.LocalDate;
@@ -42,7 +43,7 @@ public class UserService {
             throw new RuntimeException("Ungültiges Passwort");
         }
 
-        if (!user.isEmailVerified()) {
+        if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
             throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
         }
 

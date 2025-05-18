@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 
@@ -70,10 +71,10 @@ public class CleanupRepositoryService {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde //ToDo: implement account status, implement rest of mails
+    @Scheduled(cron = "0 0 * * * *") // jede Stunde
     public void cleanupOldRegistrations() {
         LocalDateTime warningTime = LocalDateTime.now().minusHours(23);
-        List<User> requests = userRepository.findAllByCreatedAtBeforeAndEmailVerifiedFalse(warningTime);
+        List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
 
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
@@ -81,13 +82,14 @@ public class CleanupRepositoryService {
             variables.put("username", request.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + authenticationTokenRepository.findTokenByQuizUser(request));
             variables.put("loginUrl", frontendUrl + "/login");
-            //if(user.status="registration"){
+            if(request.getUserStatus()== UserStatus.PENDING_VERIFICATION){
             emailService.sendEmail(request.getEmail(), "Erinnerung: Registrierung", "registration-delete-warning", variables);
-            //} else{
-            //    emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables); }
+            } else if(request.getUserStatus()== UserStatus.PENDING_DELETE){
+                emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
+            }
         }
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
-        requests = userRepository.findAllByCreatedAtBeforeAndEmailVerifiedFalse(expiryTime);
+        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE);
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/logo192.png");
@@ -95,6 +97,6 @@ public class CleanupRepositoryService {
             variables.put("loginUrl", frontendUrl + "/login");
             emailService.sendEmail(request.getEmail(), "Account Deletion Notification", "account-deletion-notification", variables);
         }
-        userRepository.deleteAllByCreatedAtBeforeAndEmailVerifiedFalse(expiryTime);
+        userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
     }
 }

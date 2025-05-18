@@ -13,6 +13,7 @@ import rh.ptp.quizapp.dto.RegisterRequest;
 import rh.ptp.quizapp.dto.UserDTO;
 import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.security.JwtService;
@@ -47,7 +48,7 @@ public class AuthService {
                 .setName(request.getName())
                 .setEmail(request.getEmail())
                 .setPassword(passwordEncoder.encode(request.getPassword()))
-                .setEmailVerified(false)
+                .setUserStatus(UserStatus.PENDING_VERIFICATION)
                 .setDailyQuizReminder(request.isDailyQuizReminder());
 
         pendingUser = userRepository.save(pendingUser);
@@ -76,8 +77,18 @@ public class AuthService {
             User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
 
-            if (!user.isEmailVerified()) {
+            if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
                 throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
+            } else if (user.getUserStatus()==UserStatus.BLOCKED) {
+                throw new RuntimeException("Benutzerkonto ist gesperrt");
+            } else if (user.getUserStatus()==UserStatus.PENDING_DELETE) {
+                user.setUserStatus(UserStatus.ACTIVE);
+                userRepository.save(user);
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
+                variables.put("username", request.getName());
+                variables.put("quizUrl", frontendUrl + "/daily-quiz");
+                emailService.sendEmail(user.getEmail(), "Account reaktiviert", "account-reactivated", variables);
             }
 
             String token = jwtService.generateToken(user);
@@ -99,7 +110,7 @@ public class AuthService {
         }
 
         User user = authenticationToken.getQuizUser();
-        user.setEmailVerified(true);
+        user.setUserStatus(UserStatus.ACTIVE);
 
         userRepository.save(user);
         authenticationTokenRepository.delete(authenticationToken);

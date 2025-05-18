@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
+import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AuthService;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {

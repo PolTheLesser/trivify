@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,8 +42,7 @@ public class Quiz {
     private List<QuizQuestion> questions;
 
     private boolean isPublic = true;
-    @Setter
-    private boolean isDailyQuiz = false;
+    private List<QuizCategory> categories = new ArrayList<>();
     
     
     @Column(name = "quiz_date")
@@ -54,20 +54,16 @@ public class Quiz {
     private Double avgRating;
     private Long   ratingCount;
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
     public boolean isDailyQuiz() {
-        return isDailyQuiz;
+        return categories.contains(QuizCategory.DAILY_QUIZ);
     }
 
     public void setDailyQuiz(boolean isDailyQuiz) {
-        this.isDailyQuiz = isDailyQuiz;
+        if(isDailyQuiz) {
+            categories.add(QuizCategory.DAILY_QUIZ);
+        } else {
+            categories.remove(QuizCategory.DAILY_QUIZ);
+        }
     }
 
     @PrePersist

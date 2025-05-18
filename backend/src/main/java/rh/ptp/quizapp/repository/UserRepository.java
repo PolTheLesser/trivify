@@ -2,6 +2,7 @@ package rh.ptp.quizapp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByResetPasswordToken(String token);
     List<User> findByDailyQuizReminderIsNotNull();
     boolean existsByName(String name);
-    List<User> findAllByCreatedAtBeforeAndEmailVerifiedFalse(LocalDateTime warningTime);
-    void deleteAllByCreatedAtBeforeAndEmailVerifiedFalse(LocalDateTime dateTime);
+    List<User> findAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> statuses);
+    void deleteAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime dateTime, List<UserStatus> statuses);
 } 

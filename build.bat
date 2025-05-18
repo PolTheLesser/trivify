@@ -20,7 +20,7 @@ if /I "%BRANCH_SAFE%"=="main" (
 echo On branch "%BRANCH%", tagging images as :"%TAG%".
 REM ==== FRONTEND ====
 echo Building frontend...
-docker build --build-arg REACT_APP_API_URL=http://127.0.0.1:9090/api -t quiz-frontend ./frontend
+docker build --build-arg REACT_APP_API_URL=http://192.168.200.11:9090/api -t quiz-frontend ./frontend
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...

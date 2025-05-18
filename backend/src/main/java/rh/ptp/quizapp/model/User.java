@@ -34,7 +34,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false)
-    private boolean emailVerified = false;
+    private UserStatus userStatus = UserStatus.PENDING_VERIFICATION;
 
     @Column(nullable = false)
     private boolean dailyQuizReminder = false;
@@ -58,7 +58,9 @@ public class User implements UserDetails {
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        if(userStatus == UserStatus.ACTIVE){
+            updatedAt = LocalDateTime.now();
+        }
     }
 
     @Override
@@ -88,6 +90,10 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return emailVerified;
+        if(userStatus == UserStatus.ACTIVE) {
+            return true;
+        } else {
+            return false;
+        }
     }
 } 
