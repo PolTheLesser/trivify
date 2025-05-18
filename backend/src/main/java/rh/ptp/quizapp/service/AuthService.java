@@ -50,6 +50,7 @@ public class AuthService {
                 .setEmailVerified(false)
                 .setDailyQuizReminder(request.isDailyQuizReminder());
 
+        pendingUser = userRepository.save(pendingUser);
         AuthenticationToken token = createAuthenticationToken(pendingUser);
 
         sendVerificationEmail(request.getEmail(), request.getName(), token.getToken());
