@@ -122,8 +122,10 @@ public class CleanupRepositoryService {
         requests = userRepository.findAllByCreatedAtBeforeAndEmailVerifiedFalse(expiryTime);
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
             variables.put("username", request.getName());
+            variables.put("loginUrl", frontendUrl + "/login");
+            emailService.sendEmail(request.getEmail(), "Account Deletion Notification", "account-deletion-notification", variables);
         }
         userRepository.deleteAllByCreatedAtBeforeAndEmailVerifiedFalse(expiryTime);
     }
