@@ -86,7 +86,7 @@ public class AuthService {
                 userRepository.save(user);
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("logoUrl", frontendUrl + "/logo192.png");
-                variables.put("username", request.getName());
+                variables.put("username", user.getName());
                 variables.put("quizUrl", frontendUrl + "/daily-quiz");
                 emailService.sendEmail(user.getEmail(), "Account reaktiviert", "account-reactivated", variables);
             }

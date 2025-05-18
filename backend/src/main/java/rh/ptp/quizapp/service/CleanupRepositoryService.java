@@ -89,7 +89,7 @@ public class CleanupRepositoryService {
             }
         }
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
-        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE);
+        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/logo192.png");
