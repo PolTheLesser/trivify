@@ -179,6 +179,7 @@ const Welcome = () => {
                                             </Typography>
                                             {popoverInfo.quizzes.map((quiz, i) => (
                                                 <Box key={i} sx={{mb: 1}}>
+                                                    <br/>
                                                     <Typography component="span" variant="body2">
                                                         {quiz.quizTitle}
                                                     </Typography>
@@ -191,8 +192,6 @@ const Welcome = () => {
                                                     <Typography component="span" variant="body2">
                                                         Ergebnis: {quiz.score}/{quiz.maxPossibleScore} {quiz.maxPossibleScore === 1 ? 'Punkt' : 'Punkte'}
                                                     </Typography>
-                                                    <br/>
-                                                    <br/>
                                                 </Box>
                                             ))}
                                         </Box>
