@@ -14,4 +14,5 @@ import java.util.Optional;
 public interface QuizFavoriteRepository extends JpaRepository<QuizFavorite, Long> {
     Optional<QuizFavorite> findByUserIdAndQuizId(Long userId, Long quizId);
     List<QuizFavorite> findAllByUserId(Long userId);
+    void deleteByQuizId(Long quizId);
 }

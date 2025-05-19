@@ -58,7 +58,7 @@ public class QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
-        quiz.setCategories(quizDTO.getCategories());
+        quiz.setCategories(quizDTO.getCategories()); //ToDO: not working
         quiz.setCreator(creator);
         quiz.setPublic(true);
         quiz.setDailyQuiz(quizDTO.isDailyQuiz());
@@ -122,8 +122,9 @@ public class QuizService {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
-        quizRatingRepository.deleteByQuizId(quizId);   // 🧽
-        quizResultRepository.deleteByQuizId(quizId);   // 🧽
+        quizFavoriteRepository.deleteByQuizId(quizId);
+        quizRatingRepository.deleteByQuizId(quizId);
+        quizResultRepository.deleteByQuizId(quizId);
         quizRepository.delete(quiz);
     }
 

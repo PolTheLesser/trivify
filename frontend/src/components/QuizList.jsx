@@ -30,7 +30,7 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuth } from '../contexts/AuthContext';
 import axios from '../api/api';
-
+//ToDO: Category not translated
 const QuizList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
