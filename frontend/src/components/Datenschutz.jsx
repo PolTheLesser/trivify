@@ -31,7 +31,7 @@ export default function Datenschutz() {
             </p>
             <h2 className="text-xl font-semibold mt-6">5. Ihre Rechte</h2>
             <p>
-                Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit. Wenden Sie sich hierzu an datenschutz@quiz-app.de.
+                Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit. Wenden Sie sich hierzu an quiz_rh@gmx.de
             </p>
             <h2 className="text-xl font-semibold mt-6">6. Änderungen dieser Datenschutzerklärung</h2>
             <p>
