@@ -27,6 +27,7 @@ const CreateQuiz = () => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [categories, addCategory] = useState('');
     const [difficulty, setDifficulty] = useState('MEDIUM');
     const [questions, setQuestions] = useState([
         {
@@ -44,15 +45,38 @@ const CreateQuiz = () => {
     const [tagInput, setTagInput] = useState('');
 
     const handleAddTag = async () => {
-        const response = await axios.get(process.env.REACT_APP_API_URL + '/categories/values');
-        const data = response.data;
-        data.shift();
-        const t = tagInput.trim();
-        if (t && !tags.includes(t) && tags.length < 3 && data.contains(t)) {
-            setTags(prev => [...prev, t]);
+        try {
+            // 1. Fetch the human-readable values and drop the first (placeholder) entry
+            const valuesRes = await axios.get(`${process.env.REACT_APP_API_URL}/categories/values`);
+            const values = valuesRes.data.slice(1);
+
+            // 2. Fetch the full category objects and drop the first entry to keep in sync
+            const dataRes = await axios.get(`${process.env.REACT_APP_API_URL}/categories`);
+            const categories = dataRes.data.slice(1);
+
+            // 3. Prepare the tag
+            const t = tagInput.trim();
+
+            // 4. Only add if it’s non-empty, not a duplicate, under your limit, and actually one of the values
+            if (t && !tags.includes(t) && tags.length < 3 && values.includes(t)) {
+                // a) Add the tag string
+                setTags(prev => [...prev, t]);
+
+                // b) Find its index, then grab the same-position entry from your "categories" array
+                const idx = values.indexOf(t);
+                const selectedCategory = categories[idx];
+
+                // c) Call your helper with that full category object (or ID, whatever your API shape is)
+                addCategory(selectedCategory);
+            }
+        } catch (err) {
+            console.error('Error adding tag/category:', err);
+        } finally {
+            // clear the input regardless
+            setTagInput('');
         }
-        setTagInput('');
     };
+
 
     const handleDeleteTag = (tagToDelete: string) => {
         setTags(prev => prev.filter(t => t !== tagToDelete));
@@ -123,7 +147,7 @@ const CreateQuiz = () => {
         try {
             await axios.post(
                 process.env.REACT_APP_API_URL,
-                {title, description, difficulty, questions},
+                {title, description, categories, difficulty, questions},
                 {params: {userId}}
             );
             setSuccess("Quiz erfolgreich erstellt!");
