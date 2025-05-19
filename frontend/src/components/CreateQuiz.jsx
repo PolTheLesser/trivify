@@ -134,7 +134,7 @@ const CreateQuiz = () => {
         try {
             await axios.post(
                 process.env.REACT_APP_API_URL,
-                {title, description, difficulty, questions},
+                {title, description, categories, questions},
                 {params: {userId}}
             );
             setSuccess("Quiz erfolgreich erstellt!");
