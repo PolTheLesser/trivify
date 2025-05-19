@@ -60,9 +60,7 @@ const CreateQuiz = () => {
     }, []);
 
     const handleTagsChange = (event, newTags) => {
-        // newTags is array of selected value strings
         setTags(newTags);
-        // map to full category objects by matching index
         const selectedCats = newTags.map(tag => {
             const idx = allValues.indexOf(tag);
             return allCategories[idx];
@@ -70,7 +68,6 @@ const CreateQuiz = () => {
         setCategories(selectedCats);
     };
 
-    // ... (other handlers unchanged) ...
 
     const isFormValid = () => {
         if (!title.trim()) return false;
@@ -133,7 +130,6 @@ const CreateQuiz = () => {
                         rows={3}
                     />
 
-                    {/* Tag selector using Autocomplete */}
                     <Autocomplete
                         multiple
                         options={allValues}
@@ -166,11 +162,9 @@ const CreateQuiz = () => {
                         limitTags={3}
                     />
 
-                    {/* Questions list unchanged */}
                     <List>
                         {questions.map((q, qi) => (
                             <ListItem key={qi} divider>
-                                {/* ... render questions as before ... */}
                                 <ListItemSecondaryAction>
                                     <IconButton edge="end" onClick={() => {/* removeQuestion(qi) */}} disabled={questions.length === 1}>
                                         <DeleteIcon />
