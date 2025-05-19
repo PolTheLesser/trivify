@@ -96,8 +96,8 @@ export default function Datenschutz() {
                     </List>
                     <Typography variant="body2" color="text.secondary" paragraph>
                         Für die Ausübung Ihrer Rechte oder bei Fragen zum Datenschutz schreiben Sie uns an{' '}
-                        <Link href="mailto:datenschutz@quiz-app.de" underline="hover" color="primary">
-                            datenschutz@quiz-app.de
+                        <Link href="mailto:quiz_rh@gmx.de" underline="hover" color="primary">
+                            quiz_rh@gmx.de
                         </Link>.
                     </Typography>
                 </Box>
