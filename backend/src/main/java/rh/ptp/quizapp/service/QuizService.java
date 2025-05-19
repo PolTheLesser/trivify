@@ -92,6 +92,7 @@ public class QuizService {
 
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
+        quiz.setCategories(quizDTO.getCategories());
         quiz.setPublic(quizDTO.isPublic());
         // Füge neue Fragen hinzu
         List<QuizQuestion> questions = quizDTO.getQuestions().stream()

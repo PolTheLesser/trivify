@@ -1,66 +1,121 @@
 import React from 'react';
+import { Container, Typography, Paper, Box, Link, List, ListItem, ListItemText } from '@mui/material';
 
 export default function Datenschutz() {
     return (
-        <div className="p-8 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-            <h1 className="text-3xl font-bold mb-6 text-center text-primary-700">Datenschutzerklärung</h1>
-            <p className="mb-4 text-gray-700">
-                Wir freuen uns über Ihr Interesse an Trivify. Der Schutz Ihrer Daten ist uns sehr wichtig. Nachfolgend
-                informieren wir Sie über die wichtigsten Aspekte der Datenverarbeitung im Rahmen unserer App.
-            </p>
+        <Container maxWidth="md" sx={{ mt: 8 }}>
+            <Paper elevation={3} sx={{ p: 4 }}>
+                <Typography variant="h4" align="center" gutterBottom>
+                    Datenschutzerklärung
+                </Typography>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">1. Verantwortliche Stelle</h2>
-            <div className="mb-4 text-gray-700">
-                Trivify Team<br/>
-                c/o Rheinische Hochschule Köln (RH Köln)<br/>
-                Schaevenstraße 1B<br/>
-                50676 Köln<br/>
-                E-Mail: <a href="mailto:quiz_rh@gmx.de" className="text-blue-600 underline">quiz_rh@gmx.de</a>
-            </div>
+                <Typography variant="body1" paragraph color="text.secondary">
+                    Wir freuen uns über Ihr Interesse an Trivify. Der Schutz Ihrer Daten ist uns sehr wichtig.
+                    Nachfolgend informieren wir Sie über die wichtigsten Aspekte der Datenverarbeitung im Rahmen unserer App.
+                </Typography>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">2. Welche Daten werden verarbeitet?</h2>
-            <ul className="list-disc list-inside mb-4 text-gray-700">
-                <li>Registrierungsdaten (Name, E-Mail-Adresse, Passwort)</li>
-                <li>Quiz-Aktivitäten (z. B. beantwortete Fragen, Streaks, Punkte)</li>
-                <li>Einstellungen (z. B. Erinnerungsfunktion für das tägliche Quiz)</li>
-                <li>Kommunikationsdaten (z. B. E-Mail-Benachrichtigungen)</li>
-            </ul>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        1. Verantwortliche Stelle
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Trivify Team<br />
+                        c/o Rheinische Hochschule Köln (RH Köln)<br />
+                        Schaevenstraße 1B<br />
+                        50676 Köln<br />
+                        E-Mail:{' '}
+                        <Link href="mailto:quiz_rh@gmx.de" underline="hover" color="primary">
+                            quiz_rh@gmx.de
+                        </Link>
+                    </Typography>
+                </Box>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">3. Zweck der Datenverarbeitung</h2>
-            <ul className="list-disc list-inside mb-4 text-gray-700">
-                <li>Betrieb und Verbesserung der Quiz-Plattform</li>
-                <li>Versand von Erinnerungs- und Streak-E-Mails (sofern aktiviert)</li>
-                <li>Auswertung der Nutzung zur Optimierung des Angebots</li>
-                <li>Fehleranalyse und Sicherheit</li>
-            </ul>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        2. Welche Daten werden verarbeitet?
+                    </Typography>
+                    <List dense>
+                        {[
+                            'Registrierungsdaten (Name, E-Mail-Adresse, Passwort)',
+                            'Quiz-Aktivitäten (z. B. beantwortete Fragen, Streaks, Punkte)',
+                            'Einstellungen (z. B. Erinnerungsfunktion für das tägliche Quiz)',
+                            'Kommunikationsdaten (z. B. E-Mail-Benachrichtigungen)'
+                        ].map((item, index) => (
+                            <ListItem key={index}>
+                                <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2' }} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">4. Weitergabe von Daten</h2>
-            <p className="mb-4 text-gray-700">
-                Ihre Daten werden nicht an Dritte weitergegeben, außer es besteht eine gesetzliche Verpflichtung oder
-                Sie haben ausdrücklich eingewilligt. Die Quizfragen werden teilweise automatisiert durch einen externen
-                KI-Service generiert; dabei werden jedoch keine personenbezogenen Daten übermittelt.
-            </p>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        3. Zweck der Datenverarbeitung
+                    </Typography>
+                    <List dense>
+                        {[
+                            'Betrieb und Verbesserung der Quiz-Plattform',
+                            'Versand von Erinnerungs- und Streak-E-Mails (sofern aktiviert)',
+                            'Auswertung der Nutzung zur Optimierung des Angebots',
+                            'Fehleranalyse und Sicherheit'
+                        ].map((item, index) => (
+                            <ListItem key={index}>
+                                <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2' }} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">5. Ihre Rechte</h2>
-            <ul className="list-disc list-inside mb-4 text-gray-700">
-                <li>Auskunft über Ihre gespeicherten Daten</li>
-                <li>Berichtigung oder Löschung Ihrer Daten</li>
-                <li>Einschränkung der Verarbeitung</li>
-                <li>Widerspruch gegen die Verarbeitung</li>
-                <li>Datenübertragbarkeit</li>
-            </ul>
-            <p className="mb-4 text-gray-700">
-                Für die Ausübung Ihrer Rechte oder bei Fragen zum Datenschutz schreiben Sie uns an <a
-                href="mailto:datenschutz@quiz-app.de" className="text-blue-600 underline">datenschutz@quiz-app.de</a>.
-            </p>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        4. Weitergabe von Daten
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                        Ihre Daten werden nicht an Dritte weitergegeben, außer es besteht eine gesetzliche Verpflichtung oder
+                        Sie haben ausdrücklich eingewilligt. Die Quizfragen werden teilweise automatisiert durch einen externen
+                        KI-Service generiert; dabei werden jedoch keine personenbezogenen Daten übermittelt.
+                    </Typography>
+                </Box>
 
-            <h2 className="text-xl font-semibold mt-8 mb-2 text-primary-600">6. Änderungen</h2>
-            <p className="mb-4 text-gray-700">
-                Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf zu aktualisieren. Die aktuelle Version
-                finden Sie jederzeit in der App.
-            </p>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        5. Ihre Rechte
+                    </Typography>
+                    <List dense>
+                        {[
+                            'Auskunft über Ihre gespeicherten Daten',
+                            'Berichtigung oder Löschung Ihrer Daten',
+                            'Einschränkung der Verarbeitung',
+                            'Widerspruch gegen die Verarbeitung',
+                            'Datenübertragbarkeit'
+                        ].map((item, index) => (
+                            <ListItem key={index}>
+                                <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2' }} />
+                            </ListItem>
+                        ))}
+                    </List>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                        Für die Ausübung Ihrer Rechte oder bei Fragen zum Datenschutz schreiben Sie uns an{' '}
+                        <Link href="mailto:datenschutz@quiz-app.de" underline="hover" color="primary">
+                            datenschutz@quiz-app.de
+                        </Link>.
+                    </Typography>
+                </Box>
 
-            <p className="mt-8 text-sm text-gray-500 text-center">Stand: 18. April 2025</p>
-        </div>
+                <Box mt={4}>
+                    <Typography variant="h6" gutterBottom>
+                        6. Änderungen
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf zu aktualisieren. Die aktuelle Version
+                        finden Sie jederzeit in der App.
+                    </Typography>
+                </Box>
+
+                <Typography variant="caption" display="block" align="center" sx={{ mt: 6, color: 'text.disabled' }}>
+                    Stand: 18. April 2025
+                </Typography>
+            </Paper>
+        </Container>
     );
 }

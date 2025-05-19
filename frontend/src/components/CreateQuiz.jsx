@@ -207,6 +207,7 @@ const CreateQuiz = () => {
 
                     <Autocomplete
                         multiple
+                        required
                         options={allValues}
                         value={tags}
                         onChange={handleTagsChange}

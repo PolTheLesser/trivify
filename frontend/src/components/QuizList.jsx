@@ -91,12 +91,14 @@ const QuizList = () => {
                     axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
                     axios.get(`${process.env.REACT_APP_API_URL}/categories`)
                 ]);
-                const values = valsRes.data;
-                const cats = catsRes.data;
+                const values = valsRes.data; // z.B. [{ id: 1, value: "Sport" }, ...]
+                const cats = catsRes.data;   // z.B. [{ id: 1, name: "SPORT" }, ...]
+
                 const labels = {};
-                for (let i = 1; i < cats.length; i++) {
-                    labels[cats[i].name] = values[i];
-                }
+                cats.forEach(cat => {
+                    const match = values.find(val => val.id === cat.id);
+                    if (match) labels[cat.name] = match.value;
+                });
                 setCategoryLabels(labels);
             } catch (err) {
                 console.error('Failed to load category labels', err);
@@ -145,7 +147,12 @@ const QuizList = () => {
         const q = searchQuery.trim().toLowerCase();
 
         let filtered = quizzes.filter(quiz => {
-            const matchesSearch = quiz.title.toLowerCase().includes(q);
+            const matchesSearch =
+                quiz.title.toLowerCase().includes(q) ||
+                quiz.description?.toLowerCase().includes(q) ||
+                quiz.categories.some(cat =>
+                    (categoryLabels[cat] || cat).toLowerCase().includes(q)
+                );
             const matchesCategory =
                 selectedCategory === 'all' || quiz.categories.includes(selectedCategory);
             return matchesSearch && matchesCategory;
