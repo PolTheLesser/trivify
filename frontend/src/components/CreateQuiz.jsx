@@ -30,7 +30,7 @@ const CreateQuiz = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [categories, setCategories] = useState([]);
-    const [difficulty, setDifficulty] = useState('MEDIUM');
+    const [tagError, setTagError] = useState(false);
     const [questions, setQuestions] = useState([
         {
             question: "",
@@ -125,6 +125,11 @@ const CreateQuiz = () => {
 
     const handleSubmit = async e => {
         e.preventDefault();
+        if (tags.length === 0) {
+            setTagError(true);
+            return;
+        }
+        setTagError(false);
         const userId = localStorage.getItem('userId');
         if (!userId) {
             setError('Benutzer ID nicht gefunden. Bitte erneut anmelden.');
@@ -140,7 +145,6 @@ const CreateQuiz = () => {
             setSuccess("Quiz erfolgreich erstellt!");
             setTitle("");
             setDescription("");
-            setDifficulty("MEDIUM");
             setQuestions([
                 {
                     question: "",
@@ -207,37 +211,40 @@ const CreateQuiz = () => {
 
                     <Autocomplete
                         multiple
-                        required
                         options={allValues}
                         value={tags}
-                        onChange={handleTagsChange}
+                        onChange={(event, newValue) => {
+                            setTags(newValue);
+                            if (newValue.length > 0) setTagError(false); // Fehler zurücksetzen
+                        }}
                         disabled={loadingTags}
                         loading={loadingTags}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
-                                <Chip key={option} label={option} {...getTagProps({index})} />
+                                <Chip key={option} label={option} {...getTagProps({ index })} />
                             ))
                         }
-                        renderInput={params => (
+                        renderInput={(params) => (
                             <TextField
                                 {...params}
                                 label="Kategorien"
                                 placeholder="Kategorien wählen"
+                                error={tagError}
+                                helperText={tagError ? 'Bitte wähle mindestens eine Kategorie' : ''}
                                 InputProps={{
                                     ...params.InputProps,
                                     endAdornment: (
                                         <>
-                                            {loadingTags ? <CircularProgress color="inherit" size={20}/> : null}
+                                            {loadingTags ? <CircularProgress color="inherit" size={20} /> : null}
                                             {params.InputProps.endAdornment}
                                         </>
                                     )
                                 }}
                             />
                         )}
-                        sx={{mt: 2, mb: 3}}
+                        sx={{ mt: 2, mb: 3 }}
                         limitTags={3}
                     />
-
                     <List>
                         {questions.map((q, qi) => (
                             <ListItem key={qi} divider>
