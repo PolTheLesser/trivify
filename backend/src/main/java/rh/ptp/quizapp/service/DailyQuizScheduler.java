@@ -95,7 +95,7 @@ public class DailyQuizScheduler {
 
             log.info("Tägliches Quiz wurde aktualisiert");
 
-            List<User> usersToRemind = userRepository.findByDailyQuizReminderIsNotNull();
+            List<User> usersToRemind = userRepository.findByDailyQuizReminderIsTrue();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
             variables.put("logoUrl", frontendUrl+"/logo192.png");
@@ -126,7 +126,7 @@ public class DailyQuizScheduler {
 
     @Scheduled(cron = "0 0 18 * * ?") // Täglich um 18 Uhr
     public void dailyQuizStreakReminder() {
-        for (User user : userRepository.findByDailyQuizReminderIsNotNull()) {
+        for (User user : userRepository.findByDailyQuizReminderIsTrue()) {
             LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
                     ? user.getLastDailyQuizPlayed().toLocalDate()
                     : null;
