@@ -201,7 +201,7 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
-                        <MenuItem onClick={() => { handleUserMenuClose(); logout(); }}>Abmelden</MenuItem>
+                        <MenuItem onClick={() => { handleUserMenuClose(); logout(); navigate('/'); }}>Abmelden</MenuItem>
                     </>
                 ) : (
                     <>

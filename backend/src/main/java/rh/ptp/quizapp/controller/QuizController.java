@@ -78,16 +78,6 @@ public class QuizController {
         }
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<QuizCategory[]> getCategories() {
-        return ResponseEntity.ok(QuizCategory.class.getEnumConstants());
-    }
-
-    @GetMapping("/categories/values")
-    public ResponseEntity<List<String>> getCategorievalues() {
-        return ResponseEntity.ok(quizService.getCategoryValues());
-    }
-
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody QuizDTO quizDTO, @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = userRepository.findByEmail(userDetails.getUsername()).get().getId();

@@ -20,13 +20,9 @@ public class CreateAiRequest {
     private final String apiUrl = "https://api.ai.rh-koeln.de/v1/chat/completions";
     private static final Logger logger = LoggerFactory.getLogger(CreateAiRequest.class);
 
-    public JSONArray fetchQuizFromAPI() throws IOException, InterruptedException {
-        QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
-                .filter(cat -> cat != QuizCategory.DAILY_QUIZ)
-                .toArray(QuizCategory[]::new);
-        QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
+    public JSONArray fetchQuizFromAPI(String category) throws IOException, InterruptedException {
         String prompt =
-                "Generiere 10 abwechslungsreiche Quizfragen der Kategorie " + randomCategory.getDisplayName() + " " +
+                "Generiere 10 abwechslungsreiche Quizfragen der Kategorie " + category + " " +
                         """
                                 in folgendem JSON-Format:
                                 [
@@ -36,6 +32,9 @@ public class CreateAiRequest {
                                     "RichtigeAntwort": "A"
                                   }
                                 ]
+                                Die Antworten:
+                                - sollen nicht mit Labels, wie A, B, C, D oder ähnliches beginnen
+                                - die korrekte Antwort soll exakt so in Liste der Antworten enthalten sein
                                 
                                 Die Fragen sollen:
                                 - aus unterschiedlichen Kategorien stammen (z.B. Geschichte, Natur, Popkultur, Wissenschaft)
@@ -74,16 +73,19 @@ public class CreateAiRequest {
                 .getJSONObject("message")
                 .getString("content");
 
+        // Remove JSON markdown formatting if any
         content = content.replaceAll("(?s)```json|```", "").trim();
-        logger.info("Antwort vom KI-Service: {}", content);
 
-        if (content.startsWith("[")) {
-            return new JSONArray(content);
-        } else if (content.startsWith("{")) {
-            JSONObject json = new JSONObject(content);
-            return json.getJSONArray("Fragen");
-        } else {
-            throw new RuntimeException("Unerwartetes JSON-Format: " + content);
+        // Remove <think>...</think> section including trailing whitespace, so content starts with [
+        content = content.replaceAll("(?s)<think>.*?</think>\\s*", "").trim();
+
+        // Now content should start with [
+        if (!content.startsWith("[")) {
+            throw new RuntimeException("JSON content does not start with '[' after cleaning: " + content);
         }
+
+        logger.info("Bereinigte Antwort vom KI-Service: {}", content);
+
+        return new JSONArray(content);
     }
 }

@@ -57,6 +57,11 @@ const QuizList = () => {
     const [sortOrder, setSortOrder] = useState('desc');
     const [dailyFilter, setDailyFilter] = useState('all');
 
+    const handleRandomQuiz = () => {
+        if (!filteredQuizzes.length) return;
+        const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
+        navigate(`/quizzes/${random.id}`);
+    };
     // Sync URL <-> state
     useEffect(() => {
         setSearchQuery(searchParams.get('query') || '');
@@ -218,7 +223,71 @@ const QuizList = () => {
 
     return (
         <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
-            {/* ... filter UI unchanged ... */}
+            {/* Such- und Filterleiste */}
+            <Paper elevation={2} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2 }}>
+                <TextField
+                    label="Quiz suchen"
+                    variant="outlined"
+                    size="small"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyDown}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        )
+                    }}
+                />
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                    {user && (
+                        <>
+                            <FormControlLabel
+                                control={<Checkbox checked={onlyFavorites} onChange={e => setOnlyFavorites(e.target.checked)} />}
+                                label="Nur Favoriten"
+                            />
+                            <FormControlLabel
+                                control={<Checkbox checked={onlyUnplayed} onChange={e => setOnlyUnplayed(e.target.checked)} />}
+                                label="Noch nie gespielt"
+                            />
+                        </>
+                    )}
+
+                    <FormControlLabel
+                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)} />}
+                        label="Nur bewertete"
+                    />
+
+                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                        <InputLabel>Quiz-Typ</InputLabel>
+                        <Select value={dailyFilter} label="Quiz-Typ" onChange={e => setDailyFilter(e.target.value)}>
+                            <MenuItem value="all">Alle Quizze</MenuItem>
+                            <MenuItem value="daily">Nur tägliche Quizze</MenuItem>
+                            <MenuItem value="nonDaily">Keine täglichen Quizze</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <Box sx={{ width: 150 }}>
+                        <Typography gutterBottom>≥ Fragen</Typography>
+                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto" min={0} max={20} />
+                    </Box>
+
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                        <InputLabel>Sortieren</InputLabel>
+                        <Select value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
+                            <MenuItem value="desc">Neueste zuerst</MenuItem>
+                            <MenuItem value="asc">Älteste zuerst</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
+                        Zufälliges Quiz
+                    </Button>
+                </Box>
+            </Paper>
+
 
             <Grid container spacing={3} sx={{ px: 2 }}>
                 {filteredQuizzes.map(q => (
@@ -238,8 +307,8 @@ const QuizList = () => {
                                 </Typography>
                                 {/* categories as chips */}
                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-                                    {q.categories.map(cat => (
-                                        <Chip key={cat} label={categoryLabels[cat] || cat} size='small' color='primary' />
+                                    {q.categories?.map(cat => (
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary" />
                                     ))}
                                 </Box>
                                 {q.ratingCount > 0 ? (

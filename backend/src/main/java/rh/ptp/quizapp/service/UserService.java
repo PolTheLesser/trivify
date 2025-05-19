@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.dto.UserDTO;
+import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.*;
@@ -126,7 +127,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
         log.info("Incrementing daily quiz streak for user: {}", user.getEmail());
         boolean alreadyPlayedToday = quizResultRepository
-                .existsByUserIdAndQuizIsDailyQuizTrueAndPlayedAtAfter(user.getId(), today.atStartOfDay());
+                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(),QuizCategory.DAILY_QUIZ, today.atStartOfDay());
         user.setLastDailyQuizPlayed(LocalDateTime.now());
 
         if (alreadyPlayedToday) {

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.util.CreateAiRequest;
@@ -74,24 +75,26 @@ public class DailyQuizSchedulerService {
 
         try {
             LocalDate today = LocalDate.now();
-            if (!quizRepository.findByIsDailyQuizTrueAndDate(today).isEmpty()) {
+            if (!quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, today).isEmpty()) {
                 log.info("Quiz für heute existiert bereits");
                 return;
             }
 
             JSONArray fragen = null;
             boolean valid = false;
-
+            QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values()).filter(cat -> cat != QuizCategory.DAILY_QUIZ).toArray(QuizCategory[]::new);
+            QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
+            String category = randomCategory.getDisplayName();
             while (!valid) {
                 try {
-                    fragen = createAiRequest.fetchQuizFromAPI();
+                    fragen = createAiRequest.fetchQuizFromAPI(category);
                     valid = true;
                 } catch (IOException | InterruptedException | JSONException ignored) {
                     log.warn("Invalid JSON-Format, retrying...");
                 }
             }
 
-            quizService.updateDailyQuiz(fragen);
+            quizService.updateDailyQuiz(fragen, category);
 
             log.info("Tägliches Quiz wurde aktualisiert");
 

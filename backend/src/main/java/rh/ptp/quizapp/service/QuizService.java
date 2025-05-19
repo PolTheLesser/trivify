@@ -132,7 +132,7 @@ public class QuizService {
 
     public QuizDTO getDailyQuiz() {
         LocalDate today = LocalDate.now();
-        List<Quiz> dailyQuizzes = quizRepository.findByIsDailyQuizTrueAndDate(today);
+        List<Quiz> dailyQuizzes = quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, today);
         
         if (dailyQuizzes.isEmpty()) {
             throw new RuntimeException("Das tägliche Quiz wird jeden Tag um Mitternacht aktualisiert. Bitte versuchen Sie es später erneut.");
@@ -172,10 +172,10 @@ public class QuizService {
         return quizDTO;
     }
 
-    public void updateDailyQuiz(JSONArray questions) {
+    public void updateDailyQuiz(JSONArray questions, String category) {
         try {
             Quiz dailyQuiz = new Quiz();
-            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now());
+            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now()+", Kategorie: " + category);
             dailyQuiz.setDescription("Teste dein Wissen mit unserem täglichen Quiz!");
             dailyQuiz.setDailyQuiz(true);
             dailyQuiz.setDate(LocalDate.now());
@@ -228,7 +228,7 @@ public class QuizService {
 
     public boolean hasCompletedDailyQuiz(Long userId) {
         LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        return quizResultRepository.existsByUserIdAndQuizIsDailyQuizTrueAndPlayedAtAfter(userId, today);
+        return quizResultRepository.existsByUserIdAndQuizCategoriesAndPlayedAtAfter(userId,QuizCategory.DAILY_QUIZ, today);
     }
 
     public QuizQuestion findQuestionById(Long questionId) {

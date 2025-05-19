@@ -14,8 +14,6 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "quizzes")
-@Setter
-@Getter
 public class Quiz {
     // Getters und Setters
     
@@ -42,6 +40,10 @@ public class Quiz {
     private List<QuizQuestion> questions;
 
     private boolean isPublic = true;
+
+    @ElementCollection
+    @CollectionTable(name = "quiz_categories", joinColumns = @JoinColumn(name = "quiz_id"))
+    @Column(name = "category")
     private List<QuizCategory> categories = new ArrayList<>();
     
     
