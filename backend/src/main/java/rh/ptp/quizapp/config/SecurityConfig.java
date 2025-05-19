@@ -63,6 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/daily", "/api/daily/**").permitAll()
                         .requestMatchers("/api/{id}").permitAll()
                         .requestMatchers("/api/quiz-results/scores/top").permitAll()
+                        .requestMatchers("/api/categories").permitAll()
+                        .requestMatchers("/api/categories/values").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

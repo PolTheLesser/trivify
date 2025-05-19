@@ -43,9 +43,12 @@ const CreateQuiz = () => {
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
 
-    const handleAddTag = () => {
+    const handleAddTag = async () => {
+        const response = await axios.get(process.env.REACT_APP_API_URL + '/categories/values');
+        const data = response.data;
+        data.shift();
         const t = tagInput.trim();
-        if (t && !tags.includes(t) && tags.length < 3) {
+        if (t && !tags.includes(t) && tags.length < 3 && data.contains(t)) {
             setTags(prev => [...prev, t]);
         }
         setTagInput('');

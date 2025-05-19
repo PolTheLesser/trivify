@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.QuestionType;
 import rh.ptp.quizapp.model.Quiz;
+import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.QuizService;
@@ -75,6 +76,16 @@ public class QuizController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<QuizCategory[]> getCategories() {
+        return ResponseEntity.ok(QuizCategory.class.getEnumConstants());
+    }
+
+    @GetMapping("/categories/values")
+    public ResponseEntity<List<String>> getCategorievalues() {
+        return ResponseEntity.ok(quizService.getCategoryValues());
     }
 
     @PostMapping

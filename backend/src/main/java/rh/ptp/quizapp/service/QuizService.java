@@ -12,9 +12,6 @@ import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.*;
 import rh.ptp.quizapp.repository.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -345,4 +342,12 @@ public class QuizService {
                 })
                 .collect(Collectors.toList());
     }
-} 
+
+    public List<String> getCategoryValues() {
+        List<String> values = new ArrayList<>();
+        for (QuizCategory category : QuizCategory.values()) {
+            values.add(category.getDisplayName());
+        }
+        return values;
+    }
+}
