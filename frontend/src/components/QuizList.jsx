@@ -55,19 +55,18 @@ const QuizList = () => {
     const [onlyRated, setOnlyRated] = useState(false);
     const [minQuestions, setMinQuestions] = useState(0);
     const [sortOrder, setSortOrder] = useState('desc');
-    const [dailyFilter, setDailyFilter] = useState('all');
+    const [selectedCategory, setSelectedCategory] = useState('all');
 
     const handleRandomQuiz = () => {
         if (!filteredQuizzes.length) return;
         const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
         navigate(`/quizzes/${random.id}`);
     };
-    // Sync URL <-> state
+
     useEffect(() => {
         setSearchQuery(searchParams.get('query') || '');
     }, [searchParams]);
 
-    // Handlers for search input
     const handleSearchChange = e => {
         const val = e.target.value;
         setSearchQuery(val);
@@ -76,6 +75,7 @@ const QuizList = () => {
             else setSearchParams({});
         }
     };
+
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchQuery.trim();
@@ -83,7 +83,6 @@ const QuizList = () => {
         }
     };
 
-    // Load category labels (enum key -> human name)
     useEffect(() => {
         const fetchCategoryLabels = async () => {
             try {
@@ -107,7 +106,6 @@ const QuizList = () => {
         fetchCategoryLabels();
     }, []);
 
-    // Load played quizzes
     useEffect(() => {
         if (!user) return;
         axios
@@ -116,7 +114,6 @@ const QuizList = () => {
             .catch(() => console.error('Quiz history load error'));
     }, [user]);
 
-    // Load all quizzes + favorites
     useEffect(() => {
         const fetchQuizzes = async () => {
             try {
@@ -143,26 +140,19 @@ const QuizList = () => {
         fetchQuizzes();
     }, [user]);
 
-    // Main filter effect: filter by title OR by category if valid
     useEffect(() => {
         const q = searchQuery.trim().toLowerCase();
-        const catEntry = Object.entries(categoryLabels).find(
-            ([key, label]) => key.toLowerCase() === q || label.toLowerCase() === q
-        );
-        const isCategoryQuery = Boolean(catEntry);
-        const selectedCat = isCategoryQuery ? catEntry[0] : null;
 
         let filtered = quizzes.filter(quiz => {
-            const matchesTitle = quiz.title.toLowerCase().includes(q);
-            const matchesCategory = isCategoryQuery && quiz.categories.includes(selectedCat);
-            return matchesTitle || matchesCategory;
+            const matchesSearch = quiz.title.toLowerCase().includes(q);
+            const matchesCategory =
+                selectedCategory === 'all' || quiz.categories.includes(selectedCategory);
+            return matchesSearch && matchesCategory;
         });
 
         if (onlyFavorites && user) filtered = filtered.filter(q => q.isFavorite);
         if (onlyUnplayed && user) filtered = filtered.filter(q => !playedQuizIds.has(q.id));
         if (onlyRated) filtered = filtered.filter(q => q.ratingCount > 0);
-        if (dailyFilter === 'daily') filtered = filtered.filter(q => q.isDaily);
-        else if (dailyFilter === 'nonDaily') filtered = filtered.filter(q => !q.isDaily);
         filtered = filtered.filter(q => q.questions.length >= minQuestions);
 
         filtered.sort((a, b) => {
@@ -179,7 +169,7 @@ const QuizList = () => {
         onlyFavorites,
         onlyUnplayed,
         onlyRated,
-        dailyFilter,
+        selectedCategory,
         minQuestions,
         sortOrder,
         playedQuizIds
@@ -223,7 +213,7 @@ const QuizList = () => {
 
     return (
         <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
-            {/* Such- und Filterleiste */}
+            {/* Filterleiste */}
             <Paper elevation={2} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2 }}>
                 <TextField
                     label="Quiz suchen"
@@ -261,11 +251,12 @@ const QuizList = () => {
                     />
 
                     <FormControl size="small" sx={{ minWidth: 160 }}>
-                        <InputLabel>Quiz-Typ</InputLabel>
-                        <Select value={dailyFilter} label="Quiz-Typ" onChange={e => setDailyFilter(e.target.value)}>
-                            <MenuItem value="all">Alle Quizze</MenuItem>
-                            <MenuItem value="daily">Nur tägliche Quizze</MenuItem>
-                            <MenuItem value="nonDaily">Keine täglichen Quizze</MenuItem>
+                        <InputLabel>Kategorie</InputLabel>
+                        <Select value={selectedCategory} label="Kategorie" onChange={e => setSelectedCategory(e.target.value)}>
+                            <MenuItem value="all">Alle Kategorien</MenuItem>
+                            {Object.entries(categoryLabels).map(([key, label]) => (
+                                <MenuItem key={key} value={key}>{label}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
 
@@ -288,7 +279,6 @@ const QuizList = () => {
                 </Box>
             </Paper>
 
-
             <Grid container spacing={3} sx={{ px: 2 }}>
                 {filteredQuizzes.map(q => (
                     <Grid item xs={12} sm={6} md={4} key={q.id}>
@@ -305,7 +295,6 @@ const QuizList = () => {
                                 <Typography variant='body2' color='text.secondary' paragraph>
                                     {q.description}
                                 </Typography>
-                                {/* categories as chips */}
                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                                     {q.categories?.map(cat => (
                                         <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary" />
