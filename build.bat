@@ -24,11 +24,11 @@ docker build --build-arg REACT_APP_API_URL=http://127.0.0.1:9090/api -t quiz-fro
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...
-docker save -o quiz-frontend.tar quiz-frontend:%TAG%
+docker save -o trivify-frontend.tar trivify-frontend:%TAG%
 
 echo Tagging and pushing frontend...
-docker tag quiz-frontend lesommer2019/quizapp-frontend:%TAG%
-docker push lesommer2019/quizapp-frontend:%TAG%
+docker tag trivify-frontend lesommer2019/trivify-frontend:%TAG%
+docker push lesommer2019/trivify-frontend:%TAG%
 
 REM ==== BACKEND ====
 echo Building backend...
@@ -37,15 +37,15 @@ call mvnw clean package
 if %errorlevel% neq 0 goto :error
 cd ..
 
-docker build -t quiz-backend:beta ./backend
+docker build -t trivify-backend:beta ./backend
 if %errorlevel% neq 0 goto :error
 
 echo Saving backend image...
-docker save -o quiz-backend.tar quiz-backend:%TAG%
+docker save -o trivify-backend.tar trivify-backend:%TAG%
 
 echo Tagging and pushing backend...
-docker tag quiz-backend lesommer2019/quizapp-backend:%TAG%
-docker push lesommer2019/quizapp-backend:%TAG%
+docker tag trivify-backend lesommer2019/trivify-backend:%TAG%
+docker push lesommer2019/trivify-backend:%TAG%
 
 echo All done!
 goto :eof
