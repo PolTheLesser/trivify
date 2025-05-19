@@ -13,8 +13,7 @@ import {
   ListItemSecondaryAction,
   Alert,
   CircularProgress,
-  Chip,
-  CircularProgress as Progress
+  Chip
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -36,7 +35,7 @@ const EditQuiz = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // fetch available categories
+  // Kategorien und Werte laden
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -44,7 +43,7 @@ const EditQuiz = () => {
           axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
           axios.get(`${process.env.REACT_APP_API_URL}/categories`)
         ]);
-        const values = valsRes.data.slice(1);
+        const values = valsRes.data.slice(1); // Nur sichtbare Werte
         const cats = catsRes.data.slice(1);
         setAllValues(values);
         setAllCategories(cats);
@@ -58,19 +57,24 @@ const EditQuiz = () => {
     fetchTags();
   }, []);
 
-  // fetch quiz data
+  // Quizdaten laden
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await axios.get(
-            `${process.env.REACT_APP_API_URL}/toEdit/${id}`
-        );
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/toEdit/${id}`);
         const data = res.data;
         setTitle(data.title);
         setDescription(data.description);
         setQuestions(data.questions || []);
-        // existing categories: array of enum names
-        setTags(data.categories || []);
+
+        // Enum-Werte übersetzen (z. B. "HISTORY" → "Geschichte")
+        const tagDisplayNames = data.categories
+            .map(catEnum => {
+              const idx = allCategories.indexOf(catEnum);
+              return idx !== -1 ? allValues[idx] : null;
+            })
+            .filter(Boolean);
+        setTags(tagDisplayNames);
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || "Quiz konnte nicht geladen werden");
@@ -78,8 +82,10 @@ const EditQuiz = () => {
         setLoading(false);
       }
     };
-    fetchQuiz();
-  }, [id]);
+
+    // Warten bis Kategorien geladen sind
+    if (!loadingTags) fetchQuiz();
+  }, [id, allCategories, allValues, loadingTags]);
 
   const handleQuestionChange = (index, field, value) => {
     const newQuestions = [...questions];
@@ -96,7 +102,12 @@ const EditQuiz = () => {
   const addQuestion = () => {
     setQuestions(prev => [
       ...prev,
-      { question: "", answers: ["", "", "", ""], correctAnswer: "" }
+      {
+        question: "",
+        questionType: "MULTIPLE_CHOICE",
+        answers: ["", "", "", ""],
+        correctAnswer: ""
+      }
     ]);
   };
 
@@ -105,11 +116,10 @@ const EditQuiz = () => {
   };
 
   const isFormValid = () => {
-    if (!title.trim()) return false;
-    if (tags.length === 0) return false;
+    if (!title.trim() || tags.length === 0) return false;
     return questions.every(q => {
       if (!q.question.trim() || !q.correctAnswer.trim()) return false;
-      if (q.questionType === 'TEXT_INPUT') return true;
+      if (q.questionType === "TEXT_INPUT") return true;
       if (!q.answers || q.answers.some(a => !a.trim())) return false;
       return q.answers.includes(q.correctAnswer);
     });
@@ -122,22 +132,26 @@ const EditQuiz = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await axios.put(
-          `${process.env.REACT_APP_API_URL}/${id}`,
-          {
-            title,
-            description,
-            questions,
-            categories: tags
-          }
-      );
+      const selectedEnums = newTagsToEnums(tags);
+      await axios.put(`${process.env.REACT_APP_API_URL}/${id}`, {
+        title,
+        description,
+        questions,
+        categories: selectedEnums
+      });
       setSuccess("Quiz erfolgreich aktualisiert");
-      setTimeout(() => navigate("/quizzes/my-quizzes"), 2000);
+      setTimeout(() => navigate("/quizzes/my-quizzes"), 1500);
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Fehler beim Aktualisieren des Quiz");
     }
   };
+
+  const newTagsToEnums = (tagValues) =>
+      tagValues.map(t => {
+        const idx = allValues.indexOf(t);
+        return allCategories[idx];
+      }).filter(Boolean);
 
   if (loading || loadingTags) {
     return (
@@ -150,7 +164,7 @@ const EditQuiz = () => {
   return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h4" component="h1" align="center" gutterBottom>
+          <Typography variant="h4" align="center" gutterBottom>
             Quiz bearbeiten
           </Typography>
 
@@ -187,7 +201,7 @@ const EditQuiz = () => {
                         <Chip key={option} label={option} {...getTagProps({ index })} />
                     ))
                 }
-                renderInput={params => (
+                renderInput={(params) => (
                     <TextField
                         {...params}
                         label="Kategorien"
@@ -235,7 +249,7 @@ const EditQuiz = () => {
                       />
                     </Box>
                     <ListItemSecondaryAction>
-                      <IconButton edge="end" onClick={() => removeQuestion(qi)} disabled={questions.length===1}>
+                      <IconButton edge="end" onClick={() => removeQuestion(qi)} disabled={questions.length === 1}>
                         <DeleteIcon />
                       </IconButton>
                     </ListItemSecondaryAction>

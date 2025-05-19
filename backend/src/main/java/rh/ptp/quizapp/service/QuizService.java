@@ -58,6 +58,7 @@ public class QuizService {
         Quiz quiz = new Quiz();
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
+        quiz.setCategories(quizDTO.getCategories());
         quiz.setCreator(creator);
         quiz.setPublic(true);
         quiz.setDailyQuiz(quizDTO.isDailyQuiz());

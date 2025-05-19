@@ -56,6 +56,7 @@ const QuizList = () => {
     const [minQuestions, setMinQuestions] = useState(0);
     const [sortOrder, setSortOrder] = useState('desc');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [dailyQuizFilter, setDailyQuizFilter] = useState('exclude'); // 'exclude' | 'all'
 
     const handleRandomQuiz = () => {
         if (!filteredQuizzes.length) return;
@@ -160,7 +161,9 @@ const QuizList = () => {
             const dateB = new Date(b.createdAt);
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
-
+        if (dailyQuizFilter === 'exclude') {
+            filtered = filtered.filter(q => !q.categories.includes('DAILY_QUIZ'));
+        }
         setFilteredQuizzes(filtered);
     }, [
         searchQuery,
@@ -250,13 +253,15 @@ const QuizList = () => {
                         label="Nur bewertete"
                     />
 
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
-                        <InputLabel>Kategorie</InputLabel>
-                        <Select value={selectedCategory} label="Kategorie" onChange={e => setSelectedCategory(e.target.value)}>
-                            <MenuItem value="all">Alle Kategorien</MenuItem>
-                            {Object.entries(categoryLabels).map(([key, label]) => (
-                                <MenuItem key={key} value={key}>{label}</MenuItem>
-                            ))}
+                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                        <InputLabel>Tägliche Quizze</InputLabel>
+                        <Select
+                            value={dailyQuizFilter}
+                            label="Tägliche Quizze"
+                            onChange={(e) => setDailyQuizFilter(e.target.value)}
+                        >
+                            <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
+                            <MenuItem value="all">Alle Quizze</MenuItem>
                         </Select>
                     </FormControl>
 
