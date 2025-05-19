@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import rh.ptp.quizapp.model.QuizCategory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,25 +21,31 @@ public class CreateAiRequest {
     private static final Logger logger = LoggerFactory.getLogger(CreateAiRequest.class);
 
     public JSONArray fetchQuizFromAPI() throws IOException, InterruptedException {
-        String prompt = """
-                Generiere 10 abwechslungsreiche Quizfragen in folgendem JSON-Format:
-                [
-                  {
-                    "Frage": "Beispiel-Frage",
-                    "Antworten": ["A", "B", "C", "D"],
-                    "RichtigeAntwort": "A"
-                  }
-                ]
-
-                Die Fragen sollen:
-                - aus unterschiedlichen Kategorien stammen (z.B. Geschichte, Natur, Popkultur, Wissenschaft)
-                - einen ansteigenden Schwierigkeitsgrad haben
-                - verständlich formuliert sein
-                - keine Wiederholungen oder identische Antworten enthalten
-                - realistisch & aktuell sein
-
-                Gib **nur** das JSON-Array zurück – ohne Markdown, Erläuterungen oder zusätzliche Zeichen.
-                """;
+        QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
+                .filter(cat -> cat != QuizCategory.DAILY_QUIZ)
+                .toArray(QuizCategory[]::new);
+        QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
+        String prompt =
+                "Generiere 10 abwechslungsreiche Quizfragen der Kategorie " + randomCategory.getDisplayName() + " " +
+                        """
+                                in folgendem JSON-Format:
+                                [
+                                  {
+                                    "Frage": "Beispiel-Frage",
+                                    "Antworten": ["A", "B", "C", "D"],
+                                    "RichtigeAntwort": "A"
+                                  }
+                                ]
+                                
+                                Die Fragen sollen:
+                                - aus unterschiedlichen Kategorien stammen (z.B. Geschichte, Natur, Popkultur, Wissenschaft)
+                                - einen ansteigenden Schwierigkeitsgrad haben
+                                - verständlich formuliert sein
+                                - keine Wiederholungen oder identische Antworten enthalten
+                                - realistisch & aktuell sein
+                                
+                                Gib **nur** das JSON-Array zurück – ohne Markdown, Erläuterungen oder zusätzliche Zeichen.
+                                """;
 
         return fetchQuizFromAPI(HttpClient.newHttpClient(), prompt);
     }

@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DailyQuizScheduler {
+public class DailyQuizSchedulerService {
 
     /**
      * Hilfsklasse zum Erstellen von API-Anfragen für Quizdaten.

@@ -1,6 +1,7 @@
 package rh.ptp.quizapp.model;
 
 public enum QuizCategory {
+    DAILY_QUIZ("Tägliches Quiz"),
     GENERAL_KNOWLEDGE("Allgemeinwissen"),
     SCIENCE("Wissenschaft"),
     HISTORY("Geschichte"),
@@ -10,8 +11,7 @@ public enum QuizCategory {
     SPORTS("Sport"),
     MUSIC("Musik"),
     FILM_AND_TELEVISION("Film und Fernsehen"),
-    TECHNOLOGY("Technologie"),
-    DAILY_QUIZ("Tägliches Quiz");
+    TECHNOLOGY("Technologie");
     private final String displayName;
 
     QuizCategory(String displayName) {
