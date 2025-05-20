@@ -87,29 +87,26 @@ const QuizList = () => {
         const fetchCategoryLabels = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`), // ["Sport", "Geschichte", "Wissenschaft"]
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)          // ["SPORT", "HISTORY", "SCIENCE"]
                 ]);
-                const values = valsRes.data; // z.B. [{ id: 1, value: "Sport" }, ...]
-                const cats = catsRes.data;   // z.B. [{ id: 1, name: "SPORT" }, ...]
+
+                const values = valsRes.data; // Labels
+                const cats = catsRes.data;   // Enum-Namen
 
                 const labels = {};
-                cats.forEach(cat => {
-                    const match = values.find(val => val.enumValue === cat.name);
-                    if (match) {
-                        labels[cat.name] = match.value; // z. B. labels["SPORT"] = "Sport"
-                    } else {
-                        labels[cat.name] = cat.name; // fallback
-                    }
+                cats.forEach((cat, index) => {
+                    labels[cat] = values[index] || cat; // fallback auf Enum-Name falls Label fehlt
                 });
 
                 setCategoryLabels(labels);
             } catch (err) {
-                console.error('Failed to load category labels', err);
+                console.error('Fehler beim Laden der Kategorienamen', err);
             } finally {
                 setLoadingTags(false);
             }
         };
+
         fetchCategoryLabels();
     }, []);
 
