@@ -22,7 +22,7 @@ public class CreateAiRequest {
 
     public JSONArray fetchQuizFromAPI(String category) throws IOException, InterruptedException {
         String prompt =
-                "Generiere 10 abwechslungsreiche Quizfragen der Kategorie " + category + " " +
+                "Generiere 10 abwechslungsreiche Quizfragen der Kategorie " + category + ", Allgemeinwissen " +
                         """
                                 in folgendem JSON-Format:
                                 [
