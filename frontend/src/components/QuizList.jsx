@@ -95,9 +95,14 @@ const QuizList = () => {
 
                 const labels = {};
                 cats.forEach(cat => {
-                    const match = values.find(val => val.id === cat.id);
-                    if (match) labels[cat.name] = match.value;
+                    const match = values.find(val => val.enumValue === cat.name);
+                    if (match) {
+                        labels[cat.name] = match.value; // z. B. labels["SPORT"] = "Sport"
+                    } else {
+                        labels[cat.name] = cat.name; // fallback
+                    }
                 });
+
                 setCategoryLabels(labels);
             } catch (err) {
                 console.error('Failed to load category labels', err);
