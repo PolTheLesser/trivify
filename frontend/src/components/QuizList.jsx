@@ -229,21 +229,6 @@ const QuizList = () => {
         <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
             {/* Filterleiste */}
             <Paper elevation={2} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2 }}>
-                <TextField
-                    label="Quiz suchen"
-                    variant="outlined"
-                    size="small"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onKeyDown={handleSearchKeyDown}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        )
-                    }}
-                />
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                     {user && (

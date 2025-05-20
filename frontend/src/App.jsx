@@ -54,16 +54,16 @@ const App = () => {
                         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>}/>
                         <Route path="/impressum" element={<Impressum/>}/>
                         <Route path="/datenschutz" element={<Datenschutz/>}/>
-  {/* Catch-all: if you have a token, go to /welcome; otherwise go to / */}
-  <Route
-    path="*"
-    element={
-      localStorage.getItem("token")
-        ? <Navigate to="/welcome" replace />
-        : <Navigate to="/" replace />
-    }
-  />
-</Routes>
+                        {/* Catch-all: if you have a token, go to /welcome; otherwise go to / */}
+                        <Route
+                            path="*"
+                            element={
+                                localStorage.getItem("token")
+                                    ? <Navigate to="/welcome" replace/>
+                                    : <Navigate to="/" replace/>
+                            }
+                        />
+                    </Routes>
                 </main>
                 <div style={{height: "3rem"}}></div>
                 <Footer/>
