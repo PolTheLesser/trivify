@@ -213,10 +213,7 @@ const CreateQuiz = () => {
                         multiple
                         options={allValues}
                         value={tags}
-                        onChange={(event, newValue) => {
-                            setTags(newValue);
-                            if (newValue.length > 0) setTagError(false); // Fehler zurücksetzen
-                        }}
+                        onChange={handleTagsChange}
                         disabled={loadingTags}
                         loading={loadingTags}
                         renderTags={(value, getTagProps) =>
