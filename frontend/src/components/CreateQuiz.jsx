@@ -49,18 +49,6 @@ const CreateQuiz = () => {
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
 
-    const handleAddTag = () => {
-        const t = tagInput.trim();
-        if (t && !tags.includes(t) && tags.length < 3) {
-            setTags(prev => [...prev, t]);
-        }
-        setTagInput('');
-    };
-
-    const handleDeleteTag = (tagToDelete: string) => {
-        setTags(prev => prev.filter(t => t !== tagToDelete));
-    };
-
     const handleQuestionChange = (index, field, value) => {
         const newQuestions = [...questions];
         newQuestions[index] = {...newQuestions[index], [field]: value};
@@ -142,7 +130,7 @@ const CreateQuiz = () => {
         try {
             await axios.post(
                 process.env.REACT_APP_API_URL,
-                {title, description, categories, questions},
+                {title, description, categories: tags, questions},
                 {params: {userId}}
             );
             setSuccess("Quiz erfolgreich erstellt!");
