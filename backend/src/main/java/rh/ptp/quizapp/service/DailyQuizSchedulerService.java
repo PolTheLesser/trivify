@@ -82,7 +82,9 @@ public class DailyQuizSchedulerService {
 
             JSONArray fragen = null;
             boolean valid = false;
-            QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values()).filter(cat -> cat != QuizCategory.DAILY_QUIZ).toArray(QuizCategory[]::new);
+            QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
+    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
+    .toArray(QuizCategory[]::new);
             QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
             while (!valid) {
                 try {
