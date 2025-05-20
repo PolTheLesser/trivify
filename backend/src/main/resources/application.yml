@@ -8,10 +8,12 @@ spring:
     password: quizpass
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-    format_sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
   mail:
     host: mail.gmx.net
     port: 587
