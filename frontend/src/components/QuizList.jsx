@@ -30,7 +30,6 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuth } from '../contexts/AuthContext';
 import axios from '../api/api';
-//ToDO: Category not translated
 const QuizList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -144,6 +143,7 @@ const QuizList = () => {
     }, [user]);
 
     useEffect(() => {
+        if (loadingTags) return;
         const q = searchQuery.trim().toLowerCase();
 
         let filtered = quizzes.filter(quiz => {
@@ -176,6 +176,7 @@ const QuizList = () => {
         searchQuery,
         quizzes,
         categoryLabels,
+        loadingTags,
         onlyFavorites,
         onlyUnplayed,
         onlyRated,
