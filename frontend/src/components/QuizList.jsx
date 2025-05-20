@@ -56,7 +56,7 @@ const QuizList = () => {
     const [minQuestions, setMinQuestions] = useState(0);
     const [sortOrder, setSortOrder] = useState('desc');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [dailyQuizFilter, setDailyQuizFilter] = useState('exclude'); // 'exclude' | 'all'
+    const [dailyQuizFilter, setDailyQuizFilter] = useState('all');
 
     const handleRandomQuiz = () => {
         if (!filteredQuizzes.length) return;
@@ -182,7 +182,8 @@ const QuizList = () => {
         selectedCategory,
         minQuestions,
         sortOrder,
-        playedQuizIds
+        playedQuizIds,
+        dailyQuizFilter
     ]);
 
     const toggleFavorite = async quizId => {
