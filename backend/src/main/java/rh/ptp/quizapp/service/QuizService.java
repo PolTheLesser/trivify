@@ -175,12 +175,12 @@ public class QuizService {
         return quizDTO;
     }
 
-    public void updateDailyQuiz(JSONArray questions, String category) {
+    public void updateDailyQuiz(JSONArray questions, QuizCategory category) {
         try {
             Quiz dailyQuiz = new Quiz();
-            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now()+", Kategorie: " + category);
+            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now()+", Kategorie: " + category.getDisplayName());
             dailyQuiz.setDescription("Teste dein Wissen mit unserem täglichen Quiz!");
-            dailyQuiz.setDailyQuiz(true);
+            dailyQuiz.setCategories(List.of(QuizCategory.DAILY_QUIZ, category));
             dailyQuiz.setDate(LocalDate.now());
             dailyQuiz.setPublic(true);
 

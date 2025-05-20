@@ -84,17 +84,16 @@ public class DailyQuizSchedulerService {
             boolean valid = false;
             QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values()).filter(cat -> cat != QuizCategory.DAILY_QUIZ).toArray(QuizCategory[]::new);
             QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
-            String category = randomCategory.getDisplayName();
             while (!valid) {
                 try {
-                    fragen = createAiRequest.fetchQuizFromAPI(category);
+                    fragen = createAiRequest.fetchQuizFromAPI(randomCategory.getDisplayName());
                     valid = true;
                 } catch (IOException | InterruptedException | JSONException ignored) {
                     log.warn("Invalid JSON-Format, retrying...");
                 }
             }
 
-            quizService.updateDailyQuiz(fragen, category);
+            quizService.updateDailyQuiz(fragen, randomCategory);
 
             log.info("Tägliches Quiz wurde aktualisiert");
 
