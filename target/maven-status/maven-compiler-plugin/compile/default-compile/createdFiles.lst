@@ -43,7 +43,6 @@ rh\ptp\quizapp\dto\ResetPasswordRequest.class
 rh\ptp\quizapp\config\MailConfig.class
 rh\ptp\quizapp\dto\QuizHistoryDTO.class
 rh\ptp\quizapp\service\EmailService.class
-rh\ptp\quizapp\service\RecaptchaService.class
 rh\ptp\quizapp\security\JwtAuthenticationFilter.class
 rh\ptp\quizapp\service\CustomUserDetailsService.class
 rh\ptp\quizapp\dto\AuthRequest.class
@@ -54,4 +53,3 @@ rh\ptp\quizapp\model\RegistrationRequest.class
 rh\ptp\quizapp\dto\MessageResponse.class
 rh\ptp\quizapp\dto\UserStreakDTO.class
 rh\ptp\quizapp\model\UserStreak.class
-rh\ptp\quizapp\service\RecaptchaService$RecaptchaResponse.class
