@@ -31,6 +31,7 @@ const EditQuiz = () => {
   const [allValues, setAllValues] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [loadingTags, setLoadingTags] = useState(true);
+  const [tagError, setTagError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -123,10 +124,17 @@ const EditQuiz = () => {
 
   const handleTagsChange = (_, newTags) => {
     setTags(newTags);
+    if (newTags.length > 0) {
+      setTagError(false);
+    }
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
+    if (tags.length === 0) {
+      setTagError(true);
+      return;
+    }
     try {
       const selectedEnums = newTagsToEnums(tags);
       await axios.put(`${process.env.REACT_APP_API_URL}/${id}`, {
@@ -191,6 +199,8 @@ const EditQuiz = () => {
                 multiple
                 options={allValues}
                 value={tags}
+                disabled={loadingTags}
+                loading={loadingTags}
                 onChange={handleTagsChange}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
@@ -200,9 +210,19 @@ const EditQuiz = () => {
                 renderInput={(params) => (
                     <TextField
                         {...params}
+                        error={tagError}
+                        helperText={tagError ? 'Bitte wähle mindestens eine Kategorie' : ''}
                         label="Kategorien"
                         placeholder="Kategorien wählen"
-                        margin="normal"
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                              <>
+                                {loadingTags ? <CircularProgress color="inherit" size={20} /> : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                          )
+                        }}
                     />
                 )}
                 limitTags={3}

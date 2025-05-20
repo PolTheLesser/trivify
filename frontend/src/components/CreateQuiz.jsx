@@ -107,6 +107,9 @@ const CreateQuiz = () => {
             return allCategories[idx];
         }).filter(Boolean);
         setCategories(selectedCats);
+        if (newTags.length > 0) {
+            setTagError(false);
+        }
     };
 
     const removeQuestion = index => {
