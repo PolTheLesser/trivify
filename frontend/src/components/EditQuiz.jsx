@@ -66,15 +66,11 @@ const EditQuiz = () => {
         setTitle(data.title);
         setDescription(data.description);
         setQuestions(data.questions || []);
-
-        // Enum-Werte übersetzen (z. B. "HISTORY" → "Geschichte")
-        const tagDisplayNames = data.categories
-            .map(catEnum => {
-              const idx = allCategories.indexOf(catEnum);
-              return idx !== -1 ? allValues[idx] : null;
-            })
-            .filter(Boolean);
-        setTags(tagDisplayNames);
+        const tagsFromEnums = data.categories.map((cat) => {
+          const idx = allCategories.indexOf(cat);
+          return allValues[idx] || cat;
+        });
+        setTags(tagsFromEnums);
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || "Quiz konnte nicht geladen werden");
