@@ -35,7 +35,7 @@ export default function Datenschutz() {
                         2. Welche Daten werden verarbeitet?
                     </Typography>
                     <List dense>
-                        {[
+                        {[  'Nach Registrierung werden folgende Daten verarbeitet: ',
                             'Registrierungsdaten (Name, E-Mail-Adresse, Passwort)',
                             'Quiz-Aktivitäten (z. B. beantwortete Fragen, Streaks, Punkte)',
                             'Einstellungen (z. B. Erinnerungsfunktion für das tägliche Quiz)',

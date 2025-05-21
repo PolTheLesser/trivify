@@ -122,6 +122,7 @@ public class AuthService {
         variables.put("logoUrl", frontendUrl+"/logo192.png");
         variables.put("username", name);
         variables.put("verificationUrl", frontendUrl + "/verify-email/" + token);
+        variables.put("dataUrl", frontendUrl + "/datenschutz");
         emailService.sendEmail(email, "E-Mail-Adresse verifizieren", "verification-email", variables);
     }
 
