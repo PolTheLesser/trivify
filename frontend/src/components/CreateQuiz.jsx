@@ -280,16 +280,20 @@ const CreateQuiz = () => {
                                         />
                                     ))}
 
-                                    <TextField
-                                        fullWidth
-                                        label="Richtige Antwort"
+                                    <FormControl fullWidth margin="normal">
+                                      <InputLabel>Richtige Antwort</InputLabel>
+                                      <Select
                                         value={q.correctAnswer}
-                                        onChange={e =>
-                                            handleQuestionChange(qi, 'correctAnswer', e.target.value)
-                                        }
-                                        margin="normal"
-                                        required
-                                    />
+                                        label="Richtige Antwort"
+                                        onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                      >
+                                        {q.answers.map((ans, ai) => (
+                                          <MenuItem key={ai} value={ans}>
+                                            {ans}
+                                          </MenuItem>
+                                        ))}
+                                      </Select>
+                                    </FormControl>
                                 </Box>
 
                                 <ListItemSecondaryAction>
