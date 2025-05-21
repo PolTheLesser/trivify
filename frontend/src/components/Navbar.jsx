@@ -75,7 +75,7 @@ const Navbar = () => {
                     {/* Logo / Burger on xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                         <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
-                            <img src="/logo192.png" alt="Trivify" style={{ height: 32, width: 32 }} />
+                            <img src="/logo192.png" alt="Trivify" style={{ height: 64, width: 64 }} />
                         </IconButton>
                     </Box>
 
