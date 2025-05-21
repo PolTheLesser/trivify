@@ -277,10 +277,10 @@ const QuizList = () => {
                 </Box>
             </Paper>
 
-            <Grid container spacing={3} sx={{ px: 2 }}>
-                {filteredQuizzes.map(q => (
-                    <Grid item xs={12} sm={6} md={4} key={q.id}>
-                        <Card sx={{ position: 'relative' }}>
+            <Grid container spacing={3} sx={{ px: 2, pb: 6 }}>
+            {filteredQuizzes.map(q => (
+                <Grid item xs={12} sm={6} md={4} key={q.id} sx={{ display: 'flex' }}>
+                    <Card sx={{ position: 'relative', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                             <Box sx={{ position: 'absolute', top: 2, right: 2 }}>
                                 {user && (
                                     <IconButton size='small' color='warning' onClick={() => toggleFavorite(q.id)}>
