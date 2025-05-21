@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface AuthenticationTokenRepository extends JpaRepository<AuthenticationToken, Long> {
@@ -15,4 +16,5 @@ public interface AuthenticationTokenRepository extends JpaRepository<Authenticat
 
     @Query("SELECT a.token FROM AuthenticationToken a WHERE a.quizUser = :user")
     String findTokenByQuizUser(@Param("user") User user);
+    void deleteAllByExpiryDateBefore(LocalDateTime date);
 }
