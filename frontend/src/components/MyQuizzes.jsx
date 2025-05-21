@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -6,6 +7,8 @@ import {
     Card,
     CardActions,
     CardContent,
+    Checkbox,
+    Chip,
     CircularProgress,
     Container,
     Dialog,
@@ -15,28 +18,46 @@ import {
     DialogTitle,
     FormControl,
     Grid,
+    IconButton,
     InputLabel,
     MenuItem,
+    Paper,
+    Rating,
     Slider,
     TextField,
     Typography
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {useAuth} from '../contexts/AuthContext';
 import axios from '../api/api';
-import { CustomSelect } from "../CustomElements";
+import {CustomFormControlLabel, CustomSelect} from "../CustomElements";
 
 const MeineQuizze = () => {
     const {user} = useAuth();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
+    // Query state
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
+
+    // Data states
     const [quizzes, setQuizzes] = useState([]);
     const [filtered, setFiltered] = useState([]);
+    const [categoryLabels, setCategoryLabels] = useState({});
+
+    // UI states
     const [loading, setLoading] = useState(true);
+    const [loadingTags, setLoadingTags] = useState(true);
     const [error, setError] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [onlyFavorites, setOnlyFavorites] = useState(false);
+    const [onlyUnplayed, setOnlyUnplayed] = useState(false);
+    const [onlyRated, setOnlyRated] = useState(false);
     const [minQuestions, setMinQuestions] = useState(0);
     const [sortOrder, setSortOrder] = useState('desc');
+    const [selectedCategory, setSelectedCategory] = useState('all');
+
 
     // Dialog-State
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,12 +69,22 @@ const MeineQuizze = () => {
 
     const fetchData = async () => {
         try {
-            const [quizRes] = await Promise.all([
-                axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
-            ]);
+            const [quizRes, favRes] = user
+                ? await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
+                    axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
+                ])
+                : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
+
+            const favoriteIds = new Set(favRes.data || []);
 
             const ownQuizzes = quizRes.data
-                .filter(q => q.creator?.id === user.id);
+                .filter(q => q.creator?.id === user.id)
+                .map(q => ({
+                    ...q,
+                    isFavorite: favoriteIds.has(q.id),
+                    isDaily: !!q.dailyQuiz
+                }));
 
             setQuizzes(ownQuizzes);
             setFiltered(ownQuizzes);
@@ -64,20 +95,74 @@ const MeineQuizze = () => {
         }
     };
 
+    const toggleFavorite = async quizId => {
+        try {
+            const res = await axios.post(
+                `${process.env.REACT_APP_API_URL}/users/quizzes/${quizId}/favorite`
+            );
+            setQuizzes(prev => prev.map(q => q.id === quizId ? {...q, isFavorite: res.data.favorited} : q));
+        } catch (err) {
+            console.error(err);
+        }
+    };
     useEffect(() => {
-        let result = quizzes.filter(q =>
-            q.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            q.questions.length >= minQuestions
-        );
+        const fetchCategoryLabels = async () => {
+            try {
+                const [valsRes, catsRes] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`), // ["Sport", "Geschichte", "Wissenschaft"]
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)          // ["SPORT", "HISTORY", "SCIENCE"]
+                ]);
 
+                const values = valsRes.data; // Labels
+                const cats = catsRes.data;   // Enum-Namen
+
+                const labels = {};
+                cats.forEach((cat, index) => {
+                    labels[cat] = values[index] || cat; // fallback auf Enum-Name falls Label fehlt
+                });
+
+                setCategoryLabels(labels);
+            } catch (err) {
+                console.error('Fehler beim Laden der Kategorienamen', err);
+            } finally {
+                setLoadingTags(false);
+            }
+        };
+
+        fetchCategoryLabels();
+    }, []);
+
+    useEffect(() => {
+        let result = quizzes.filter(q => {
+            const query = searchQuery.toLowerCase();
+            const inTitle = q.title.toLowerCase().includes(query);
+            const inDescription = q.description?.toLowerCase().includes(query);
+            const inCategories = (q.categories || []).some(cat =>
+                (categoryLabels[cat] || cat).toLowerCase().includes(query)
+            );
+            return (inTitle || inDescription || inCategories) && q.questions.length >= minQuestions;
+        });
+
+        // Sortieren
         result.sort((a, b) => {
             const dateA = new Date(a.createdAt);
             const dateB = new Date(b.createdAt);
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
+        // Filter nur Favoriten
+        if (onlyFavorites) {
+            result = result.filter(q => q.isFavorite);
+        }
+
+        // Filter nur bewertete
+        if (onlyRated) {
+            result = result.filter(q => q.ratingCount > 0);
+        }
+
         setFiltered(result);
-    }, [searchQuery, minQuestions, sortOrder, quizzes]);
+    }, [searchQuery, minQuestions, sortOrder, quizzes, onlyFavorites, onlyRated, categoryLabels, user]);
+
 
     // Öffnet den Bestätigungs-Dialog
     const confirmDelete = (quizId) => {
@@ -117,68 +202,113 @@ const MeineQuizze = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{mt: 4}}>
-            {/* Filter & Actions */}
-            <Box sx={{mb: 4, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2}}>
-                <TextField
-                    label="Suche"
-                    variant="outlined"
-                    size="small"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+            {/* Filterleiste */}
+            <Paper elevation={2}
+                   sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}>
 
-                <Box sx={{width: 150}}>
-                    <Typography gutterBottom>≥ Fragen</Typography>
-                    <Slider
-                        value={minQuestions}
-                        onChange={(e, val) => setMinQuestions(val)}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={20}
+                <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
+                    <TextField
+                        label="Suche"
+                        variant="outlined"
+                        size="small"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    <CustomFormControlLabel
+                        control={<Checkbox checked={onlyFavorites}
+                                           onChange={e => setOnlyFavorites(e.target.checked)}/>}
+                        label="Nur Favoriten"
+                    />
+
+                    <CustomFormControlLabel
+                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
+                        label="Nur bewertete"
+                    />
+
+                    <Box sx={{width: 150}}>
+                        <Typography gutterBottom>≥ Fragen</Typography>
+                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto"
+                                min={0} max={20}/>
+                    </Box>
+
+                    <FormControl size="small" sx={{minWidth: 150}}>
+                        <InputLabel>Sortieren</InputLabel>
+                        <CustomSelect value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
+                            <MenuItem value="desc">Neueste zuerst</MenuItem>
+                            <MenuItem value="asc">Älteste zuerst</MenuItem>
+                        </CustomSelect>
+                    </FormControl>
+
+                    <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
+                        Neues Quiz erstellen
+                    </Button>
                 </Box>
-
-                <FormControl sx={{minWidth: 160}} size="small">
-                    <InputLabel>Sortieren</InputLabel>
-                    <CustomSelect
-                        value={sortOrder}
-                        label="Sortieren"
-                        onChange={(e) => setSortOrder(e.target.value)}
-                    >
-                        <MenuItem value="desc">Neueste zuerst</MenuItem>
-                        <MenuItem value="asc">Älteste zuerst</MenuItem>
-                    </CustomSelect>
-                </FormControl>
-
-                <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
-                    Neues Quiz erstellen
-                </Button>
-            </Box>
+            </Paper>
 
             {/* Quiz-Karten */}
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{px: 2, pb: 6}}>
                 {filtered.map((quiz) => (
-                    <Grid item xs={12} sm={6} md={4} key={quiz.id}>
-                        <Card>
+                    <Grid item xs={12} sm={6} md={4} key={quiz.id} sx={{display: 'flex'}}>
+                        <Card sx={{
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            flexGrow: 1,
+                            height: '100%',
+                        }}>
+                            <Box sx={{position: 'absolute', top: 2, right: 2}}>
+                                {user && (
+                                    <IconButton size='small' color='warning' onClick={() => toggleFavorite(quiz.id)}>
+                                        {quiz.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
+                                    </IconButton>
+                                )}
+                            </Box>
+                            <Box sx={{position: 'absolute', top: 2, right: 2}}>
+                                {user && (
+                                    <IconButton size='small' color='warning' onClick={() => toggleFavorite(quiz.id)}>
+                                        {quiz.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
+                                    </IconButton>
+                                )}
+                            </Box>
                             <CardContent>
-                                <Typography variant="h6" gutterBottom>
-                                    {quiz.title}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography variant='h6' gutterBottom>{quiz.title}</Typography>
+                                <Typography variant='body2' color='text.secondary' paragraph>
                                     {quiz.description}
                                 </Typography>
+                                <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
+                                    {quiz.categories?.map(cat => (
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small"
+                                              color="primary"/>
+                                    ))}
+                                </Box>
+                                {quiz.ratingCount > 0 ? (
+                                    <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
+                                        <Rating value={quiz.avgRating} precision={0.1} readOnly size='small'/>
+                                        <Typography variant='body2' sx={{ml: 1}}>({quiz.ratingCount})</Typography>
+                                    </Box>
+                                ) : (
+                                    <Typography variant='body2' color='text.secondary' mb={1}>
+                                        Noch keine Bewertungen
+                                    </Typography>
+                                )}
                             </CardContent>
                             <CardActions>
-                                <Button size="small" onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
-                                <Button size="small"
+                                <Button variant="contained"
+                                        color="primary"
+                                        size="small" onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
+                                <Button variant="contained"
+                                        color="primary"
+                                        size="small"
                                         onClick={() => navigate(`/quizzes/edit/${quiz.id}`)}>Bearbeiten</Button>
-                                <Button size="small" color="error"
+                                <Button variant="contained"
+                                        size="small"
+                                        color="error"
                                         onClick={() => confirmDelete(quiz.id)}>Löschen</Button>
                             </CardActions>
                         </Card>
                     </Grid>
-                ))}
+                    ))}
             </Grid>
 
             {/* Bestätigungs-Dialog */}
@@ -199,8 +329,8 @@ const MeineQuizze = () => {
                     }}>Löschen</Button>
                 </DialogActions>
             </Dialog>
-        </Container>
-    );
+        </Box>
+);
 };
 
 export default MeineQuizze;

@@ -110,7 +110,7 @@ const Navbar = () => {
                         <TextField
                             size="small"
                             variant="outlined"
-                            placeholder="Quiz suchen..."
+                            placeholder="Quiz spielen..."
                             value={searchTerm}
                             onChange={handleSearchChange}
                             onKeyDown={handleSearchKeyDown}

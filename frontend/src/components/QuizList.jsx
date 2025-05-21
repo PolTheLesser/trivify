@@ -25,10 +25,10 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {useAuth} from '../contexts/AuthContext';
 import axios from '../api/api';
-import { CustomSelect, CustomFormControlLabel } from "../CustomElements";
+import {CustomSelect, CustomFormControlLabel} from "../CustomElements";
 
 const QuizList = () => {
-    const { user } = useAuth();
+    const {user} = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -63,22 +63,6 @@ const QuizList = () => {
     useEffect(() => {
         setSearchQuery(searchParams.get('query') || '');
     }, [searchParams]);
-
-    const handleSearchChange = e => {
-        const val = e.target.value;
-        setSearchQuery(val);
-        if (location.pathname === '/quizzes') {
-            if (val) setSearchParams({ query: val });
-            else setSearchParams({});
-        }
-    };
-
-    const handleSearchKeyDown = e => {
-        if (e.key === 'Enter') {
-            const q = searchQuery.trim();
-            navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
-        }
-    };
 
     useEffect(() => {
         const fetchCategoryLabels = async () => {
@@ -123,7 +107,7 @@ const QuizList = () => {
                         axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
                         axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
                     ])
-                    : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), { data: [] }];
+                    : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
                 const favoriteIds = new Set(favRes.data || []);
                 const data = quizRes.data.map(q => ({
                     ...q,
@@ -191,25 +175,16 @@ const QuizList = () => {
             const res = await axios.post(
                 `${process.env.REACT_APP_API_URL}/users/quizzes/${quizId}/favorite`
             );
-            setQuizzes(prev => prev.map(q => q.id === quizId ? { ...q, isFavorite: res.data.favorited } : q));
+            setQuizzes(prev => prev.map(q => q.id === quizId ? {...q, isFavorite: res.data.favorited} : q));
         } catch (err) {
             console.error(err);
-        }
-    };
-
-    const handleDelete = async quizId => {
-        try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/quizzes/${quizId}`);
-            setQuizzes(prev => prev.filter(q => q.id !== quizId));
-        } catch (err) {
-            setError(err.response?.data?.message || 'Fehler beim Löschen des Quiz');
         }
     };
 
     if (loading || loadingTags) {
         return (
             <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     }
@@ -217,36 +192,39 @@ const QuizList = () => {
     if (error) {
         return (
             <Container maxWidth='sm'>
-                <Alert severity='error' sx={{ mt: 4 }}>{error}</Alert>
+                <Alert severity='error' sx={{mt: 4}}>{error}</Alert>
             </Container>
         );
     }
 
     return (
-        <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
             {/* Filterleiste */}
-            <Paper elevation={2} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2 }}>
+            <Paper elevation={2}
+                   sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}>
 
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                    {user && (
+                <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
+                {user && (
                         <>
                             <CustomFormControlLabel
-                                control={<Checkbox checked={onlyFavorites} onChange={e => setOnlyFavorites(e.target.checked)} />}
+                                control={<Checkbox checked={onlyFavorites}
+                                                   onChange={e => setOnlyFavorites(e.target.checked)}/>}
                                 label="Nur Favoriten"
                             />
                             <CustomFormControlLabel
-                                control={<Checkbox checked={onlyUnplayed} onChange={e => setOnlyUnplayed(e.target.checked)} />}
+                                control={<Checkbox checked={onlyUnplayed}
+                                                   onChange={e => setOnlyUnplayed(e.target.checked)}/>}
                                 label="Noch nie gespielt"
                             />
                         </>
                     )}
 
                     <CustomFormControlLabel
-                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)} />}
+                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
                         label="Nur bewertete"
                     />
 
-                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                    <FormControl size="small" sx={{minWidth: 200}}>
                         <InputLabel>Tägliche Quizze</InputLabel>
                         <CustomSelect
                             value={dailyQuizFilter}
@@ -258,12 +236,13 @@ const QuizList = () => {
                         </CustomSelect>
                     </FormControl>
 
-                    <Box sx={{ width: 150 }}>
+                    <Box sx={{width: 150}}>
                         <Typography gutterBottom>≥ Fragen</Typography>
-                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto" min={0} max={20} />
+                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto"
+                                min={0} max={20}/>
                     </Box>
 
-                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <FormControl size="small" sx={{minWidth: 150}}>
                         <InputLabel>Sortieren</InputLabel>
                         <CustomSelect value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
                             <MenuItem value="desc">Neueste zuerst</MenuItem>
@@ -277,14 +256,14 @@ const QuizList = () => {
                 </Box>
             </Paper>
 
-            <Grid container spacing={3} sx={{ px: 2, pb: 6 }}>
-            {filteredQuizzes.map(q => (
-                <Grid item xs={12} sm={6} md={4} key={q.id} sx={{ display: 'flex' }}>
-                    <Card sx={{ position: 'relative', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                            <Box sx={{ position: 'absolute', top: 2, right: 2 }}>
+            <Grid container spacing={3} sx={{px: 2, pb: 6}}>
+                {filteredQuizzes.map(q => (
+                    <Grid item xs={12} sm={6} md={4} key={q.id} sx={{display: 'flex'}}>
+                        <Card sx={{position: 'relative', display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%',}}>
+                            <Box sx={{position: 'absolute', top: 2, right: 2}}>
                                 {user && (
                                     <IconButton size='small' color='warning' onClick={() => toggleFavorite(q.id)}>
-                                        {q.isFavorite ? <StarIcon /> : <StarBorderIcon />}
+                                        {q.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
                                     </IconButton>
                                 )}
                             </Box>
@@ -293,15 +272,16 @@ const QuizList = () => {
                                 <Typography variant='body2' color='text.secondary' paragraph>
                                     {q.description}
                                 </Typography>
-                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                                <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
                                     {q.categories?.map(cat => (
-                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary" />
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small"
+                                              color="primary"/>
                                     ))}
                                 </Box>
                                 {q.ratingCount > 0 ? (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                        <Rating value={q.avgRating} precision={0.1} readOnly size='small' />
-                                        <Typography variant='body2' sx={{ ml: 1 }}>({q.ratingCount})</Typography>
+                                    <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
+                                        <Rating value={q.avgRating} precision={0.1} readOnly size='small'/>
+                                        <Typography variant='body2' sx={{ml: 1}}>({q.ratingCount})</Typography>
                                     </Box>
                                 ) : (
                                     <Typography variant='body2' color='text.secondary' mb={1}>
@@ -309,21 +289,17 @@ const QuizList = () => {
                                     </Typography>
                                 )}
                             </CardContent>
-                            <CardActions>
-                                <Button size='small' color='primary' onClick={() => navigate(`/quizzes/${q.id}`)}>
+                            <CardActions sx={{mt: 'auto', justifyContent: 'center', pb: 2}}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => navigate(`/quizzes/${q.id}`)}
+                                >
                                     Spielen
                                 </Button>
-                                {user && user.id === q.creatorId && (
-                                    <>
-                                        <Button size='small' color='primary' onClick={() => navigate(`/quizzes/edit/${q.id}`)}>
-                                            Bearbeiten
-                                        </Button>
-                                        <Button size='small' color='error' onClick={() => handleDelete(q.id)}>
-                                            Löschen
-                                        </Button>
-                                    </>
-                                )}
                             </CardActions>
+
+
                         </Card>
                     </Grid>
                 ))}
