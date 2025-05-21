@@ -148,6 +148,12 @@ public class QuizController {
         if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Titel darf nicht leer sein");
         }
+        if (quizDTO.getDescription() == null || quizDTO.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("Beschreibung darf nicht leer sein");
+        }
+        if(quizDTO.getCategories() == null || quizDTO.getCategories().size() > 3) {
+            throw new IllegalArgumentException("Es min. 1 und maximal 3 Kategorien ausgewählt werden");
+        }
 
         for (int i = 0; i < quizDTO.getQuestions().size(); i++) {
             QuizQuestionDTO q = quizDTO.getQuestions().get(i);

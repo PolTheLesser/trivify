@@ -2,6 +2,7 @@ package rh.ptp.quizapp.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +43,7 @@ public class Quiz {
     private boolean isPublic = true;
 
     @ElementCollection
+    @Size(max = 3)
     @CollectionTable(name = "quiz_categories", joinColumns = @JoinColumn(name = "quiz_id"))
     @Column(name = "category")
     private List<QuizCategory> categories = new ArrayList<>();

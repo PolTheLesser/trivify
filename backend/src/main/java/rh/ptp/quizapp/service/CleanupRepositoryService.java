@@ -74,15 +74,7 @@ public class CleanupRepositoryService {
 
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
     public void cleanupOldRegistrations() {
-        // 1) Delete all registration requests older than 1 hour
-        LocalDateTime deleteTokenTime = LocalDateTime.now().minusHours(1);
-        List<User> users = userRepository.findByResetPasswordTokenExpiryBefore(deleteTokenTime);
-        for (User user : users) {
-            user.setResetPasswordToken(null);
-            user.setResetPasswordTokenExpiry(null);
-        }
-
-        // 2) Warn all registration and deletion requests older than 6 days
+        // 1) Warn all registration and deletion requests older than 6 days
         LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
         List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
 
@@ -100,7 +92,7 @@ public class CleanupRepositoryService {
             }
         }
 
-        // 3) Delete all registration and deletion requests older than 7 days
+        // 2) Delete all registration and deletion requests older than 7 days
         LocalDateTime expiryTime = LocalDateTime.now().minusDays(7);
         requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
         for (User request : requests) {

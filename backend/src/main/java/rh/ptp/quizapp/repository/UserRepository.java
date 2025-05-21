@@ -15,7 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByResetPasswordToken(String token);
     List<User> findByDailyQuizReminderIsTrue();
     boolean existsByName(String name);
-    List<User> findByResetPasswordTokenExpiryBefore(LocalDateTime deleteTokenTime);
     List<User> findAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> statuses);
     void deleteAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime dateTime, List<UserStatus> statuses);
 } 
