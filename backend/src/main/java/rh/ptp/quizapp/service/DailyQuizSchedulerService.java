@@ -25,7 +25,6 @@ import java.util.Map;
  * Service zur automatischen Erstellung und Speicherung eines täglichen Quiz.
  * <p>
  * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt
- * und speichert ein generiertes Quiz im JSON-Format unter {@code src/main/resources/daily.json}.
  */
 @Slf4j
 @Service
