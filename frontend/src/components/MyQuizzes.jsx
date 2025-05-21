@@ -1,14 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import {
-    Container, Grid, Card, CardContent, CardActions,
-    Typography, Button, Box, CircularProgress,
-    Alert, TextField, Slider, MenuItem, Select,
-    InputLabel, FormControl, Dialog, DialogTitle,
-    DialogContent, DialogContentText, DialogActions
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CircularProgress,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Slider,
+    TextField,
+    Typography
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
 import axios from '../api/api';
+import { CustomSelect } from "../CustomElements";
 
 const MeineQuizze = () => {
     const {user} = useAuth();
@@ -125,14 +141,14 @@ const MeineQuizze = () => {
 
                 <FormControl sx={{minWidth: 160}} size="small">
                     <InputLabel>Sortieren</InputLabel>
-                    <Select
+                    <CustomSelect
                         value={sortOrder}
                         label="Sortieren"
                         onChange={(e) => setSortOrder(e.target.value)}
                     >
                         <MenuItem value="desc">Neueste zuerst</MenuItem>
                         <MenuItem value="asc">Älteste zuerst</MenuItem>
-                    </Select>
+                    </CustomSelect>
                 </FormControl>
 
                 <Button variant="contained" onClick={() => navigate('/quizzes/create')}>

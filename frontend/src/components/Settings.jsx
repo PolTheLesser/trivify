@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Switch,
-  FormControlLabel,
-  Divider,
   Alert,
+  Box,
+  Button,
   CircularProgress,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
-  DialogActions
+  DialogTitle,
+  Divider,
+  Paper,
+  TextField,
+  Typography
 } from '@mui/material';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
+import { CustomSwitch, CustomFormControlLabel } from "../CustomElements";
 
 const Settings = () => {
   const { user, logout } = useAuth();
@@ -125,8 +124,8 @@ const Settings = () => {
                 onChange={e => setProfile({ ...profile, email: e.target.value })}
                 margin="normal" required
             />
-            <FormControlLabel
-                control={<Switch checked={profile.dailyQuizReminder} onChange={handleDailyQuizReminderChange} />}
+            <CustomFormControlLabel
+                control={<CustomSwitch checked={profile.dailyQuizReminder} onChange={handleDailyQuizReminderChange} />}
                 label="Tägliche Quiz-Erinnerungen"
             />
             <Button type="submit" variant="contained" sx={{ mt: 2 }}>Profil aktualisieren</Button>

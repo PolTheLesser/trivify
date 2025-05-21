@@ -1,28 +1,27 @@
-import React, {useState, useEffect} from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import {
-    Container,
-    Paper,
-    Typography,
-    TextField,
-    Button,
+    Alert,
     Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Container,
+    FormControl,
     IconButton,
+    InputLabel,
     List,
     ListItem,
     ListItemSecondaryAction,
     MenuItem,
-    FormControl,
-    Select,
-    InputLabel,
-    Alert,
-    CircularProgress,
-    Chip
+    Paper,
+    TextField,
+    Typography
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import Autocomplete from '@mui/material/Autocomplete';
 import axios from "axios";
+import { CustomAutocomplete, CustomSelect } from "../CustomElements";
 
 const EditQuiz = () => {
     const {id} = useParams();
@@ -201,7 +200,7 @@ const EditQuiz = () => {
                         rows={3}
                     />
 
-                    <Autocomplete
+                    <CustomAutocomplete
                         multiple
                         options={allValues}
                         value={tags}
@@ -298,7 +297,7 @@ const EditQuiz = () => {
                                         </Box>)}
                                     <FormControl fullWidth margin="normal">
                                         <InputLabel>Richtige Antwort</InputLabel>
-                                        <Select
+                                        <CustomSelect
                                             value={q.correctAnswer}
                                             label="Richtige Antwort"
                                             onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
@@ -308,7 +307,7 @@ const EditQuiz = () => {
                                                     {ans}
                                                 </MenuItem>
                                             ))}
-                                        </Select>
+                                        </CustomSelect>
                                     </FormControl>
                                 </Box>
                                 <ListItemSecondaryAction>

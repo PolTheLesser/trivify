@@ -1,35 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {
-    Container,
-    Box,
-    Grid,
-    Card,
-    CardContent,
-    CardActions,
-    Typography,
-    Button,
-    CircularProgress,
     Alert,
-    Chip,
-    TextField,
-    Rating,
-    FormControlLabel,
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
     Checkbox,
-    Slider,
-    MenuItem,
-    Select,
-    InputLabel,
+    Chip,
+    CircularProgress,
+    Container,
     FormControl,
-    InputAdornment,
+    Grid,
+    IconButton,
+    InputLabel,
+    MenuItem,
     Paper,
-    IconButton
+    Rating,
+    Slider,
+    Typography
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
 import axios from '../api/api';
+import { CustomSelect, CustomFormControlLabel } from "../CustomElements";
+
 const QuizList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -233,32 +230,32 @@ const QuizList = () => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                     {user && (
                         <>
-                            <FormControlLabel
+                            <CustomFormControlLabel
                                 control={<Checkbox checked={onlyFavorites} onChange={e => setOnlyFavorites(e.target.checked)} />}
                                 label="Nur Favoriten"
                             />
-                            <FormControlLabel
+                            <CustomFormControlLabel
                                 control={<Checkbox checked={onlyUnplayed} onChange={e => setOnlyUnplayed(e.target.checked)} />}
                                 label="Noch nie gespielt"
                             />
                         </>
                     )}
 
-                    <FormControlLabel
+                    <CustomFormControlLabel
                         control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)} />}
                         label="Nur bewertete"
                     />
 
                     <FormControl size="small" sx={{ minWidth: 200 }}>
                         <InputLabel>Tägliche Quizze</InputLabel>
-                        <Select
+                        <CustomSelect
                             value={dailyQuizFilter}
                             label="Tägliche Quizze"
                             onChange={(e) => setDailyQuizFilter(e.target.value)}
                         >
                             <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
                             <MenuItem value="all">Alle Quizze</MenuItem>
-                        </Select>
+                        </CustomSelect>
                     </FormControl>
 
                     <Box sx={{ width: 150 }}>
@@ -268,10 +265,10 @@ const QuizList = () => {
 
                     <FormControl size="small" sx={{ minWidth: 150 }}>
                         <InputLabel>Sortieren</InputLabel>
-                        <Select value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
+                        <CustomSelect value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
                             <MenuItem value="desc">Neueste zuerst</MenuItem>
                             <MenuItem value="asc">Älteste zuerst</MenuItem>
-                        </Select>
+                        </CustomSelect>
                     </FormControl>
 
                     <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>

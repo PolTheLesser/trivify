@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Link,
-  Box,
   Alert,
+  Box,
+  Button,
+  Container,
   Grid,
-  FormControlLabel,
-  Checkbox,
+  Link,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
+import {CustomFormControlLabel, CustomSwitch } from "../CustomElements";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -143,18 +142,14 @@ const Register = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
+                <CustomFormControlLabel
                   control={
-                    <Checkbox
-                      checked={formData.dailyQuizReminder}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        dailyQuizReminder: e.target.checked 
-                      })}
+                    <CustomSwitch checked={formData.dailyQuizReminder} onChange={(e) => setFormData({
+                      ...formData,
+                      dailyQuizReminder: e.target.checked
+                    })} />}
+                        label="Tägliche Quiz-Erinnerungen aktivieren"
                     />
-                  }
-                  label="Tägliche Quiz-Erinnerung aktivieren"
-                />
               </Grid>
             </Grid>
             <Button

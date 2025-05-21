@@ -6,7 +6,6 @@ import {
     Button,
     CircularProgress,
     FormControl,
-    FormControlLabel,
     LinearProgress,
     Paper,
     Radio,
@@ -15,6 +14,7 @@ import {
 } from '@mui/material';
 import axios from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
+import {CustomFormControlLabel} from '../CustomElements'
 
 const DailyQuiz = () => {
     const navigate = useNavigate();
@@ -160,7 +160,7 @@ const DailyQuiz = () => {
                             <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
                                 {currentQuestion.answers &&
                                     currentQuestion.answers.map((option, index) => (
-                                        <FormControlLabel
+                                        <CustomFormControlLabel
                                             key={index}
                                             value={option}
                                             control={<Radio/>}

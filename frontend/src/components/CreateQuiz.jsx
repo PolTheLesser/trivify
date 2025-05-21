@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
     Alert,
     Box,
     Button,
     Chip,
+    CircularProgress,
     Container,
     FormControl,
     IconButton,
@@ -14,15 +15,13 @@ import {
     ListItemSecondaryAction,
     MenuItem,
     Paper,
-    Select,
     TextField,
-    Typography,
-    CircularProgress
+    Typography
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
+import { CustomAutocomplete, CustomSelect } from "../CustomElements";
 
 const CreateQuiz = () => {
     const navigate = useNavigate();
@@ -209,7 +208,7 @@ const CreateQuiz = () => {
                         rows={3}
                     />
 
-                    <Autocomplete
+                    <CustomAutocomplete
                         multiple
                         options={allValues}
                         value={tags}
@@ -262,7 +261,7 @@ const CreateQuiz = () => {
 
                                     <FormControl fullWidth margin="normal">
                                         <InputLabel>Fragetyp</InputLabel>
-                                        <Select
+                                        <CustomSelect
                                             value={q.questionType}
                                             label="Fragetyp"
                                             onChange={e =>
@@ -272,7 +271,7 @@ const CreateQuiz = () => {
                                             <MenuItem value="MULTIPLE_CHOICE">Multiple Choice</MenuItem>
                                             <MenuItem value="TEXT_INPUT">Texteingabe</MenuItem>
                                             <MenuItem value="TRUE_FALSE">Wahr/Falsch</MenuItem>
-                                        </Select>
+                                        </CustomSelect>
                                     </FormControl>
 
                                     {q.questionType !== 'TRUE_FALSE' && q.answers.map((ans, ai) => (
@@ -325,7 +324,7 @@ const CreateQuiz = () => {
 
                                     <FormControl fullWidth margin="normal">
                                       <InputLabel>Richtige Antwort</InputLabel>
-                                      <Select
+                                      <CustomSelect
                                         value={q.correctAnswer}
                                         label="Richtige Antwort"
                                         onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
@@ -335,7 +334,7 @@ const CreateQuiz = () => {
                                             {ans}
                                           </MenuItem>
                                         ))}
-                                      </Select>
+                                      </CustomSelect>
                                     </FormControl>
                                 </Box>
                                 <ListItemSecondaryAction>

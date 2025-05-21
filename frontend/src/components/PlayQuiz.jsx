@@ -7,7 +7,6 @@ import {
   CircularProgress,
   Container,
   FormControl,
-  FormControlLabel,
   LinearProgress,
   Paper,
   Radio,
@@ -18,7 +17,7 @@ import {
 } from '@mui/material';
 import axios from '../api/api';
 import {useAuth} from '../contexts/AuthContext';
-
+import{CustomFormControlLabel} from '../CustomElements'
 const PlayQuiz = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -268,7 +267,7 @@ const PlayQuiz = () => {
             ) : (
                 <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
                   {question.answers.map((answer, idx) => (
-                      <FormControlLabel
+                      <CustomFormControlLabel
                           key={idx}
                           value={answer}
                           control={<Radio />}
