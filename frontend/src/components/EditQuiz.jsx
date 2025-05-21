@@ -106,7 +106,7 @@ const EditQuiz = () => {
             {
                 question: "",
                 questionType: "MULTIPLE_CHOICE",
-                answers: ["", "", "", ""],
+                answers: ["", ""],
                 correctAnswer: ""
             }
         ]);
@@ -121,15 +121,17 @@ const EditQuiz = () => {
         return questions.every(q => {
             if (!q.question.trim() || !q.correctAnswer.trim()) return false;
             if (q.questionType === "TEXT_INPUT") return true;
-            if (!q.answers || q.answers.some(a => !a.trim())) return false;
+            if (!q.answers || q.answers.length < 2 || q.answers.some(a => !a.trim())) return false;
             return q.answers.includes(q.correctAnswer);
         });
     };
 
     const handleTagsChange = (_, newTags) => {
-        setTags(newTags);
-        if (newTags.length > 0) {
-            setTagError(false);
+        if (newTags.length <= 3) {
+            setTags(newTags);
+            if (newTags.length > 0) {
+                setTagError(false);
+            }
         }
     };
 
@@ -248,7 +250,7 @@ const EditQuiz = () => {
                                         margin="normal"
                                         required
                                     />
-                                    {q.answers.map((ans, ai) => (
+                                    {q.questionType !== 'TRUE_FALSE' && q.answers.map((ans, ai) => (
                                         <TextField
                                             key={ai}
                                             fullWidth
@@ -259,6 +261,41 @@ const EditQuiz = () => {
                                             required
                                         />
                                     ))}
+
+                                    {q.questionType !== 'TRUE_FALSE' && (
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                                            <Button
+                                                size="small"
+                                                onClick={() => {
+                                                    const newQuestions = [...questions];
+                                                    if (q.answers.length < 5) {
+                                                        newQuestions[qi].answers.push("");
+                                                        setQuestions(newQuestions);
+                                                    }
+                                                }}
+                                                disabled={q.answers.length >= 4}
+                                            >
+                                                Antwort hinzufügen
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() => {
+                                                    const newQuestions = [...questions];
+                                                    if (q.answers.length > 2) {
+                                                        newQuestions[qi].answers.pop();
+                                                        setQuestions(newQuestions);
+                                                        // Entferne richtige Antwort, falls gelöscht
+                                                        if (!newQuestions[qi].answers.includes(q.correctAnswer)) {
+                                                            newQuestions[qi].correctAnswer = "";
+                                                        }
+                                                    }
+                                                }}
+                                                disabled={q.answers.length <= 2}
+                                            >
+                                                Letzte Antwort entfernen
+                                            </Button>
+                                        </Box>)}
                                     <FormControl fullWidth margin="normal">
                                         <InputLabel>Richtige Antwort</InputLabel>
                                         <Select

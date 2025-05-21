@@ -35,7 +35,7 @@ const CreateQuiz = () => {
         {
             question: "",
             questionType: "MULTIPLE_CHOICE",
-            answers: ["", "", "", ""],
+            answers: ["", ""],
             correctAnswer: ""
         }
     ]);
@@ -83,20 +83,22 @@ const CreateQuiz = () => {
             {
                 question: "",
                 questionType: "MULTIPLE_CHOICE",
-                answers: ["", "", "", ""],
+                answers: ["", ""],
                 correctAnswer: ""
             }
         ]);
     };
     const handleTagsChange = (event, newTags) => {
-        setTags(newTags);
-        const selectedCats = newTags.map(tag => {
-            const idx = allValues.indexOf(tag);
-            return allCategories[idx];
-        }).filter(Boolean);
-        setCategories(selectedCats);
-        if (newTags.length > 0) {
-            setTagError(false);
+        if (newTags.length <= 3) {
+            setTags(newTags);
+            const selectedCats = newTags.map(tag => {
+                const idx = allValues.indexOf(tag);
+                return allCategories[idx];
+            }).filter(Boolean);
+            setCategories(selectedCats);
+            if (newTags.length > 0) {
+                setTagError(false);
+            }
         }
     };
 
@@ -109,14 +111,21 @@ const CreateQuiz = () => {
         return questions.every(q => {
             if (!q.question.trim() || !q.correctAnswer.trim()) return false;
             if (q.questionType === 'TEXT_INPUT') return true;
-            if (!q.answers || q.answers.some(a => !a.trim())) return false;
+            if (!q.answers || q.answers.length < 2 || q.answers.some(a => !a.trim())) return false;
             return q.answers.includes(q.correctAnswer);
         });
     };
+    const newTagsToEnums = (tagValues) =>
+        tagValues.map(t => {
+            const idx = allValues.indexOf(t);
+            return allCategories[idx];
+        }).filter(Boolean);
+
 
     const handleSubmit = async e => {
+        const selectedEnums = newTagsToEnums(tags);
         e.preventDefault();
-        if (tags.length === 0) {
+        if (selectedEnums.length === 0) {
             setTagError(true);
             return;
         }
@@ -130,7 +139,7 @@ const CreateQuiz = () => {
         try {
             await axios.post(
                 process.env.REACT_APP_API_URL,
-                {title, description, categories: tags, questions},
+                {title, description, categories: selectedEnums, questions},
                 {params: {userId}}
             );
             setSuccess("Quiz erfolgreich erstellt!");
@@ -266,19 +275,53 @@ const CreateQuiz = () => {
                                         </Select>
                                     </FormControl>
 
-                                    {q.answers.map((ans, ai) => (
+                                    {q.questionType !== 'TRUE_FALSE' && q.answers.map((ans, ai) => (
                                         <TextField
                                             key={ai}
                                             fullWidth
                                             label={`Antwort ${ai + 1}`}
                                             value={ans}
-                                            onChange={e =>
-                                                handleAnswerChange(qi, ai, e.target.value)
-                                            }
+                                            onChange={e => handleAnswerChange(qi, ai, e.target.value)}
                                             margin="normal"
                                             required
                                         />
                                     ))}
+
+                                    {q.questionType !== 'TRUE_FALSE' && (
+                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                                        <Button
+                                            size="small"
+                                            onClick={() => {
+                                                const newQuestions = [...questions];
+                                                if (q.answers.length < 5) {
+                                                    newQuestions[qi].answers.push("");
+                                                    setQuestions(newQuestions);
+                                                }
+                                            }}
+                                            disabled={q.answers.length >= 4}
+                                        >
+                                            Antwort hinzufügen
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            color="secondary"
+                                            onClick={() => {
+                                                const newQuestions = [...questions];
+                                                if (q.answers.length > 2) {
+                                                    newQuestions[qi].answers.pop();
+                                                    setQuestions(newQuestions);
+                                                    // Entferne richtige Antwort, falls gelöscht
+                                                    if (!newQuestions[qi].answers.includes(q.correctAnswer)) {
+                                                        newQuestions[qi].correctAnswer = "";
+                                                    }
+                                                }
+                                            }}
+                                            disabled={q.answers.length <= 2}
+                                        >
+                                            Letzte Antwort entfernen
+                                        </Button>
+                                    </Box>)}
+
 
                                     <FormControl fullWidth margin="normal">
                                       <InputLabel>Richtige Antwort</InputLabel>
@@ -295,7 +338,6 @@ const CreateQuiz = () => {
                                       </Select>
                                     </FormControl>
                                 </Box>
-
                                 <ListItemSecondaryAction>
                                     <IconButton
                                         edge="end"
