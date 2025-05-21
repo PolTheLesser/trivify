@@ -73,10 +73,10 @@ public class CleanupRepositoryService {
     }
 
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
-    public void cleanupOldRegistrations() {
-        // 1) Warn all registration and deletion requests older than 6 days
+    public void completeDeletionRequests() {
+        // 1) Warn all deletion requests older than 6 days
         LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
-        List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
+        List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_DELETE));
 
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
@@ -84,17 +84,12 @@ public class CleanupRepositoryService {
             variables.put("username", request.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + authenticationTokenRepository.findTokenByQuizUser(request));
             variables.put("loginUrl", frontendUrl + "/login");
-            if (request.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
-                variables.put("dataUrl", frontendUrl + "/datenschutz");
-                emailService.sendEmail(request.getEmail(), "Erinnerung: Registrierung", "registration-delete-warning", variables);
-            } else if (request.getUserStatus() == UserStatus.PENDING_DELETE) {
-                emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
-            }
+            emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
         }
 
-        // 2) Delete all registration and deletion requests older than 7 days
+        // 2) Delete all deletion requests older than 7 days
         LocalDateTime expiryTime = LocalDateTime.now().minusDays(7);
-        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
+        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/logo192.png");
@@ -103,6 +98,6 @@ public class CleanupRepositoryService {
             variables.put("registerUrl", frontendUrl + "/register");
             emailService.sendEmail(request.getEmail(), "Deine Benutzerdaten wurden gelöscht!", "account-deleted", variables);
         }
-        userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_VERIFICATION, UserStatus.PENDING_DELETE));
+        userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }
 }
