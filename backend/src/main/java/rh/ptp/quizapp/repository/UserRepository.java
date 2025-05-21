@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findUserById(Long id);
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
-    Optional<User> findByResetPasswordToken(String token);
     List<User> findByDailyQuizReminderIsTrue();
     boolean existsByName(String name);
     List<User> findAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> statuses);

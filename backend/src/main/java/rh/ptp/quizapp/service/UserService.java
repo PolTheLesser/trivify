@@ -32,6 +32,8 @@ public class UserService {
     private final UserRepository           userRepo;
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final QuizResultRepository quizResultRepository;
+    private final AuthenticationTokenRepository authenticationTokenRepository;
+    private final AuthService authService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -55,11 +57,8 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
         
-        String token = UUID.randomUUID().toString();
-        user.setResetPasswordToken(token);
-        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
-        userRepository.save(user);
-
+        authService.createAuthenticationToken(user);
+        String token = authenticationTokenRepository.findTokenByQuizUser(user);
         Map<String, Object> variables = new HashMap<>();
         variables.put("logoUrl", frontendUrl+"/logo192.png");
         variables.put("username", user.getName());
@@ -69,16 +68,12 @@ public class UserService {
     }
 
     public void resetPassword(String token, String newPassword) {
-        User user = userRepository.findByResetPasswordToken(token)
+        long userId = authenticationTokenRepository.findIdByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Token"));
-
-        if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Der Token ist abgelaufen");
-        }
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetPasswordToken(null);
-        user.setResetPasswordTokenExpiry(null);
+        authenticationTokenRepository.deleteAllById(userId);
         userRepository.save(user);
     }
 

@@ -46,9 +46,6 @@ public class User implements UserDetails {
     private LocalDateTime lastDailyQuizPlayed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
-    private String resetPasswordToken;
-    private LocalDateTime resetPasswordTokenExpiry;
 
     @PrePersist
     protected void onCreate() {

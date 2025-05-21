@@ -59,7 +59,7 @@ public class AuthService {
         return pendingUser;
     }
 
-    private AuthenticationToken createAuthenticationToken(User user) {
+    AuthenticationToken createAuthenticationToken(User user) {
         AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
         if (existingToken != null) {
             authenticationTokenRepository.delete(existingToken);
