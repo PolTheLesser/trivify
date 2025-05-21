@@ -38,21 +38,6 @@ public class UserService {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public User loginUser(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Ungültiges Passwort");
-        }
-
-        if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
-            throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
-        }
-
-        return user;
-    }
-
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
