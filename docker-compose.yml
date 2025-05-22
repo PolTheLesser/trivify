@@ -39,7 +39,7 @@ services:
       test: [ "CMD-SHELL", "wget -q -O - http://localhost:9090/actuator/health  grep -q 'UP'" ]
       interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 25
       start_period: 20s
     depends_on:
       quizapp-db:
@@ -61,7 +61,7 @@ services:
       test: [ "CMD-SHELL", "wget -q --spider http://127.0.0.1 || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
       start_period: 15s
 
 volumes:
