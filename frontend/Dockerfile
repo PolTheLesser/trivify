@@ -3,7 +3,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* \
-RUN npm install -g npm@11.4.1
+    npm install -g npm@11.4.1
 WORKDIR /app
 
 COPY package*.json ./
