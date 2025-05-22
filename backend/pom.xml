@@ -146,7 +146,7 @@
                 <artifactId>dependency-check-maven</artifactId>
                 <version>12.1.1</version>
                 <configuration>
-                    <nvdApiKey>31222d83-86b8-4e8d-9f28-95ef61527869</nvdApiKey>
+                    <nvdApiKey>${nvd.api.key}</nvdApiKey>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <suppressionFiles>backend/build-props/dependency-check-suppress.xml</suppressionFiles>
                 </configuration>
