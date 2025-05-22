@@ -2,6 +2,7 @@ version: "3.9"
 services:
   quizapp-db:
     image: postgres:latest
+    pull_policy: always
     restart: always
     container_name: quizapp-db
     environment:
@@ -22,6 +23,7 @@ services:
 
   quizapp-backend:
     image: lesommer2019/trivify-backend:latest
+    pull_policy: always
     container_name: quizapp-backend
     ports:
       - "9090:9090"
@@ -45,6 +47,7 @@ services:
 
   quizapp-frontend:
     image: lesommer2019/trivify-frontend:latest
+    pull_policy: always
     container_name: quizapp-frontend
     ports:
       - "3000:80"
