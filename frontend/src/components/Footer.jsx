@@ -18,7 +18,7 @@ const Footer = () => {
             }}
         >
             <div className="footer-links">
-                <a href="mailto:quiz_rh@gmx.de?subject=Kontaktanfrage%20Quizapp" style={{color: 'inherit'}}>
+                <a href={`mailto:${mail}?subject=Kontaktanfrage%20Trivify`} style={{color: 'inherit'}}>
                     Kontakt
                 </a>{' '}
                 |{' '}

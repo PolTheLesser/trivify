@@ -35,8 +35,8 @@ export default function Impressum() {
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         E-Mail:{' '}
-                        <a href="mailto:quiz_rh@gmx.de" style={{ color: '#1976d2', textDecoration: 'underline' }}>
-                            quiz_rh@gmx.de
+                        <a href={`mailto:${mail}`} style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                            {mail}
                         </a>
                     </Typography>
                 </Box>

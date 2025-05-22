@@ -24,8 +24,8 @@ export default function Datenschutz() {
                         Schaevenstraße 1B<br />
                         50676 Köln<br />
                         E-Mail:{' '}
-                        <Link href="mailto:quiz_rh@gmx.de" underline="hover" color="primary">
-                            quiz_rh@gmx.de
+                        <Link href={`mailto:${mail}`} underline="hover" color="primary">
+                            {mail}
                         </Link>
                     </Typography>
                 </Box>
@@ -96,8 +96,8 @@ export default function Datenschutz() {
                     </List>
                     <Typography variant="body2" color="text.secondary" paragraph>
                         Für die Ausübung Ihrer Rechte oder bei Fragen zum Datenschutz schreiben Sie uns an{' '}
-                        <Link href="mailto:quiz_rh@gmx.de" underline="hover" color="primary">
-                            quiz_rh@gmx.de
+                        <Link href={`mailto:${mail}`} underline="hover" color="primary">
+                            {mail}
                         </Link>.
                     </Typography>
                 </Box>
