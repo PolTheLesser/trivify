@@ -148,7 +148,7 @@
                 <configuration>
                     <nvdApiKey>31222d83-86b8-4e8d-9f28-95ef61527869</nvdApiKey>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <suppressionFiles>build-props/dependency-check-suppress.xml</suppressionFiles>
+                    <suppressionFiles>backend/build-props/dependency-check-suppress.xml</suppressionFiles>
                 </configuration>
                 <executions>
                     <execution>
