@@ -35,11 +35,14 @@ jobs:
 
       - name: Build Frontend
         run: |
-          docker build --build-arg REACT_APP_API_URL=http://192.168.200.11:9090/api \
+          docker build --build-arg REACT_APP_API_URL=${{ vars.FRONTEND_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
       - name: Push Frontend
         run: docker push lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }}
+
+      - name: Set Execution Permissions for Maven Wrapper
+        run: chmod +x ./backend/mvnw
 
       - name: Build Backend
         run: |
