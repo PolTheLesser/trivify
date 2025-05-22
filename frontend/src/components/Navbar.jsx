@@ -70,7 +70,7 @@ const Navbar = () => {
 
     return (
         <>
-            <AppBar position="fixed" top="0" left="0" right="0" sx={{ zIndex: 1000 }}>
+            <AppBar position="static">
                 <Toolbar>
                     {/* Logo / Burger on xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
