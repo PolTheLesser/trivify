@@ -52,7 +52,7 @@ public class QuizService {
     private String mailUser;
 
     @Value("${admin.password}")
-    private String adminpassword
+    private String adminpassword;
 
     public Quiz getQuizById(Long quizId) {
         return quizRepository.findById(quizId)
