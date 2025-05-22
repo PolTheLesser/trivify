@@ -22,7 +22,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   quizapp-backend:
-    image: lesommer2019/trivify-backend:latest
+    image: lesommer2019/trivify-backend:beta
     pull_policy: always
     container_name: quizapp-backend
     ports:
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   quizapp-frontend:
-    image: lesommer2019/trivify-frontend:latest
+    image: lesommer2019/trivify-frontend:beta
     pull_policy: always
     container_name: quizapp-frontend
     ports:

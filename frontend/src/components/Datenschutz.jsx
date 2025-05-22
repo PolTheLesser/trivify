@@ -24,7 +24,7 @@ export default function Datenschutz() {
                         Schaevenstraße 1B<br />
                         50676 Köln<br />
                         E-Mail:{' '}
-                        <Link href={`mailto:${process.env.REACT_APP_MAIL}`} underline="hover" color="primary">
+                        <Link href={`mailto:${process.env.REACT_APP_MAIL}?subject=Anfrage%20Datenschutz%20Trivify`} underline="hover" color="primary">
                             {process.env.REACT_APP_MAIL}
                         </Link>
                     </Typography>

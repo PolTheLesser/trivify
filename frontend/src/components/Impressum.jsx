@@ -35,7 +35,7 @@ export default function Impressum() {
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         E-Mail:{' '}
-                        <a href={`mailto:${process.env.REACT_APP_MAIL}`} style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                        <a href={`mailto:${process.env.REACT_APP_MAIL}?subject=Anfrage%20Impressum%20Trivify`} style={{ color: '#1976d2', textDecoration: 'underline' }}>
                             {process.env.REACT_APP_MAIL}
                         </a>
                     </Typography>
