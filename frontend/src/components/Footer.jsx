@@ -18,7 +18,7 @@ const Footer = () => {
             }}
         >
             <div className="footer-links">
-                <a href={`mailto:${mail}?subject=Kontaktanfrage%20Trivify`} style={{color: 'inherit'}}>
+                <a href={`mailto:${process.env.REACT_APP_MAIL}?subject=Kontaktanfrage%20Trivify`} style={{color: 'inherit'}}>
                     Kontakt
                 </a>{' '}
                 |{' '}
