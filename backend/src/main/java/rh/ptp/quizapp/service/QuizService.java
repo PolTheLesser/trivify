@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.*;
 import rh.ptp.quizapp.repository.*;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class QuizService {
     private Logger log = LoggerFactory.getLogger(QuizService.class);
+
     @Autowired
     private QuizRepository quizRepository;
 
@@ -45,6 +47,12 @@ public class QuizService {
 
     @Autowired
     private UserService userService;
+
+    @Value("${spring.mail.username}")
+    private String mailUser;
+
+    @Value("${admin.password}")
+    private String adminpassword
 
     public Quiz getQuizById(Long quizId) {
         return quizRepository.findById(quizId)
@@ -186,12 +194,12 @@ public class QuizService {
             dailyQuiz.setPublic(true);
 
             // Admin-Creator
-            User adminUser = userRepository.findByEmail("quiz_rh@gmx.de")
+            User adminUser = userRepository.findByEmail(mailUser)
                     .orElseGet(() -> {
                         User newAdmin = new User();
                         newAdmin.setName("Admin");
-                        newAdmin.setEmail("quiz_rh@gmx.de");
-                        newAdmin.setPassword(passwordEncoder.encode("admin123"));
+                        newAdmin.setEmail(mailUser);
+                        newAdmin.setPassword(passwordEncoder.encode(adminpassword));
                         newAdmin.setUserStatus(UserStatus.ACTIVE);
                         return userRepository.save(newAdmin);
                     });

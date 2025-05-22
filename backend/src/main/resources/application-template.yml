@@ -2,9 +2,9 @@ spring:
   application:
     name: quizapp
   datasource:
-    url: jdbc:postgresql://quizapp-db:5432/quizapp
-    username: quizuser
-    password: quizpass
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASS}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
@@ -16,8 +16,8 @@ spring:
   mail:
     host: mail.gmx.net
     port: 587
-    username: quiz_rh@gmx.de
-    password: F~}rL%xSYiux=3H
+    username: ${MAIL_USER}
+    password: ${MAIL_PASS}
     from: quiz_rh@gmx.de
     properties:
       mail:
@@ -36,11 +36,14 @@ spring:
 server:
   port: 9090
 
+admin:
+  password: ${ADMIN_PASSWORD}
+
 # Application Secrets
 app:
-  jwt-secret: YourSuperSecretKey123!@#
+  jwt-secret: ${JWT_SECRET}
   jwt-expiration-in-ms: 86400000
-frontend.url: http://192.168.200.11:3000
+frontend.url: ${SERVER_URL}:3000
 
 management:
   endpoints:

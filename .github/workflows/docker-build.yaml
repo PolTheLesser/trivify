@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Frontend
         run: |
-          docker build --build-arg REACT_APP_API_URL=${{ vars.FRONTEND_URL }}:9090/api \
+          docker build --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
       - name: Push Frontend
@@ -49,6 +49,19 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin' # Use the OpenJDK distribution
+
+      - name: Replace placeholders in application.yml
+        run: |
+          envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
+        env:
+          DB_URL: ${{ vars.DB_URL }}
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: Build Backend
         run: |
