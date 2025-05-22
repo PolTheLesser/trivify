@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+REM ─── load secrets ────────────────────────────────────────────────
+for /f "usebackq tokens=1,2 delims==" %%A in ("secrets.env") do set %%A=%%B
 REM ─── detect branch name ────────────────────────────────────────────────
 for /f "delims=" %%B in ('git rev-parse --abbrev-ref HEAD') do set "BRANCH=%%B"
 for /f "delims=" %%S in ('git rev-parse --short HEAD')      do set "SHA=%%S"
@@ -20,7 +22,7 @@ if /I "%BRANCH_SAFE%"=="main" (
 echo On branch "%BRANCH%", tagging images as :"%TAG%".
 REM ==== FRONTEND ====
 echo Building frontend...
-docker build --build-arg REACT_APP_API_URL=http://127.0.0.1:9090/api -t trivify-frontend:%TAG% ./frontend
+docker build --build-arg REACT_APP_API_URL=http://192.168.200.11:9090/api -t trivify-frontend:%TAG% ./frontend
 if %errorlevel% neq 0 goto :error
 
 echo Saving frontend image...
@@ -35,7 +37,7 @@ if %errorlevel% neq 0 goto :error
 REM ==== BACKEND ====
 echo Building backend...
 cd backend
-call mvnw clean package
+call mvnw clean verify
 if %errorlevel% neq 0 goto :error
 cd ..
 
