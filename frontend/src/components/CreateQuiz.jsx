@@ -286,7 +286,7 @@ const CreateQuiz = () => {
                                         />
                                     ))}
 
-                                    {q.questionType !== 'TRUE_FALSE' && (
+                                    {q.questionType !== 'TRUE_FALSE' && q.questionType !== 'TEXT_INPUT' && (
                                         <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                                         <Button
                                             size="small"
@@ -323,18 +323,30 @@ const CreateQuiz = () => {
 
 
                                     <FormControl fullWidth margin="normal">
-                                      <InputLabel>Richtige Antwort</InputLabel>
-                                      <CustomSelect
-                                        value={q.correctAnswer}
-                                        label="Richtige Antwort"
-                                        onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
-                                      >
-                                        {q.answers.map((ans, ai) => (
-                                          <MenuItem key={ai} value={ans}>
-                                            {ans}
-                                          </MenuItem>
-                                        ))}
-                                      </CustomSelect>
+                                        {q.questionType !== 'TEXT_INPUT' && (
+                                        <InputLabel>Richtige Antwort</InputLabel>)}
+
+                                        {q.questionType === 'TEXT_INPUT' ? (
+                                            <TextField
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                                margin="normal"
+                                                required
+                                            />
+                                        ) : (
+                                            <CustomSelect
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                            >
+                                                {q.answers.map((ans, ai) => (
+                                                    <MenuItem key={ai} value={ans}>
+                                                        {ans}
+                                                    </MenuItem>
+                                                ))}
+                                            </CustomSelect>
+                                        )}
                                     </FormControl>
                                 </Box>
                                 <ListItemSecondaryAction>

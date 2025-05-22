@@ -70,6 +70,7 @@ public class QuizService {
                     QuizQuestion question = new QuizQuestion();
                     question.setQuestion(q.getQuestion());
                     question.setAnswers(q.getAnswers());
+                    question.setQuestionType(q.getQuestionType());
                     question.setCorrectAnswer(q.getCorrectAnswer());
                     question.setDifficulty(q.getDifficulty());
                     question.setSource(quizDTO.getTitle());
@@ -358,9 +359,6 @@ public class QuizService {
         if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Titel darf nicht leer sein");
         }
-        if (quizDTO.getDescription() == null || quizDTO.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Beschreibung darf nicht leer sein");
-        }
         if(quizDTO.getCategories() == null || quizDTO.getCategories().size() > 3) {
             throw new IllegalArgumentException("Es min. 1 und maximal 3 Kategorien ausgewählt werden");
         }
@@ -377,6 +375,15 @@ public class QuizService {
             }
 
             if (q.getQuestionType() != QuestionType.TEXT_INPUT) {
+
+                if(q.getAnswers() == null || q.getAnswers().size() < 2) {
+                    throw new IllegalArgumentException("Es müssen mindestens 2 Antwortmöglichkeiten bei Frage " + (i + 1) + " angegeben werden");
+                }
+
+                if(q.getAnswers().size() > 4) {
+                    throw new IllegalArgumentException("Es dürfen maximal 4 Antwortmöglichkeiten bei Frage " + (i + 1) + " angegeben werden");
+                }
+
                 if (q.getAnswers() == null || q.getAnswers().isEmpty() || q.getAnswers().stream().anyMatch(a -> a == null || a.trim().isEmpty())) {
                     throw new IllegalArgumentException("Alle Antwortmöglichkeiten müssen bei Frage " + (i + 1) + " ausgefüllt sein");
                 }

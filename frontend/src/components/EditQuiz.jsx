@@ -83,9 +83,10 @@ const EditQuiz = () => {
             }
         };
 
-        // Warten bis Kategorien geladen sind
-        if (!loadingTags) fetchQuiz();
-    }, [id, allCategories, allValues, loadingTags]);
+        if (allCategories.length > 0 && allValues.length > 0) {
+            fetchQuiz();
+        }
+    }, [id, allCategories, allValues]);
 
     const handleQuestionChange = (index, field, value) => {
         const newQuestions = [...questions];
@@ -156,6 +157,22 @@ const EditQuiz = () => {
         }
     };
 
+    const handleQuestionTypeChange = (index, newType) => {
+        const newQuestions = [...questions];
+        newQuestions[index] = {
+            ...newQuestions[index],
+            questionType: newType,
+            answers:
+                newType === 'TRUE_FALSE'
+                    ? ['Wahr', 'Falsch']
+                    : newType === 'TEXT_INPUT'
+                        ? []
+                        : ['', '', '', ''],
+            correctAnswer: newType === 'TRUE_FALSE' ? 'Wahr' : ''
+        };
+        setQuestions(newQuestions);
+    };
+
     const newTagsToEnums = (tagValues) =>
         tagValues.map(t => {
             const idx = allValues.indexOf(t);
@@ -217,7 +234,7 @@ const EditQuiz = () => {
                                 {...params}
                                 error={tagError}
                                 helperText={tagError ? 'Bitte wähle mindestens eine Kategorie' : ''}
-                                label="Kategorien"
+                                label="Kategorien *"
                                 placeholder="Kategorien wählen"
                                 InputProps={{
                                     ...params.InputProps,
@@ -249,6 +266,20 @@ const EditQuiz = () => {
                                         margin="normal"
                                         required
                                     />
+                                    <FormControl fullWidth margin="normal">
+                                        <InputLabel>Fragetyp</InputLabel>
+                                        <CustomSelect
+                                            value={q.questionType}
+                                            label="Fragetyp"
+                                            onChange={e =>
+                                                handleQuestionTypeChange(qi, e.target.value)
+                                            }
+                                        >
+                                            <MenuItem value="MULTIPLE_CHOICE">Multiple Choice</MenuItem>
+                                            <MenuItem value="TEXT_INPUT">Texteingabe</MenuItem>
+                                            <MenuItem value="TRUE_FALSE">Wahr/Falsch</MenuItem>
+                                        </CustomSelect>
+                                    </FormControl>
                                     {q.questionType !== 'TRUE_FALSE' && q.answers.map((ans, ai) => (
                                         <TextField
                                             key={ai}
@@ -261,7 +292,7 @@ const EditQuiz = () => {
                                         />
                                     ))}
 
-                                    {q.questionType !== 'TRUE_FALSE' && (
+                                    {q.questionType !== 'TRUE_FALSE' && q.questionType !== 'TEXT_INPUT' && (
                                         <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                                             <Button
                                                 size="small"
@@ -296,18 +327,29 @@ const EditQuiz = () => {
                                             </Button>
                                         </Box>)}
                                     <FormControl fullWidth margin="normal">
-                                        <InputLabel>Richtige Antwort</InputLabel>
-                                        <CustomSelect
-                                            value={q.correctAnswer}
-                                            label="Richtige Antwort"
-                                            onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
-                                        >
-                                            {q.answers.map((ans, ai) => (
-                                                <MenuItem key={ai} value={ans}>
-                                                    {ans}
-                                                </MenuItem>
-                                            ))}
-                                        </CustomSelect>
+                                        {q.questionType !== 'TEXT_INPUT' && (
+                                            <InputLabel>Richtige Antwort</InputLabel>)}
+                                        {q.questionType === 'TEXT_INPUT' ? (
+                                            <TextField
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                                margin="normal"
+                                                required
+                                            />
+                                        ) : (
+                                            <CustomSelect
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                            >
+                                                {q.answers.map((ans, ai) => (
+                                                    <MenuItem key={ai} value={ans}>
+                                                        {ans}
+                                                    </MenuItem>
+                                                ))}
+                                            </CustomSelect>
+                                        )}
                                     </FormControl>
                                 </Box>
                                 <ListItemSecondaryAction>

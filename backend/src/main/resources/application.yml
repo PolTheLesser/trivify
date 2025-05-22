@@ -1,4 +1,3 @@
-# Anwendung
 spring:
   application:
     name: quizapp
@@ -41,7 +40,7 @@ server:
 app:
   jwt-secret: YourSuperSecretKey123!@#
   jwt-expiration-in-ms: 86400000
-frontend.url: http://127.0.0.1:3000
+frontend.url: http://192.168.200.11:3000
 
 management:
   endpoints:
