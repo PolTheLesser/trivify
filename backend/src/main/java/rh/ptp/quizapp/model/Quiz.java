@@ -17,25 +17,25 @@ import java.util.List;
 @Table(name = "quizzes")
 public class Quiz {
     // Getters und Setters
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    
+
     @Column(nullable = false)
     private String title;
 
-    
+
     @Column(length = 1000)
     private String description;
 
-    
+
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
-    
+
     @JsonManagedReference
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<QuizQuestion> questions;
@@ -47,37 +47,38 @@ public class Quiz {
     @CollectionTable(name = "quiz_categories", joinColumns = @JoinColumn(name = "quiz_id"))
     @Column(name = "category")
     private List<QuizCategory> categories = new ArrayList<>();
-    
-    
+
+
     @Column(name = "quiz_date")
     private LocalDate date;
-    
-    
+
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Double avgRating;
-    private Long   ratingCount;
+    private Long ratingCount;
 
     public boolean isDailyQuiz() {
         return categories.contains(QuizCategory.DAILY_QUIZ);
     }
 
     public void setDailyQuiz(boolean isDailyQuiz) {
-        if(isDailyQuiz) {
-            categories.add(QuizCategory.DAILY_QUIZ);
-        } else {
-            categories.remove(QuizCategory.DAILY_QUIZ);
+        if (isDailyQuiz) {
+            if (!categories.contains(QuizCategory.DAILY_QUIZ)) {
+                categories.add(QuizCategory.DAILY_QUIZ);
+            } else {
+                categories.remove(QuizCategory.DAILY_QUIZ);
+            }
+        }
+
+        @PrePersist
+        protected void onCreate () {
+            createdAt = LocalDateTime.now();
+            updatedAt = LocalDateTime.now();
+        }
+
+        @PreUpdate
+        protected void onUpdate () {
+            updatedAt = LocalDateTime.now();
         }
     }
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-} 
