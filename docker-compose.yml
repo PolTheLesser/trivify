@@ -22,7 +22,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   quizapp-backend:
-    image: lesommer2019/trivify-backend:beta
+    image: lesommer2019/trivify-backend:latest
     pull_policy: always
     container_name: quizapp-backend
     ports:
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   quizapp-frontend:
-    image: lesommer2019/trivify-frontend:beta
+    image: lesommer2019/trivify-frontend:latest
     pull_policy: always
     container_name: quizapp-frontend
     ports:
@@ -57,6 +57,12 @@ services:
       quizapp-backend:
         condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost | grep -q '<!DOCTYPE html>'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   pgdata:
