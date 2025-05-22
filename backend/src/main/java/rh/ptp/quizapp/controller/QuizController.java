@@ -81,14 +81,14 @@ public class QuizController {
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody QuizDTO quizDTO, @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = userRepository.findByEmail(userDetails.getUsername()).get().getId();
-        validateQuizDTO(quizDTO);
+        quizService.validateQuizDTO(quizDTO);
         return ResponseEntity.ok(quizService.createQuiz(quizDTO, userId));
     }
 
     @PutMapping("/{quizId}")
     public ResponseEntity<Quiz> updateQuiz(@PathVariable Long quizId, @Valid @RequestBody QuizDTO quizDTO, @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = userRepository.findByEmail(userDetails.getUsername()).get().getId();
-        validateQuizDTO(quizDTO);
+        quizService.validateQuizDTO(quizDTO);
         return ResponseEntity.ok(quizService.updateQuiz(quizId, quizDTO, userId));
     }
 
@@ -142,40 +142,6 @@ public class QuizController {
             throw new RuntimeException("Du kannst dein eigenes Quiz nicht bewerten");
         }
         return ResponseEntity.ok(quizService.rateQuiz(quizId, userId, ratingDTO.getRating()));
-    }
-
-    private void validateQuizDTO(QuizDTO quizDTO) {
-        if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("Titel darf nicht leer sein");
-        }
-        if (quizDTO.getDescription() == null || quizDTO.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Beschreibung darf nicht leer sein");
-        }
-        if(quizDTO.getCategories() == null || quizDTO.getCategories().size() > 3) {
-            throw new IllegalArgumentException("Es min. 1 und maximal 3 Kategorien ausgewählt werden");
-        }
-
-        for (int i = 0; i < quizDTO.getQuestions().size(); i++) {
-            QuizQuestionDTO q = quizDTO.getQuestions().get(i);
-
-            if (q.getQuestion() == null || q.getQuestion().trim().isEmpty()) {
-                throw new IllegalArgumentException("Frage " + (i + 1) + " ist leer");
-            }
-
-            if (q.getCorrectAnswer() == null || q.getCorrectAnswer().trim().isEmpty()) {
-                throw new IllegalArgumentException("Richtige Antwort fehlt bei Frage " + (i + 1));
-            }
-
-            if (q.getQuestionType() != QuestionType.TEXT_INPUT) {
-                if (q.getAnswers() == null || q.getAnswers().isEmpty() || q.getAnswers().stream().anyMatch(a -> a == null || a.trim().isEmpty())) {
-                    throw new IllegalArgumentException("Alle Antwortmöglichkeiten müssen bei Frage " + (i + 1) + " ausgefüllt sein");
-                }
-
-                if (!q.getAnswers().contains(q.getCorrectAnswer())) {
-                    throw new IllegalArgumentException("Richtige Antwort ist bei Frage " + (i + 1) + " nicht unter den gegebenen Antworten");
-                }
-            }
-        }
     }
 
 } 
