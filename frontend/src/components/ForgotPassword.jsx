@@ -63,6 +63,7 @@ const ForgotPassword = () => {
               required
               fullWidth
               id="email"
+              type="email"
               label="E-Mail-Adresse"
               name="email"
               autoComplete="email"
