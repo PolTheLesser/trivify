@@ -10,9 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
-import rh.ptp.quizapp.model.QuestionType;
-import rh.ptp.quizapp.model.Quiz;
-import rh.ptp.quizapp.model.QuizCategory;
+import rh.ptp.quizapp.model.*;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.QuizService;
@@ -50,6 +48,20 @@ public class QuizController {
         return ResponseEntity.ok(quizze);
     }
 
+    @GetMapping("/myQuizzes")
+    public ResponseEntity<List<Quiz>> getMyQuizzes() {
+        List<Quiz> quizze = quizService.findAllWithRatings();
+        for (Quiz quiz : quizze) {
+            for (int i = 0; i < quiz.getQuestions().size(); i++) {
+                quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
+            }
+            quiz.getCreator().setEmail(null);
+            quiz.getCreator().setPassword(null);
+        }
+        logger.debug(quizze.toString());
+        return ResponseEntity.ok(quizze);
+    }
+
     @GetMapping("/{quizId}")
     public ResponseEntity<Quiz> getQuiz(@PathVariable Long quizId) {
         Quiz quiz = quizService.getQuizById(quizId);
@@ -69,10 +81,18 @@ public class QuizController {
     }
 
     @GetMapping("/toEdit/{quizId}")
-    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId) {
+    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId, @AuthenticationPrincipal UserDetails userDetails) {
         Quiz quiz = quizService.getQuizById(quizId);
         if (quiz != null) {
-            return ResponseEntity.ok(quiz);
+            if(userRepository.findByName(userDetails.getUsername()).isPresent()
+                    && userRepository.findByName(userDetails.getUsername()).get().getRole() != UserRole.ADMIN){
+                return ResponseEntity.ok(quiz);
+            }
+            else if (quiz.getCreator().getName().equals(userDetails.getUsername())){
+                    return ResponseEntity.ok(quiz);
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         } else {
             return ResponseEntity.notFound().build();
         }

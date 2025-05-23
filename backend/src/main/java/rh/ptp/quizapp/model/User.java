@@ -37,6 +37,9 @@ public class User implements UserDetails {
     private UserStatus userStatus = UserStatus.PENDING_VERIFICATION;
 
     @Column(nullable = false)
+    private UserRole role = UserRole.USER;
+
+    @Column(nullable = false)
     private boolean dailyQuizReminder = false;
 
     @Getter
@@ -55,14 +58,17 @@ public class User implements UserDetails {
 
     @PreUpdate
     protected void onUpdate() {
-        if(userStatus == UserStatus.ACTIVE){
+        if (userStatus == UserStatus.ACTIVE) {
             updatedAt = LocalDateTime.now();
         }
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(
+                new SimpleGrantedAuthority(UserRole.USER.getRole()),
+                new SimpleGrantedAuthority(UserRole.ADMIN.getRole())
+        );
     }
 
     @Override
@@ -87,7 +93,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        if(userStatus == UserStatus.ACTIVE) {
+        if (userStatus == UserStatus.ACTIVE) {
             return true;
         } else {
             return false;

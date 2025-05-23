@@ -100,7 +100,7 @@ const Navbar = () => {
                         <Button component={RouterLink} to="/daily-quiz" color="inherit">Tägliches Quiz (KI)</Button>
                         {user && (
                             <Button component={RouterLink} to="/quizzes/my-quizzes" color="inherit">
-                                Meine Quizze
+                                Quizlabor
                             </Button>
                         )}
                     </Box>
@@ -179,11 +179,11 @@ const Navbar = () => {
                 {!user && (
                     <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Startseite</MenuItem>
                 )}
-                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes">Quizze</MenuItem>
+                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes">Quizze spielen</MenuItem>
                 <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/daily-quiz">Tägliches Quiz (KI)</MenuItem>
                 {user && (
                     <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes/my-quizzes">
-                        Meine Quizze
+                        Quizlabor
                     </MenuItem>
                 )}
             </Menu>

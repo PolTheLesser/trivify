@@ -73,9 +73,10 @@ const MeineQuizze = () => {
 
     const fetchData = async () => {
         try {
+            const isAdmin = user?.role === 'ROLE_ADMIN';
             const [quizRes, favRes] = user
                 ? await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
+                    axios.get(`${process.env.REACT_APP_API_URL}/${isAdmin ? 'quizzes' : 'myQuizzes'}`),
                     axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
                 ])
                 : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
@@ -83,7 +84,7 @@ const MeineQuizze = () => {
             const favoriteIds = new Set(favRes.data || []);
 
             const ownQuizzes = quizRes.data
-                .filter(q => q.creator?.id === user.id)
+                .filter(q => isAdmin || q.creator?.id === user.id)
                 .map(q => ({
                     ...q,
                     isFavorite: favoriteIds.has(q.id),
@@ -316,6 +317,11 @@ const MeineQuizze = () => {
                                               color="primary"/>
                                     ))}
                                 </Box>
+                                {user?.role === 'ADMIN' && quiz.creator && (
+                                    <Typography variant='body2' color='text.secondary' mb={1}>
+                                        Erstellt von: {quiz.creator.name}
+                                    </Typography>
+                                )}
                                 {quiz.ratingCount > 0 ? (
                                     <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
                                         <Rating value={quiz.avgRating} precision={0.1} readOnly size='small'/>
