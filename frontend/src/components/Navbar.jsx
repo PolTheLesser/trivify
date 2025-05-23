@@ -25,6 +25,20 @@ const Navbar = () => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
+    const isAdmin = user?.role === 'ROLE_ADMIN';
+
+    // User-Menu-Logik …
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isUserMenuOpen = Boolean(anchorEl);
+    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
+    const handleUserMenuClose = () => setAnchorEl(null);
+
+    // Mobile-Menu …
+    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
+    const isMobileMenuOpen = Boolean(mobileAnchorEl);
+    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
+    const handleMobileMenuClose = () => setMobileAnchorEl(null);
+
 
     // lokaler State für das Eingabefeld
     const [searchTerm, setSearchTerm] = useState('');
@@ -55,18 +69,6 @@ const Navbar = () => {
     const handleToggle = () => {
         setDarkMode(!darkMode);
     };
-
-    // User-Menu-Logik …
-    const [anchorEl, setAnchorEl] = useState(null);
-    const isUserMenuOpen = Boolean(anchorEl);
-    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
-    const handleUserMenuClose = () => setAnchorEl(null);
-
-    // Mobile-Menu …
-    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
-    const isMobileMenuOpen = Boolean(mobileAnchorEl);
-    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
-    const handleMobileMenuClose = () => setMobileAnchorEl(null);
 
     return (
         <>
@@ -102,6 +104,9 @@ const Navbar = () => {
                             <Button component={RouterLink} to="/quizzes/my-quizzes" color="inherit">
                                 Quizlabor
                             </Button>
+                        )}
+                        {isAdmin && (
+                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
                         )}
                     </Box>
 
@@ -185,6 +190,9 @@ const Navbar = () => {
                     <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes/my-quizzes">
                         Quizlabor
                     </MenuItem>
+                )}
+                {isAdmin && (
+                    <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
                 )}
             </Menu>
 

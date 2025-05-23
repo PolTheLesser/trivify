@@ -48,20 +48,6 @@ public class QuizController {
         return ResponseEntity.ok(quizze);
     }
 
-    @GetMapping("/myQuizzes")
-    public ResponseEntity<List<Quiz>> getMyQuizzes() {
-        List<Quiz> quizze = quizService.findAllWithRatings();
-        for (Quiz quiz : quizze) {
-            for (int i = 0; i < quiz.getQuestions().size(); i++) {
-                quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
-            }
-            quiz.getCreator().setEmail(null);
-            quiz.getCreator().setPassword(null);
-        }
-        logger.debug(quizze.toString());
-        return ResponseEntity.ok(quizze);
-    }
-
     @GetMapping("/{quizId}")
     public ResponseEntity<Quiz> getQuiz(@PathVariable Long quizId) {
         Quiz quiz = quizService.getQuizById(quizId);

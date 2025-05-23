@@ -5,6 +5,7 @@ import {ThemeProvider as MuiThemeProvider, createTheme} from "@mui/material/styl
 import {ThemeContext} from "./contexts/ThemeContext";
 import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/Navbar";
+import AdminPanel from "./components/AdminPanel";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import Welcome from "./components/Welcome";
@@ -52,6 +53,7 @@ const App = () => {
                         <Route path="/quizzes/create" element={<PrivateRoute><CreateQuiz/></PrivateRoute>}/>
                         <Route path="/quizzes/edit/:id" element={<PrivateRoute><EditQuiz/></PrivateRoute>}/>
                         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>}/>
+                        <Route path="/adminpanel" element={<PrivateRoute><AdminPanel/></PrivateRoute>}/>
                         <Route path="/impressum" element={<Impressum/>}/>
                         <Route path="/datenschutz" element={<Datenschutz/>}/>
                         {/* Catch-all: if you have a token, go to /welcome; otherwise go to / */}

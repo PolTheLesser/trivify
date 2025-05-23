@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/quiz-results/scores/top").permitAll()
                         .requestMatchers("/api/categories").permitAll()
                         .requestMatchers("/api/categories/values").permitAll()
+                        .requestMatchers("/api/admin", "/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
