@@ -20,7 +20,8 @@ const DailyQuiz = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const storageKey = `quiz-${id}-answers`;
+    const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const storageKey = `quiz-${today}-answers`;
     const [answers, setAnswers] = useState(() => {
         const saved = localStorage.getItem(storageKey);
         return saved ? JSON.parse(saved) : {};
@@ -89,7 +90,6 @@ const DailyQuiz = () => {
 
             if (currentQuestionIndex < quiz.questions.length - 1) {
                 setCurrentQuestionIndex(prev => prev + 1);
-                setSelectedAnswer('');
             } else {
                 const finalScore = score + (isCorrect ? 1 : 0); // letzter Punkt wird direkt dazugerechnet
 

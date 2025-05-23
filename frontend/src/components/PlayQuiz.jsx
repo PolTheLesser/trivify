@@ -116,7 +116,6 @@ const PlayQuiz = () => {
                 localStorage.removeItem(storageKey);
             } else {
                 setCurrentQuestionIndex(prev => prev + 1);
-                setSelectedAnswer('');
             }
         } catch {
             setError('Fehler beim Einreichen der Antwort');
