@@ -331,9 +331,14 @@ const QuizList = () => {
                             <MenuItem value="asc">Älteste zuerst</MenuItem>
                         </CustomSelect>
                     </FormControl>
-
+                    <br/>
                     <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
                         Zufälliges Quiz
+                    </Button>
+                    {/* Roter Zurücksetzen-Button rechts */}
+                    <Box sx={{flexGrow: 1}} />
+                    <Button variant="contained" color="error" onClick={resetFilters}>
+                        Filter zurücksetzen
                     </Button>
                 </Box>
             </Paper>

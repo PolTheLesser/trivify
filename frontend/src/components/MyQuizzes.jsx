@@ -274,7 +274,7 @@ const MeineQuizze = () => {
                             <MenuItem value="asc">Älteste zuerst</MenuItem>
                         </CustomSelect>
                     </FormControl>
-
+                    <br/>
                     <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
                         Neues Quiz erstellen
                     </Button>
@@ -282,7 +282,7 @@ const MeineQuizze = () => {
                     {/* Roter Zurücksetzen-Button rechts */}
                     <Box sx={{flexGrow: 1}} />
                     <Button variant="contained" color="error" onClick={resetFilters}>
-                        Zurücksetzen
+                        Filter zurücksetzen
                     </Button>
                 </Box>
             </Paper>

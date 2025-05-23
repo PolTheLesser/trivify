@@ -19,9 +19,12 @@ import {CustomFormControlLabel} from '../CustomElements'
 const DailyQuiz = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState(null);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
     const storageKey = `quiz-${today}-answers`;
+    const savedIndex = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
+        return savedIndex !== null ? Number(savedIndex) : 0;
+    });
     const [answers, setAnswers] = useState(() => {
         const saved = localStorage.getItem(storageKey);
         return saved ? JSON.parse(saved) : {};
@@ -89,7 +92,7 @@ const DailyQuiz = () => {
             }
 
             if (currentQuestionIndex < quiz.questions.length - 1) {
-                setCurrentQuestionIndex(prev => prev + 1);
+                updateCurrentQuestionIndex(currentQuestionIndex + 1);
             } else {
                 const finalScore = score + (isCorrect ? 1 : 0); // letzter Punkt wird direkt dazugerechnet
 
@@ -109,6 +112,7 @@ const DailyQuiz = () => {
                 }
                 console.log('Tägliches Quiz abgeschlossen & Score gespeichert');
                 localStorage.removeItem(storageKey);
+                localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
             }
         } catch (err) {
             console.error(err.response?.data?.message || 'Fehler beim Einreichen der Antwort oder Speichern des Scores:', err);
@@ -118,7 +122,7 @@ const DailyQuiz = () => {
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
+            updateCurrentQuestionIndex(currentQuestionIndex - 1);
         }
     };
 
@@ -128,6 +132,11 @@ const DailyQuiz = () => {
             localStorage.setItem(storageKey, JSON.stringify(updated));
             return updated;
         });
+    };
+
+    const updateCurrentQuestionIndex = (newIndex) => {
+        setCurrentQuestionIndex(newIndex);
+        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
     };
 
     if (loading) {

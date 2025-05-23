@@ -22,11 +22,14 @@ import {CustomFormControlLabel} from '../CustomElements'
 const PlayQuiz = () => {
     const {id} = useParams();
     const {user} = useAuth();
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showResults, setShowResults] = useState(false);
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState(null);
     const storageKey = `quiz-${id}-answers`;
+    const savedIndex = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
+        return savedIndex !== null ? Number(savedIndex) : 0;
+    });
     const [answers, setAnswers] = useState(() => {
         const saved = localStorage.getItem(storageKey);
         return saved ? JSON.parse(saved) : {};
@@ -42,10 +45,6 @@ const PlayQuiz = () => {
     const userId = user?.id;
     const quizId = quiz?.id;
     const maxPossibleScore = quiz?.questions.length;
-
-    useEffect(() => {
-        fetchQuiz();
-    }, [id]);
 
     const fetchQuiz = async () => {
         try {
@@ -114,8 +113,9 @@ const PlayQuiz = () => {
                         });
                 }, 500); // Ein bisschen Verzögerung, um den Wert korrekt zu setzen
                 localStorage.removeItem(storageKey);
+                localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
             } else {
-                setCurrentQuestionIndex(prev => prev + 1);
+                updateCurrentQuestionIndex(prev => prev + 1);
             }
         } catch {
             setError('Fehler beim Einreichen der Antwort');
@@ -124,7 +124,7 @@ const PlayQuiz = () => {
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
+            updateCurrentQuestionIndex(prev => prev - 1);
         }
     };
 
@@ -135,6 +135,15 @@ const PlayQuiz = () => {
             return updated;
         });
     };
+
+    const updateCurrentQuestionIndex = (newIndex) => {
+        setCurrentQuestionIndex(newIndex);
+        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
+    };
+
+    useEffect(() => {
+        fetchQuiz();
+    }, [id]);
 
     if (loading) {
         return (
