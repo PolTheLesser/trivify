@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserStatus;
-import rh.ptp.quizapp.service.UserService;
 import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 
@@ -31,7 +30,7 @@ public class CleanupRepositoryService {
     private AuthenticationTokenRepository authenticationTokenRepository;
 
     @Autowired
-    private UserService userService;
+    private AccountCleanupService accountCleanupService;
 
     @Autowired
     private EmailService emailService;
@@ -113,7 +112,7 @@ public class CleanupRepositoryService {
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
         for (User user : users) {
             if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
-                userService.deleteUserAccount(user.getId());
+                accountCleanupService.deleteUserAccount(user.getId());
             }
         }
     }
