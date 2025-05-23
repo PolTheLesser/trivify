@@ -54,8 +54,8 @@ jobs:
       - name: Replace placeholders in application.yml
         run: |
           envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
-          echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_OUTPUT
-          echo "SERVER_URL=${{ secrets.SERVER_URL }}" >> $GITHUB_OUTPUT
+          echo "DB_URL=${{ vars.DB_URL }}" >> $GITHUB_OUTPUT
+          echo "SERVER_URL=${{ vars.SERVER_URL }}" >> $GITHUB_OUTPUT
           echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_OUTPUT
           echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
           echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
