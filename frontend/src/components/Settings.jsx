@@ -147,8 +147,8 @@ const Settings = () => {
                 onChange={e => setPassword({ ...password, newPassword: e.target.value })}
                 margin="normal" required
             />
-            <TextField
-                fullWidth label="Passwort bestätigen" type="password"
+            <PasswordField
+                fullWidth label="Passwort bestätigen"
                 value={password.confirmPassword}
                 onChange={e => setPassword({ ...password, confirmPassword: e.target.value })}
                 margin="normal" required

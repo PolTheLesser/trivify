@@ -65,6 +65,15 @@ public class AuthService {
             authenticationTokenRepository.delete(existingToken);
         }
         AuthenticationToken newToken = new AuthenticationToken(user);
+        if(user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("username", user.getName());
+            variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken);
+            variables.put("dataUrl", frontendUrl + "/datenschutz");
+            emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
+            throw new RuntimeException("Benutzer existiert nicht!");
+        }
         return authenticationTokenRepository.save(newToken);
     }
 
