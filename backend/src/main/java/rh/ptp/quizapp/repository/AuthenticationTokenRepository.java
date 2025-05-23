@@ -21,5 +21,4 @@ public interface AuthenticationTokenRepository extends JpaRepository<Authenticat
     String findTokenByQuizUser(@Param("user") User user);
     void deleteAllByExpiryDateBefore(LocalDateTime date);
     void deleteAllById(Long id);
-    void deleteByToken(String token);
 }
