@@ -57,6 +57,9 @@ const MeineQuizze = () => {
     const [quizzes, setQuizzes] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [categoryLabels, setCategoryLabels] = useState({});
+    const [showAll, setShowAll] = useState(
+        user?.role === 'ROLE_ADMIN' && searchParams.get('showAll') === 'true'
+    );
 
     // UI states
     const [loading, setLoading] = useState(true);
@@ -73,14 +76,14 @@ const MeineQuizze = () => {
 
     const fetchData = async () => {
         try {
+            const endpoint = isAdmin
+                ? (showAll ? 'quizzes' : 'myQuizzes')
+                : 'myQuizzes';
             const isAdmin = user?.role === 'ROLE_ADMIN';
-            const [quizRes, favRes] = user
-                ? await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/${isAdmin ? 'quizzes' : 'myQuizzes'}`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
-                ])
-                : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
-
+            const [quizRes, favRes] = await Promise.all([
+                axios.get(`${process.env.REACT_APP_API_URL}/${endpoint}`),
+                axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
+            ]);
             const favoriteIds = new Set(favRes.data || []);
 
             const ownQuizzes = quizRes.data
@@ -147,7 +150,7 @@ const MeineQuizze = () => {
         if (onlyRated) params.onlyRated = 'true';
         if (minQuestions > 0) params.minQuestions = minQuestions.toString();
         if (sortOrder && sortOrder !== 'desc') params.sortOrder = sortOrder;
-
+        if (showAll && user?.role === 'ROLE_ADMIN') params.showAll = 'true';
         setSearchParams(params, {replace: true});
     }, [searchQuery, onlyFavorites, onlyRated, minQuestions, sortOrder, setSearchParams]);
 
@@ -275,6 +278,22 @@ const MeineQuizze = () => {
                             <MenuItem value="asc">Älteste zuerst</MenuItem>
                         </CustomSelect>
                     </FormControl>
+                    {user?.role === 'ROLE_ADMIN' && (
+                        <Box sx={{display: 'flex', gap: 2, mb: 2, ml: 2}}>
+                            <Button
+                                variant={!showAll ? 'contained' : 'outlined'}
+                                onClick={() => setShowAll(false)}
+                            >
+                                Meine Quizze
+                            </Button>
+                            <Button
+                                variant={showAll ? 'contained' : 'outlined'}
+                                onClick={() => setShowAll(true)}
+                            >
+                                Alle Quizze
+                            </Button>
+                        </Box>
+                    )}
                     <br/>
                     <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
                         Neues Quiz erstellen
