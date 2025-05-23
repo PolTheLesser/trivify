@@ -217,6 +217,11 @@ const DailyQuiz = () => {
                                 {currentQuestionIndex === quiz.questions.length - 1 ? 'Fertig' : 'Weiter'}
                             </Button>
                         </Box>
+                        <br/>
+                        <Alert severity="warning" sx={{mb: 3}}>
+                            Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                        </Alert>
+                        <br/>
                         <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
                             <Button variant="outlined" color="error" onClick={handleCancel}>
                                 Abbrechen
@@ -251,15 +256,17 @@ const DailyQuiz = () => {
                                             <strong>Korrekte Antwort:</strong> {wrongAnswer.correctAnswer}
                                         </Typography>
                                     </Box>
+
                                 ))}
                             </Box>
                         )}
+                        <br/>
+                        <Alert severity="warning" sx={{mb: 3}}>
+                            Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                        </Alert>
+                        <br/>
                     </>
                 )}
-
-                <Alert severity="warning" sx={{mb: 3}}>
-                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
-                </Alert>
             </Paper>
         </Box>
     );
