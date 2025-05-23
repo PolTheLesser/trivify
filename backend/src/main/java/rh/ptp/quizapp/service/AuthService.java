@@ -54,10 +54,7 @@ public class AuthService {
                 .setDailyQuizReminder(request.isDailyQuizReminder());
 
         pendingUser = userRepository.save(pendingUser);
-        AuthenticationToken token = createAuthenticationToken(pendingUser);
-
-        sendVerificationEmail(request.getEmail(), request.getName(), token.getToken());
-
+        createAuthenticationToken(pendingUser);
         return pendingUser;
     }
 
@@ -127,15 +124,6 @@ public class AuthService {
         userRepository.save(user);
         authenticationTokenRepository.delete(authenticationToken);
         return user;
-    }
-
-    private void sendVerificationEmail(String email, String name, String token) {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl+"/logo192.png");
-        variables.put("username", name);
-        variables.put("verificationUrl", frontendUrl + "/verify-email/" + token);
-        variables.put("dataUrl", frontendUrl + "/datenschutz");
-        emailService.sendEmail(email, "E-Mail-Adresse verifizieren", "verification-email", variables);
     }
 
     public User getCurrentUser(String token) {

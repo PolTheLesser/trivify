@@ -142,9 +142,12 @@ const PlayQuiz = () => {
         });
     };
 
-    const updateCurrentQuestionIndex = (newIndex) => {
-        setCurrentQuestionIndex(newIndex);
+    const updateCurrentQuestionIndex = (updater) => {
+      setCurrentQuestionIndex(prevIndex => {
+        const newIndex = typeof updater === 'function' ? updater(prevIndex) : updater;
         localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
+        return newIndex;
+      });
     };
 
     useEffect(() => {
