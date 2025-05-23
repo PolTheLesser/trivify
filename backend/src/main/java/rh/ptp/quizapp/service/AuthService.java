@@ -1,6 +1,8 @@
 package rh.ptp.quizapp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +27,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
+    private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -61,6 +63,7 @@ public class AuthService {
 
     AuthenticationToken createAuthenticationToken(User user) {
         AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
+        logger.info("Existing token: " + existingToken);
         if (existingToken != null) {
             authenticationTokenRepository.deleteByToken(existingToken.getToken());
         }

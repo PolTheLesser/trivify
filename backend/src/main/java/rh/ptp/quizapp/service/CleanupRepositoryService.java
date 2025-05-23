@@ -20,6 +20,8 @@ import java.util.Map;
 @Service
 public class CleanupRepositoryService {
 
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CleanupRepositoryService.class);
+
     @PersistenceContext
     private EntityManager em;
 
@@ -109,6 +111,7 @@ public class CleanupRepositoryService {
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
         for (User user : users) {
             if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+                logger.info("Deleting user {} with status PENDING_VERIFICATION", user.getEmail());
                 userRepository.deleteById(user.getId());
             }
         }
