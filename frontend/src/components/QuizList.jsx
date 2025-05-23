@@ -61,6 +61,15 @@ const QuizList = () => {
         navigate(`/quizzes/${random.id}`);
     };
 
+    // Filter zurücksetzen
+    const resetFilters = () => {
+        setSearchQuery('');
+        setOnlyFavorites(false);
+        setOnlyRated(false);
+        setMinQuestions(0);
+        setSortOrder('desc');
+    };
+
     // Wenn sich die URL ändert: searchQuery updaten
     useEffect(() => {
         setSearchQuery(searchParams.get('query') || '');
