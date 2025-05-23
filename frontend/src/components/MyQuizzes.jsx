@@ -39,8 +39,19 @@ const MeineQuizze = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Query state
+    // Initialwerte aus URL holen (string, boolean, number)
+    const getBoolParam = (key) => searchParams.get(key) === 'true';
+    const getNumberParam = (key, fallback = 0) => {
+        const val = Number(searchParams.get(key));
+        return isNaN(val) ? fallback : val;
+    };
+
+    // Query state (aus URL initialisiert)
     const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
+    const [onlyFavorites, setOnlyFavorites] = useState(getBoolParam('onlyFavorites'));
+    const [onlyRated, setOnlyRated] = useState(getBoolParam('onlyRated'));
+    const [minQuestions, setMinQuestions] = useState(getNumberParam('minQuestions', 0));
+    const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'desc');
 
     // Data states
     const [quizzes, setQuizzes] = useState([]);
@@ -51,13 +62,6 @@ const MeineQuizze = () => {
     const [loading, setLoading] = useState(true);
     const [loadingTags, setLoadingTags] = useState(true);
     const [error, setError] = useState('');
-    const [onlyFavorites, setOnlyFavorites] = useState(false);
-    const [onlyUnplayed, setOnlyUnplayed] = useState(false);
-    const [onlyRated, setOnlyRated] = useState(false);
-    const [minQuestions, setMinQuestions] = useState(0);
-    const [sortOrder, setSortOrder] = useState('desc');
-    const [selectedCategory, setSelectedCategory] = useState('all');
-
 
     // Dialog-State
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -105,20 +109,21 @@ const MeineQuizze = () => {
             console.error(err);
         }
     };
+
     useEffect(() => {
         const fetchCategoryLabels = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`), // ["Sport", "Geschichte", "Wissenschaft"]
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)          // ["SPORT", "HISTORY", "SCIENCE"]
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
+                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)
                 ]);
 
-                const values = valsRes.data; // Labels
-                const cats = catsRes.data;   // Enum-Namen
+                const values = valsRes.data;
+                const cats = catsRes.data;
 
                 const labels = {};
                 cats.forEach((cat, index) => {
-                    labels[cat] = values[index] || cat; // fallback auf Enum-Name falls Label fehlt
+                    labels[cat] = values[index] || cat;
                 });
 
                 setCategoryLabels(labels);
@@ -131,6 +136,19 @@ const MeineQuizze = () => {
 
         fetchCategoryLabels();
     }, []);
+
+    // Synchronisiere Filter-States mit URL-Parametern
+    useEffect(() => {
+        const params = {};
+
+        if (searchQuery) params.query = searchQuery;
+        if (onlyFavorites) params.onlyFavorites = 'true';
+        if (onlyRated) params.onlyRated = 'true';
+        if (minQuestions > 0) params.minQuestions = minQuestions.toString();
+        if (sortOrder && sortOrder !== 'desc') params.sortOrder = sortOrder;
+
+        setSearchParams(params, {replace: true});
+    }, [searchQuery, onlyFavorites, onlyRated, minQuestions, sortOrder, setSearchParams]);
 
     useEffect(() => {
         let result = quizzes.filter(q => {
@@ -163,7 +181,6 @@ const MeineQuizze = () => {
         setFiltered(result);
     }, [searchQuery, minQuestions, sortOrder, quizzes, onlyFavorites, onlyRated, categoryLabels, user]);
 
-
     // Öffnet den Bestätigungs-Dialog
     const confirmDelete = (quizId) => {
         setToDeleteId(quizId);
@@ -183,6 +200,15 @@ const MeineQuizze = () => {
             setDialogOpen(false);
             setToDeleteId(null);
         }
+    };
+
+    // Filter zurücksetzen
+    const resetFilters = () => {
+        setSearchQuery('');
+        setOnlyFavorites(false);
+        setOnlyRated(false);
+        setMinQuestions(0);
+        setSortOrder('desc');
     };
 
     if (loading) {
@@ -205,7 +231,16 @@ const MeineQuizze = () => {
         <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
             {/* Filterleiste */}
             <Paper elevation={2}
-                   sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}>
+                   sx={{
+                       display: 'flex',
+                       flexDirection: 'column',
+                       gap: 2,
+                       mb: 4,
+                       px: 2,
+                       py: 3,
+                       mx: 2,
+                       mt: 2
+                   }}>
 
                 <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
                     <TextField
@@ -239,9 +274,15 @@ const MeineQuizze = () => {
                             <MenuItem value="asc">Älteste zuerst</MenuItem>
                         </CustomSelect>
                     </FormControl>
-
+                    <br/>
                     <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
                         Neues Quiz erstellen
+                    </Button>
+
+                    {/* Roter Zurücksetzen-Button rechts */}
+                    <Box sx={{flexGrow: 1}} />
+                    <Button variant="contained" color="error" onClick={resetFilters}>
+                        Filter zurücksetzen
                     </Button>
                 </Box>
             </Paper>
@@ -257,13 +298,6 @@ const MeineQuizze = () => {
                             flexGrow: 1,
                             height: '100%',
                         }}>
-                            <Box sx={{position: 'absolute', top: 2, right: 2}}>
-                                {user && (
-                                    <IconButton size='small' color='warning' onClick={() => toggleFavorite(quiz.id)}>
-                                        {quiz.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
-                                    </IconButton>
-                                )}
-                            </Box>
                             <Box sx={{position: 'absolute', top: 2, right: 2}}>
                                 {user && (
                                     <IconButton size='small' color='warning' onClick={() => toggleFavorite(quiz.id)}>
@@ -308,7 +342,7 @@ const MeineQuizze = () => {
                             </CardActions>
                         </Card>
                     </Grid>
-                    ))}
+                ))}
             </Grid>
 
             {/* Bestätigungs-Dialog */}
@@ -330,7 +364,7 @@ const MeineQuizze = () => {
                 </DialogActions>
             </Dialog>
         </Box>
-);
+    );
 };
 
 export default MeineQuizze;

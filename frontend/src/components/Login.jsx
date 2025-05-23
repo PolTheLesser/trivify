@@ -17,6 +17,8 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [warning, setWarning] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const {login} = useAuth();
     const navigate = useNavigate();
@@ -24,7 +26,15 @@ const Login = () => {
 
     useEffect(() => {
         if (location.state?.message) {
-            setError(location.state.message);
+            if (location.state?.severity === 'error') {
+                setError(location.state.message);
+            } else if (location.state?.severity === 'warning') {
+                setWarning(location.state.message);
+            } else if (location.state?.severity === 'success') {
+                setSuccess(location.state.message)
+            } else {
+                setError(location.state.message)
+            }
             // Entferne die Nachricht aus dem State, damit sie nicht erneut angezeigt wird
             navigate(location.pathname, {state: {}});
         }
@@ -61,6 +71,16 @@ const Login = () => {
                     {error && (
                         <Alert severity="error" sx={{mb: 2}}>
                             {error}
+                        </Alert>
+                    )}
+                    {warning && (
+                        <Alert severity="warning" sx={{mb: 2}}>
+                            {warning}
+                        </Alert>
+                    )}
+                    {success && (
+                        <Alert severity="success" sx={{mb: 2}}>
+                            {success}
                         </Alert>
                     )}
                     <form onSubmit={handleSubmit}>

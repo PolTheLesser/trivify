@@ -15,8 +15,8 @@ public interface AuthenticationTokenRepository extends JpaRepository<Authenticat
     @Query("select at.id from AuthenticationToken at where at.token = ?1")
     Optional<Long> findIdByToken(String token);
     AuthenticationToken findByQuizUser(User user);
-    List<User> findQuizUserByExpiryDateBefore(LocalDateTime date);
-
+    @Query("SELECT t.quizUser FROM AuthenticationToken t WHERE t.expiryDate < :expiryDate")
+    List<User> findQuizUserByExpiryDateBefore(@Param("expiryDate") LocalDateTime date);
     @Query("SELECT a.token FROM AuthenticationToken a WHERE a.quizUser = :user")
     String findTokenByQuizUser(@Param("user") User user);
     void deleteAllByExpiryDateBefore(LocalDateTime date);

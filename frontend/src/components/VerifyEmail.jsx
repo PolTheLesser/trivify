@@ -23,7 +23,7 @@ const VerifyEmail = () => {
         setStatus('success');
         setTimeout(() => {
           navigate('/login', {
-            state: { message: 'E-Mail erfolgreich verifiziert! Sie können sich jetzt anmelden.' }
+            state: { message: 'E-Mail erfolgreich verifiziert! Sie können sich jetzt anmelden.', severity: 'success' },
           });
         }, 3000);
       } catch (error) {
