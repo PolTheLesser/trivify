@@ -62,6 +62,15 @@ const EditQuiz = () => {
         await loadQuizFromServer();
     };
 
+    const handleCancleConfirm = async () => {
+        setShowResetDialog(false);
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        localStorage.removeItem(LOCAL_KEY);
+        navigate("/quizzes/my-quizzes");
+    };
+
     const loadQuizFromServer = async () => {
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/toEdit/${id}`);
@@ -422,6 +431,9 @@ const EditQuiz = () => {
                     <Box sx={{mt: 2}}>
                         <Button variant="outlined" color="error" onClick={handleResetClick}>
                             Zurücksetzen
+                        </Button>
+                        <Button variant="outlined" onClick={handleCancleConfirm} sx={{ml: 2}}>
+                            Abbrechen
                         </Button>
                     </Box>
                 </form>
