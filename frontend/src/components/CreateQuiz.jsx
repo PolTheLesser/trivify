@@ -21,7 +21,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
-import { CustomAutocomplete, CustomSelect } from "../CustomElements";
+import {CustomAutocomplete, CustomSelect} from "../CustomElements";
 
 const CreateQuiz = () => {
     const navigate = useNavigate();
@@ -252,7 +252,7 @@ const CreateQuiz = () => {
                         loading={loadingTags}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
-                                <Chip key={option} label={option} {...getTagProps({ index })} />
+                                <Chip key={option} label={option} {...getTagProps({index})} />
                             ))
                         }
                         renderInput={(params) => (
@@ -266,23 +266,128 @@ const CreateQuiz = () => {
                                     ...params.InputProps,
                                     endAdornment: (
                                         <>
-                                            {loadingTags ? <CircularProgress color="inherit" size={20} /> : null}
+                                            {loadingTags ? <CircularProgress color="inherit" size={20}/> : null}
                                             {params.InputProps.endAdornment}
                                         </>
                                     )
                                 }}
                             />
                         )}
-                        sx={{ mt: 2, mb: 3 }}
+                        sx={{mt: 2, mb: 3}}
                         limitTags={3}
                     />
-
-                    {/* Fragen-Rendering bleibt gleich */}
 
                     <List>
                         {questions.map((q, qi) => (
                             <ListItem key={qi} divider>
-                                {/* ... Fragen-Rendering unverändert ... */}
+                                <Box sx={{width: '100%'}}>
+                                    <Typography variant="h6" gutterBottom>
+                                        Frage {qi + 1}
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        label="Frage"
+                                        value={q.question}
+                                        onChange={e =>
+                                            handleQuestionChange(qi, 'question', e.target.value)
+                                        }
+                                        margin="normal"
+                                        required
+                                    />
+                                    <FormControl fullWidth margin="normal">
+                                        <InputLabel>Fragetyp</InputLabel>
+                                        <CustomSelect
+                                            value={q.questionType}
+                                            label="Fragetyp"
+                                            onChange={e =>
+                                                handleQuestionTypeChange(qi, e.target.value)
+                                            }
+                                        >
+                                            <MenuItem value="MULTIPLE_CHOICE">Multiple Choice</MenuItem>
+                                            <MenuItem value="TEXT_INPUT">Texteingabe</MenuItem>
+                                            <MenuItem value="TRUE_FALSE">Wahr/Falsch</MenuItem>
+                                        </CustomSelect>
+                                    </FormControl>
+                                    {q.questionType !== 'TRUE_FALSE' && q.answers.map((ans, ai) => (
+                                        <TextField
+                                            key={ai}
+                                            fullWidth
+                                            label={`Antwort ${ai + 1}`}
+                                            value={ans}
+                                            onChange={e => handleAnswerChange(qi, ai, e.target.value)}
+                                            margin="normal"
+                                            required
+                                        />
+                                    ))}
+                                    {q.questionType !== 'TRUE_FALSE' && q.questionType !== 'TEXT_INPUT' && (
+                                        <Box sx={{display: 'flex', gap: 2, mt: 1}}>
+                                            <Button
+                                                size="small"
+                                                onClick={() => {
+                                                    const newQuestions = [...questions];
+                                                    if (q.answers.length < 5) {
+                                                        newQuestions[qi].answers.push("");
+                                                        setQuestions(newQuestions);
+                                                    }
+                                                }}
+                                                disabled={q.answers.length >= 4}
+                                            >
+                                                Antwort hinzufügen
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                color="secondary"
+                                                onClick={() => {
+                                                    const newQuestions = [...questions];
+                                                    if (q.answers.length > 2) {
+                                                        newQuestions[qi].answers.pop();
+                                                        setQuestions(newQuestions);
+                                                        // Entferne richtige Antwort, falls gelöscht
+                                                        if (!newQuestions[qi].answers.includes(q.correctAnswer)) {
+                                                            newQuestions[qi].correctAnswer = "";
+                                                        }
+                                                    }
+                                                }}
+                                                disabled={q.answers.length <= 2}
+                                            >
+                                                Letzte Antwort entfernen
+                                            </Button>
+                                        </Box>)}
+                                    <FormControl fullWidth margin="normal">
+                                        {q.questionType !== 'TEXT_INPUT' && (
+                                            <InputLabel>Richtige Antwort</InputLabel>)}
+                                        {q.questionType === 'TEXT_INPUT' ? (
+                                            <TextField
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                                margin="normal"
+                                                required
+                                            />
+                                        ) : (
+                                            <CustomSelect
+                                                value={q.correctAnswer}
+                                                label="Richtige Antwort"
+                                                onChange={e => handleQuestionChange(qi, 'correctAnswer', e.target.value)}
+                                            >
+                                                {q.answers.map((ans, ai) => (
+                                                    <MenuItem key={ai} value={ans}>
+                                                        {ans}
+                                                    </MenuItem>
+                                                ))}
+                                            </CustomSelect>
+                                        )}
+                                    </FormControl>
+                                </Box>
+                                <ListItemSecondaryAction>
+                                    <IconButton
+                                        edge="end"
+                                        onClick={() => removeQuestion(qi)}
+                                        disabled={questions.length === 1}
+                                    >
+                                        <DeleteIcon/>
+                                    </IconButton>
+                                </ListItemSecondaryAction>
                             </ListItem>
                         ))}
                     </List>
@@ -290,7 +395,7 @@ const CreateQuiz = () => {
                     <Box sx={{mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap'}}>
                         <Button
                             variant="outlined"
-                            startIcon={<AddIcon />}
+                            startIcon={<AddIcon/>}
                             onClick={addQuestion}
                         >
                             Frage hinzufügen
