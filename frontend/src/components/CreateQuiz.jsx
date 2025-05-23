@@ -404,6 +404,7 @@ const CreateQuiz = () => {
                             variant="contained"
                             color="error"
                             onClick={handleReset}
+                            navigate="/quizzes/my-quizzes"
                         >
                             Abbrechen
                         </Button>
