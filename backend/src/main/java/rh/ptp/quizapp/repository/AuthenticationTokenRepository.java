@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface AuthenticationTokenRepository extends JpaRepository<AuthenticationToken, Long> {
     Optional<AuthenticationToken> findByToken(String token);
+    @Query("select at.id from AuthenticationToken at where at.token = ?1")
     Optional<Long> findIdByToken(String token);
     AuthenticationToken findByQuizUser(User user);
     List<User> findQuizUserByExpiryDateBefore(LocalDateTime date);

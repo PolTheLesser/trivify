@@ -72,7 +72,6 @@ public class AuthService {
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken);
             variables.put("dataUrl", frontendUrl + "/datenschutz");
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
-            throw new RuntimeException("Benutzer nicht verifiziert! Neue E-Mail gesendet");
         }
         return authenticationTokenRepository.save(newToken);
     }
