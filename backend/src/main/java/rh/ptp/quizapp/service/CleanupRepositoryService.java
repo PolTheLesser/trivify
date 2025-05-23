@@ -30,9 +30,6 @@ public class CleanupRepositoryService {
     private AuthenticationTokenRepository authenticationTokenRepository;
 
     @Autowired
-    private AccountCleanupService accountCleanupService;
-
-    @Autowired
     private EmailService emailService;
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -112,7 +109,7 @@ public class CleanupRepositoryService {
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
         for (User user : users) {
             if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
-                accountCleanupService.deleteUserAccount(user.getId());
+                userRepository.deleteById(user.getId());
             }
         }
     }
