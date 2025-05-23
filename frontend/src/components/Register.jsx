@@ -55,7 +55,7 @@ const Register = () => {
       navigate('/login', { 
         state: { 
           message: 'Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails und klicken Sie auf den Verifizierungslink, um Ihr Konto zu aktivieren. Nach der Verifizierung können Sie sich anmelden.',
-          severity: 'warning'
+          severity: 'success'
         }
       });
     } catch (error) {
