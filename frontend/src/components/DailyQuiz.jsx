@@ -126,6 +126,12 @@ const DailyQuiz = () => {
         }
     };
 
+    const handleCancel = () => {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
+        navigate('/quizzes');
+    }
+
     const updateAnswer = (questionIndex, answer) => {
         setAnswers(prev => {
             const updated = { ...prev, [questionIndex]: answer };
@@ -212,7 +218,7 @@ const DailyQuiz = () => {
                             </Button>
                         </Box>
                         <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
-                            <Button variant="outlined" color="error" onClick={() => navigate('/quizzes')}>
+                            <Button variant="outlined" color="error" onClick={handleCancel}>
                                 Abbrechen
                             </Button>
                         </Box>
