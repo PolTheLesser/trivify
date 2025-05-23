@@ -28,7 +28,7 @@ public class AuthenticationToken {
 
     public AuthenticationToken(User quizUser) {
         this.quizUser = quizUser;
-        this.expiryDate = LocalDateTime.now().plusHours(24);
+        this.expiryDate = LocalDateTime.now().plusHours(1);
         this.token = UUID.randomUUID().toString();
     }
 }
