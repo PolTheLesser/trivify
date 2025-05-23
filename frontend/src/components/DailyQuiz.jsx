@@ -181,9 +181,6 @@ const DailyQuiz = () => {
                     Tägliches Quiz
                 </Typography>
                 <LinearProgress variant="determinate" value={progress} sx={{mb: 3}}/>
-                <Alert severity="warning" sx={{mb: 3}}>
-                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
-                </Alert>
 
                 {!completed ? (
                     <>
@@ -259,6 +256,10 @@ const DailyQuiz = () => {
                         )}
                     </>
                 )}
+
+                <Alert severity="warning" sx={{mb: 3}}>
+                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                </Alert>
             </Paper>
         </Box>
     );
