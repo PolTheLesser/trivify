@@ -428,7 +428,7 @@ const EditQuiz = () => {
                             Speichern
                         </Button>
                     </Box>
-                    <Box sx={{mt: 2}}>
+                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
                         <Button variant="outlined" color="error" onClick={handleResetClick}>
                             Zurücksetzen
                         </Button>
