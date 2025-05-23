@@ -7,6 +7,10 @@ import {
     Chip,
     CircularProgress,
     Container,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
     FormControl,
     IconButton,
     InputLabel,
@@ -21,7 +25,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import { CustomAutocomplete, CustomSelect } from "../CustomElements";
+import {CustomAutocomplete, CustomSelect} from "../CustomElements";
 
 const EditQuiz = () => {
     const {id} = useParams();
@@ -38,6 +42,54 @@ const EditQuiz = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [showResetDialog, setShowResetDialog] = useState(false);
+
+    const LOCAL_KEY = `quiz_backup_${id}`;
+    const handleResetClick = () => {
+        setShowResetDialog(true);
+    };
+
+    const handleResetCancel = () => {
+        setShowResetDialog(false);
+    };
+
+    const handleResetConfirm = async () => {
+        setShowResetDialog(false);
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        localStorage.removeItem(LOCAL_KEY);
+        await loadQuizFromServer();
+    };
+
+    const loadQuizFromServer = async () => {
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/toEdit/${id}`);
+            const data = res.data;
+            const tagsFromEnums = data.categories.map((cat) => {
+                const idx = allCategories.indexOf(cat);
+                return allValues[idx] || cat;
+            });
+
+            setTitle(data.title);
+            setDescription(data.description);
+            setQuestions(data.questions || []);
+            setTags(tagsFromEnums);
+
+            // Save to localStorage
+            localStorage.setItem(LOCAL_KEY, JSON.stringify({
+                title: data.title,
+                description: data.description,
+                questions: data.questions || [],
+                tags: tagsFromEnums
+            }));
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || "Quiz konnte nicht geladen werden");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Kategorien und Werte laden
     useEffect(() => {
@@ -47,7 +99,7 @@ const EditQuiz = () => {
                     axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
                     axios.get(`${process.env.REACT_APP_API_URL}/categories`)
                 ]);
-                const values = valsRes.data.slice(1); // Nur sichtbare Werte
+                const values = valsRes.data.slice(1);
                 const cats = catsRes.data.slice(1);
                 setAllValues(values);
                 setAllCategories(cats);
@@ -61,30 +113,19 @@ const EditQuiz = () => {
         fetchTags();
     }, []);
 
-    // Quizdaten laden
     useEffect(() => {
-        const fetchQuiz = async () => {
-            try {
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}/toEdit/${id}`);
-                const data = res.data;
-                setTitle(data.title);
-                setDescription(data.description);
-                setQuestions(data.questions || []);
-                const tagsFromEnums = data.categories.map((cat) => {
-                    const idx = allCategories.indexOf(cat);
-                    return allValues[idx] || cat;
-                });
-                setTags(tagsFromEnums);
-            } catch (err) {
-                console.error(err);
-                setError(err.response?.data?.message || "Quiz konnte nicht geladen werden");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (allCategories.length > 0 && allValues.length > 0) {
-            fetchQuiz();
+            const saved = localStorage.getItem(LOCAL_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                setTitle(parsed.title);
+                setDescription(parsed.description);
+                setTags(parsed.tags);
+                setQuestions(parsed.questions);
+                setLoading(false);
+            } else {
+                loadQuizFromServer();
+            }
         }
     }, [id, allCategories, allValues]);
 
@@ -149,6 +190,7 @@ const EditQuiz = () => {
                 questions,
                 categories: selectedEnums
             });
+            localStorage.removeItem(LOCAL_KEY);
             setSuccess("Quiz erfolgreich aktualisiert");
             setTimeout(() => navigate("/quizzes/my-quizzes"), 1500);
         } catch (err) {
@@ -171,6 +213,14 @@ const EditQuiz = () => {
             correctAnswer: newType === 'TRUE_FALSE' ? 'Wahr' : ''
         };
         setQuestions(newQuestions);
+    };
+
+    const handleReset = async () => {
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        localStorage.removeItem(LOCAL_KEY);
+        await loadQuizFromServer();
     };
 
     const newTagsToEnums = (tagValues) =>
@@ -293,7 +343,7 @@ const EditQuiz = () => {
                                     ))}
 
                                     {q.questionType !== 'TRUE_FALSE' && q.questionType !== 'TEXT_INPUT' && (
-                                        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                                        <Box sx={{display: 'flex', gap: 2, mt: 1}}>
                                             <Button
                                                 size="small"
                                                 onClick={() => {
@@ -315,7 +365,6 @@ const EditQuiz = () => {
                                                     if (q.answers.length > 2) {
                                                         newQuestions[qi].answers.pop();
                                                         setQuestions(newQuestions);
-                                                        // Entferne richtige Antwort, falls gelöscht
                                                         if (!newQuestions[qi].answers.includes(q.correctAnswer)) {
                                                             newQuestions[qi].correctAnswer = "";
                                                         }
@@ -370,7 +419,26 @@ const EditQuiz = () => {
                             Speichern
                         </Button>
                     </Box>
+                    <Box sx={{mt: 2}}>
+                        <Button variant="outlined" color="error" onClick={handleResetClick}>
+                            Zurücksetzen
+                        </Button>
+                    </Box>
                 </form>
+                <Dialog open={showResetDialog} onClose={handleResetCancel}>
+                    <DialogTitle>Zurücksetzen bestätigen</DialogTitle>
+                    <DialogContent>
+                        <Typography>Möchtest du das Formular wirklich zurücksetzen? Alle ungespeicherten Änderungen gehen verloren.</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleResetCancel} color="primary">
+                            Abbrechen
+                        </Button>
+                        <Button onClick={handleResetConfirm} color="error" variant="contained">
+                            Zurücksetzen
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Paper>
         </Container>
     );

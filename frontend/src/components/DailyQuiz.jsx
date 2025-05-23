@@ -13,20 +13,24 @@ import {
     Typography
 } from '@mui/material';
 import axios from '../api/api';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
 import {CustomFormControlLabel} from '../CustomElements'
 
 const DailyQuiz = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswer, setSelectedAnswer] = useState('');
+    const storageKey = `quiz-${id}-answers`;
+    const [answers, setAnswers] = useState(() => {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? JSON.parse(saved) : {};
+    });
     const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [completed, setCompleted] = useState(false);
     const [wrongAnswers, setWrongAnswers] = useState([]);
-    const { user } = useAuth();
+    const {user} = useAuth();
 
     useEffect(() => {
         const fetchDailyQuiz = async () => {
@@ -51,11 +55,12 @@ const DailyQuiz = () => {
         fetchDailyQuiz();
     }, []);
 
-    const handleAnswerSelect = (event) => {
-        setSelectedAnswer(event.target.value);
+    const handleAnswerSelect = (e) => {
+        updateAnswer(currentQuestionIndex, e.target.value);
     };
 
     const handleSubmit = async () => {
+        const selectedAnswer = answers[currentQuestionIndex];
         if (!selectedAnswer) return;
         const currentQuestion = quiz.questions[currentQuestionIndex];
         const quizid = quiz.id;
@@ -63,7 +68,7 @@ const DailyQuiz = () => {
         try {
             const response = await axios.post(
                 process.env.REACT_APP_API_URL + '/' + quizid + '/submit',
-                { questionId: currentQuestion.id, answer: selectedAnswer }
+                {questionId: currentQuestion.id, answer: selectedAnswer}
             );
 
             const isCorrect = response.data.correct;
@@ -93,7 +98,7 @@ const DailyQuiz = () => {
                 const userId = user?.id;
                 const quizId = quiz?.id;
                 const maxPossibleScore = quiz?.questions?.length;
-                if(user) {
+                if (user) {
                     await axios.post(process.env.REACT_APP_API_URL + '/users/daily-quiz/completed');
                     await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
                         userId,
@@ -103,6 +108,7 @@ const DailyQuiz = () => {
                     });
                 }
                 console.log('Tägliches Quiz abgeschlossen & Score gespeichert');
+                localStorage.removeItem(storageKey);
             }
         } catch (err) {
             console.error(err.response?.data?.message || 'Fehler beim Einreichen der Antwort oder Speichern des Scores:', err);
@@ -110,6 +116,19 @@ const DailyQuiz = () => {
         }
     };
 
+    const handlePrevious = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+        }
+    };
+
+    const updateAnswer = (questionIndex, answer) => {
+        setAnswers(prev => {
+            const updated = { ...prev, [questionIndex]: answer };
+            localStorage.setItem(storageKey, JSON.stringify(updated));
+            return updated;
+        });
+    };
 
     if (loading) {
         return (
@@ -157,7 +176,7 @@ const DailyQuiz = () => {
                             {currentQuestion.question}
                         </Typography>
                         <FormControl component="fieldset">
-                            <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
+                            <RadioGroup value={answers[currentQuestionIndex] || ''} onChange={handleAnswerSelect}>
                                 {currentQuestion.answers &&
                                     currentQuestion.answers.map((option, index) => (
                                         <CustomFormControlLabel
@@ -170,15 +189,22 @@ const DailyQuiz = () => {
                             </RadioGroup>
                         </FormControl>
                         <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
-                            <Button variant="outlined" onClick={() => navigate('/quizzes')}>
-                                Abbrechen
+                            <Button variant="outlined" color="secondary" onClick={handlePrevious}
+                                    disabled={currentQuestionIndex === 0}>
+                                Zurück
                             </Button>
                             <Button
                                 variant="contained"
+                                color="primary"
                                 onClick={handleSubmit}
-                                disabled={!selectedAnswer}
+                                disabled={!answers[currentQuestionIndex]}
                             >
                                 {currentQuestionIndex === quiz.questions.length - 1 ? 'Fertig' : 'Weiter'}
+                            </Button>
+                        </Box>
+                        <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
+                            <Button variant="outlined" color="error" onClick={() => navigate('/quizzes')}>
+                                Abbrechen
                             </Button>
                         </Box>
                     </>

@@ -101,9 +101,9 @@ public class CleanupRepositoryService {
         userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }
 
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    @Scheduled(cron = "0 * * * * *") // jede Minute
     public void deleteOldTokens() {
-        // Delete all tokens older than 1 day
+        // Delete all tokens older than 1 hour
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(1);
         List<User> users = authenticationTokenRepository.findQuizUserByExpiryDateBefore(expiryTime);
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
