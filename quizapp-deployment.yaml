@@ -1,0 +1,200 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quizapp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgdata
+  namespace: quizapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizapp-db
+  namespace: quizapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quizapp-db
+  template:
+    metadata:
+      labels:
+        app: quizapp-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: "quizapp"
+            - name: POSTGRES_USER
+              value: "quizuser"
+            - name: POSTGRES_PASSWORD
+              value: "quizpass"
+            - name: PGTZ
+              value: "Europe/Berlin"
+          ports:
+            - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "quizuser", "-d", "quizapp"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: pgdata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizapp-db
+  namespace: quizapp
+spec:
+  selector:
+    app: quizapp-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizapp-backend
+  namespace: quizapp
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: quizapp-backend
+  template:
+    metadata:
+      labels:
+        app: quizapp-backend
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z quizapp-db 5432; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+      containers:
+        - name: backend
+          image: lesommer2019/trivify-backend:beta
+          ports:
+            - containerPort: 9090
+          env:
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Duser.timezone=Europe/Berlin"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://quizapp-db:5432/quizapp"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "quizuser"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "quizpass"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: "update"
+            - name: SPRING_JPA_DATABASE_PLATFORM
+              value: "org.hibernate.dialect.PostgreSQLDialect"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9090
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizapp-backend
+  namespace: quizapp
+spec:
+  selector:
+    app: quizapp-backend
+  ports:
+    - port: 9090
+      targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizapp-frontend
+  namespace: quizapp
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: quizapp-frontend
+  template:
+    metadata:
+      labels:
+        app: quizapp-frontend
+    spec:
+      initContainers:
+        - name: wait-for-backend
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              until wget -qO- http://quizapp-backend:9090/actuator/health | grep -q "UP"; do
+                echo "Waiting for backend..."
+                sleep 2
+              done
+      containers:
+        - name: frontend
+          image: lesommer2019/trivify-frontend:beta
+          ports:
+            - containerPort: 80
+          env:
+            - name: TZ
+              value: "Europe/Berlin"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizapp-frontend
+  namespace: quizapp
+spec:
+  selector:
+    app: quizapp-frontend
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 80
+      nodePort: 30080

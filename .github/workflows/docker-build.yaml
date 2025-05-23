@@ -44,7 +44,7 @@ jobs:
 
       - name: Set Execution Permissions for Maven Wrapper
         run: chmod +x ./backend/mvnw
-          
+
       - name: Setup JDK 21
         uses: actions/setup-java@v3
         with:
@@ -54,6 +54,15 @@ jobs:
       - name: Replace placeholders in application.yml
         run: |
           envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
+          echo "DB_URL=${{ secrets.DB_URL }}" >> $GITHUB_OUTPUT
+          echo "SERVER_URL=${{ secrets.SERVER_URL }}" >> $GITHUB_OUTPUT
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_OUTPUT
+          echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
+          echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
+          echo "MAIL_PASS=${{ secrets.MAIL_PASS }}" >> $GITHUB_OUTPUT
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_OUTPUT
+          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_OUTPUT
+
         env:
           DB_URL: ${{ vars.DB_URL }}
           SERVER_URL: ${{ vars.SERVER_URL }}
