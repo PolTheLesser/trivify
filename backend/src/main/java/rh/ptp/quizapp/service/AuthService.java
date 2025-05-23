@@ -62,7 +62,7 @@ public class AuthService {
     AuthenticationToken createAuthenticationToken(User user) {
         AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
         if (existingToken != null) {
-            authenticationTokenRepository.delete(existingToken);
+            authenticationTokenRepository.deleteByToken(existingToken.getToken());
         }
         AuthenticationToken newToken = new AuthenticationToken(user);
         if(user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {

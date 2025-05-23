@@ -134,7 +134,7 @@ const DailyQuiz = () => {
 
     const updateAnswer = (questionIndex, answer) => {
         setAnswers(prev => {
-            const updated = { ...prev, [questionIndex]: answer };
+            const updated = {...prev, [questionIndex]: answer};
             localStorage.setItem(storageKey, JSON.stringify(updated));
             return updated;
         });
@@ -181,6 +181,9 @@ const DailyQuiz = () => {
                     Tägliches Quiz
                 </Typography>
                 <LinearProgress variant="determinate" value={progress} sx={{mb: 3}}/>
+                <Alert severity="warning" sx={{mb: 3}}>
+                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                </Alert>
 
                 {!completed ? (
                     <>

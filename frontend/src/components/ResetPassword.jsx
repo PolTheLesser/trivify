@@ -35,7 +35,7 @@ const ResetPassword = () => {
         newPassword: password
       });
       navigate('/login', {
-        state: { message: 'Passwort erfolgreich zurückgesetzt! Sie können sich jetzt anmelden.' }
+        state: { message: 'Passwort erfolgreich zurückgesetzt! Sie können sich jetzt anmelden.', severity: 'success' },
       });
     } catch (error) {
       setError(error.response?.data?.message || 'Fehler beim Zurücksetzen des Passworts');
