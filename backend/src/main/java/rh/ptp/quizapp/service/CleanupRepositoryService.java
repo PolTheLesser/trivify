@@ -30,6 +30,9 @@ public class CleanupRepositoryService {
     private AuthenticationTokenRepository authenticationTokenRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private EmailService emailService;
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -100,10 +103,17 @@ public class CleanupRepositoryService {
         }
         userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }
+
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
     public void deleteOldTokens() {
         // Delete all tokens older than 1 day
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(1);
+        List<User> users = authenticationTokenRepository.findQuizUserByExpiryDateBefore(expiryTime);
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
+        for (User user : users) {
+            if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+                userService.deleteUserAccount(user.getId());
+            }
+        }
     }
 }

@@ -7,12 +7,14 @@ import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface AuthenticationTokenRepository extends JpaRepository<AuthenticationToken, Long> {
     Optional<AuthenticationToken> findByToken(String token);
     Optional<Long> findIdByToken(String token);
     AuthenticationToken findByQuizUser(User user);
+    List<User> findQuizUserByExpiryDateBefore(LocalDateTime date);
 
     @Query("SELECT a.token FROM AuthenticationToken a WHERE a.quizUser = :user")
     String findTokenByQuizUser(@Param("user") User user);

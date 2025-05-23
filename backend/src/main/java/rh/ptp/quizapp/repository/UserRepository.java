@@ -13,6 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     List<User> findByDailyQuizReminderIsTrue();
     boolean existsByName(String name);
+    void deleteById(long userId);
     List<User> findAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> statuses);
     void deleteAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime dateTime, List<UserStatus> statuses);
 } 
