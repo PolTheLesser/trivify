@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import {useAuth} from '../contexts/AuthContext';
-import {CustomFormControlLabel, CustomSwitch } from "../CustomElements";
+import {PasswordField, CustomFormControlLabel, CustomSwitch } from "../CustomElements";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -117,25 +117,23 @@ const Register = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Passwort"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
+                <PasswordField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Passwort"
+                    id="password"
+                    autoComplete="new-password"
+                    value={formData.password}
+                    onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <PasswordField
                   required
                   fullWidth
                   name="confirmPassword"
                   label="Passwort bestätigen"
-                  type="password"
                   id="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}

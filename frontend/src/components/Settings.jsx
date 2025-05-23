@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
-import { CustomSwitch, CustomFormControlLabel } from "../CustomElements";
+import {PasswordField, CustomSwitch, CustomFormControlLabel } from "../CustomElements";
 
 const Settings = () => {
   const { user, logout } = useAuth();
@@ -135,14 +135,14 @@ const Settings = () => {
 
           <Typography variant="h5" gutterBottom>Passwort ändern</Typography>
           <form onSubmit={handlePasswordChange}>
-            <TextField
-                fullWidth label="Aktuelles Passwort" type="password"
+            <PasswordField
+                fullWidth label="Aktuelles Passwort"
                 value={password.currentPassword}
                 onChange={e => setPassword({ ...password, currentPassword: e.target.value })}
                 margin="normal" required
             />
-            <TextField
-                fullWidth label="Neues Passwort" type="password"
+            <PasswordField
+                fullWidth label="Neues Passwort"
                 value={password.newPassword}
                 onChange={e => setPassword({ ...password, newPassword: e.target.value })}
                 margin="normal" required

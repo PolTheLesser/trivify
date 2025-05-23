@@ -11,6 +11,7 @@ import {
     Alert,
 } from '@mui/material';
 import {useAuth} from '../contexts/AuthContext';
+import {PasswordField} from '../CustomElements';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -75,13 +76,12 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <TextField
+                        <PasswordField
                             margin="normal"
                             required
                             fullWidth
                             name="password"
                             label="Passwort"
-                            type="password"
                             id="password"
                             autoComplete="current-password"
                             value={password}
