@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserStatus;
+import rh.ptp.quizapp.service.UserService;
 import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 
