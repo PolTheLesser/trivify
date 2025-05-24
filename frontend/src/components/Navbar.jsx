@@ -27,9 +27,6 @@ const Navbar = () => {
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const { user, logout } = useAuth();
 
-    // Warten bis user geladen ist
-    if (user === undefined) return null;
-
     // User Menu State
     const [anchorEl, setAnchorEl] = useState(null);
     const isUserMenuOpen = Boolean(anchorEl);
@@ -42,8 +39,8 @@ const Navbar = () => {
     const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
     const handleMobileMenuClose = () => setMobileAnchorEl(null);
 
-    // Suchfeld State
-    const [searchTerm, setSearchTerm] = useState('');
+    // erst hier checken, ob user ready ist
+    if (user === undefined) return null;
 
     // URL-Query → local State synchronisieren
     useEffect(() => {
