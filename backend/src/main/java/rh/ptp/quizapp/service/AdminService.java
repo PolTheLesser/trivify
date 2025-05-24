@@ -29,11 +29,13 @@ public class AdminService {
     private boolean customEmailSend = false;
 
     public User createUser(User user) {
-        adminEmail(user, user, 0);
+        String password = user.getPassword();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+        user.setPassword(password);
+        adminEmail(user, user, 0);
         return user;
     }
 
@@ -89,6 +91,7 @@ public class AdminService {
     }
 
     private Map<String, Object> adminEmail(User user, User userUpdated, int action) {
+        customEmailSend = false;
         Map<String, Object> variables = new HashMap<>();
         variables.put("logoUrl", frontendUrl + "/logo192.png");
         variables.put("username", userUpdated.getName());

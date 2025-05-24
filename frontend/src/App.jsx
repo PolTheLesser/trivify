@@ -23,19 +23,18 @@ import Settings from "./components/Settings";
 import Datenschutz from "./components/Datenschutz";
 import Impressum from "./components/Impressum";
 import MyQuizzes from "./components/MyQuizzes";
+import { AuthProvider } from './contexts/AuthContext';
 
 const App = () => {
-    const {darkMode} = useContext(ThemeContext);
-    const muiTheme = useMemo(() =>
-            createTheme({palette: {mode: darkMode ? "dark" : "light"}}),
-        [darkMode]
-    );
+    const { darkMode } = useContext(ThemeContext);
+    const muiTheme = useMemo(() => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }), [darkMode]);
 
     return (
-        <MuiThemeProvider theme={muiTheme}>
-            <CssBaseline/>
-            <Router>
-                <Navbar/>
+        <AuthProvider>
+            <MuiThemeProvider theme={muiTheme}>
+                <CssBaseline />
+                <Router>
+                    <Navbar />
                 <main style={{flex: 1, paddingBottom: '3rem'}}>
                     <Routes>
                         <Route path="/"
@@ -69,10 +68,8 @@ const App = () => {
                 </main>
                 <div style={{height: "3rem"}}></div>
                 <Footer/>
-            </Router>
-        </MuiThemeProvider>
+                </Router>
+            </MuiThemeProvider>
+        </AuthProvider>
     );
 };
-
-
-export default App;
