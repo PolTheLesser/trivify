@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +29,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleRuntime(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorBody("Unerwarteter Fehler: " + ex.getMessage()));
+    }
+
+    //  Für NoSuchElementException, z.B. wenn ein Element nicht gefunden wird
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<?> handleNoSuchElement(NoSuchElementException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(errorBody("Nicht gefunden: " + ex.getMessage()));
     }
 
     //  Optionale Methode für mehr Kontext

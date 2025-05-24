@@ -1,13 +1,13 @@
 package rh.ptp.quizapp.model;
 
 import jakarta.persistence.*;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
 @Table(name = "questions")
-@Setter
+@Data
 public class Question {
 
     @Id
@@ -41,29 +41,5 @@ public class Question {
         this.difficulty = difficulty;
         this.answers = answers;
         this.source = source;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public String getCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public int getDifficulty() {
-        return difficulty;
-    }
-
-    public List<String> getAnswers() {
-        return answers;
-    }
-
-    public String getSource() {
-        return source;
     }
 }

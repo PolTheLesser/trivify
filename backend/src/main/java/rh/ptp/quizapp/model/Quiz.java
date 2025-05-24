@@ -16,7 +16,6 @@ import java.util.List;
 @Entity
 @Table(name = "quizzes")
 public class Quiz {
-    // Getters und Setters
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
