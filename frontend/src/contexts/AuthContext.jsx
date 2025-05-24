@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState<user | null | undefined>undefined;
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,15 +15,14 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await axios.get(process.env.REACT_APP_API_URL+ '/auth/me');
+          const response = await axios.get(process.env.REACT_APP_API_URL + '/auth/me');
           setUser(response.data);
         } catch (error) {
           localStorage.removeItem('token');
           delete axios.defaults.headers.common['Authorization'];
           setUser(null);
         }
-      }
-      else {
+      } else {
         setUser(null);
       }
       setLoading(false);
@@ -102,7 +101,7 @@ export const AuthProvider = ({ children }) => {
     );
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, /*...*/ }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;
