@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rh.ptp.quizapp.controller.UserController;
 import rh.ptp.quizapp.dto.AuthResponse;
 import rh.ptp.quizapp.dto.LoginRequest;
 import rh.ptp.quizapp.dto.RegisterRequest;
@@ -33,8 +34,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final AuthenticationTokenRepository authenticationTokenRepository;
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+    private final UserController userController;
     @Value("${frontend.url}")
     private String frontendUrl;
 
@@ -43,7 +44,7 @@ public class AuthService {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("E-Mail-Adresse wird bereits verwendet");
+            userController.forgotPassword(request.getEmail());
         }
 
         User pendingUser = new User()
