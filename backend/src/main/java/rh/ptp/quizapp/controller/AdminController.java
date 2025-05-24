@@ -44,7 +44,7 @@ public class AdminController {
 
     @GetMapping("/users/states")
     public ResponseEntity<List<String>> getUserStatesAdmin(@AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ADMIN)) {
+        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
             return ResponseEntity.status(403).build(); // Forbidden if not admin
         } else {
             return ResponseEntity.ok(UserStatus.getUserStates());
@@ -54,7 +54,7 @@ public class AdminController {
 
     @PostMapping("/users/create")
     public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ADMIN)) {
+        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
             return ResponseEntity.status(403).build(); // Forbidden if not admin
         } else {
             return ResponseEntity.ok(adminService.createUser(userToCreate));
@@ -63,7 +63,7 @@ public class AdminController {
 
     @PutMapping("/users/update/{id}")
     public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ADMIN)) {
+        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
             return ResponseEntity.status(403).build(); // Forbidden if not admin
         } else {
             return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
@@ -72,7 +72,7 @@ public class AdminController {
 
     @DeleteMapping("/users/delete/{id}")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ADMIN)) {
+        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
             return ResponseEntity.status(403).build(); // Forbidden if not admin
         } else {
             adminService.deleteUser(id);

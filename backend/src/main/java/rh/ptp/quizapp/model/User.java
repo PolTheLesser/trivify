@@ -36,9 +36,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserStatus userStatus = UserStatus.PENDING_VERIFICATION;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "role", columnDefinition = "user_role")
     @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.USER;
+    private UserRole role = UserRole.ROLE_USER;
 
     @Column(nullable = false)
     private boolean dailyQuizReminder = false;

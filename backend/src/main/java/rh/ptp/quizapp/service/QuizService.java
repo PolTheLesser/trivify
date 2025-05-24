@@ -95,7 +95,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ADMIN) {
+        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ROLE_ADMIN) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz bearbeiten");
         }
 
@@ -127,7 +127,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ADMIN) {
+        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ROLE_ADMIN) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
@@ -199,7 +199,7 @@ public class QuizService {
                         User newAdmin = new User();
                         newAdmin.setName("Admin");
                         newAdmin.setEmail(mailUser);
-                        newAdmin.setRole(UserRole.ADMIN);
+                        newAdmin.setRole(UserRole.ROLE_ADMIN);
                         newAdmin.setPassword(passwordEncoder.encode(adminpassword));
                         newAdmin.setUserStatus(UserStatus.ACTIVE);
                         return userRepository.save(newAdmin);
