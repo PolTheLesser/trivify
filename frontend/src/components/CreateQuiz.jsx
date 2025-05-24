@@ -394,6 +394,13 @@ const CreateQuiz = () => {
 
                     <Box sx={{mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap'}}>
                         <Button
+                            variant="outlined"
+                            startIcon={<AddIcon/>}
+                            onClick={addQuestion}
+                        >
+                            Frage hinzufügen
+                        </Button>
+                        <Button
                             type="submit"
                             variant="contained"
                             color="primary"
@@ -408,13 +415,6 @@ const CreateQuiz = () => {
                             navigate="/quizzes/my-quizzes"
                         >
                             Abbrechen
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            startIcon={<AddIcon/>}
-                            onClick={addQuestion}
-                        >
-                            Frage hinzufügen
                         </Button>
                     </Box>
                 </form>

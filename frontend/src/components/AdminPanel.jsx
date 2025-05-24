@@ -238,7 +238,6 @@ const AdminUserPanel = () => {
                                     </CustomSelect>
                                 </FormControl>
                                 <br/>
-                                <Box>
                                 <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer
                                     erstellen</Button>
                                 <Box sx={{flexGrow: 1}}/>
@@ -247,7 +246,6 @@ const AdminUserPanel = () => {
                                     setFilterStatus('ALL');
                                     setFilterRole('ALL');
                                 }}>Filter zurücksetzen</Button>
-                                </Box>
                             </Box>
                         </Paper>
                     </Box>
@@ -322,7 +320,7 @@ const AdminUserPanel = () => {
                             <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''}/>
                         </DialogContent>
                         <DialogActions>
-                            <Button color="error" onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
+                            <Button color="error" variant="contained" onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
                             <Button onClick={saveUser} disabled={editLoading} variant="contained">{editLoading ?
                                 <CircularProgress size={24}/> : 'Speichern'}</Button>
                         </DialogActions>
