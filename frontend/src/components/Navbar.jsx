@@ -20,34 +20,37 @@ import { useAuth } from '../contexts/AuthContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 
 const Navbar = () => {
-    const { user, logout } = useAuth();
-    if (user === undefined) return null; // Warten auf Auth-Status
+    // Hooks ganz oben aufrufen, nicht konditional
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
-    // User-Menu-Logik …
+    const { user, logout } = useAuth();
+
+    // Warten bis user geladen ist
+    if (user === undefined) return null;
+
+    // User Menu State
     const [anchorEl, setAnchorEl] = useState(null);
     const isUserMenuOpen = Boolean(anchorEl);
     const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
     const handleUserMenuClose = () => setAnchorEl(null);
 
-    // Mobile-Menu …
+    // Mobile Menu State
     const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
     const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
     const handleMobileMenuClose = () => setMobileAnchorEl(null);
 
-
-    // lokaler State für das Eingabefeld
+    // Suchfeld State
     const [searchTerm, setSearchTerm] = useState('');
 
-    // URL-Query → local State
+    // URL-Query → local State synchronisieren
     useEffect(() => {
         setSearchTerm(searchParams.get('query') || '');
     }, [searchParams]);
 
-    // bei Eingabe: State updaten; auf /quizzes auch direkt den URL-Param
+    // Suchfeld Eingabe
     const handleSearchChange = e => {
         const val = e.target.value;
         setSearchTerm(val);
@@ -57,7 +60,7 @@ const Navbar = () => {
         }
     };
 
-    // bei Enter: immer (auch außerhalb /quizzes) zur QuizList mit Query navigieren
+    // Enter im Suchfeld navigiert zur Quizliste mit Query
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchTerm.trim();
@@ -65,6 +68,7 @@ const Navbar = () => {
         }
     };
 
+    // Dark Mode toggle
     const handleToggle = () => {
         setDarkMode(!darkMode);
     };
@@ -73,14 +77,14 @@ const Navbar = () => {
         <>
             <AppBar position="static">
                 <Toolbar>
-                    {/* Logo / Burger on xs */}
+                    {/* Logo / Burger auf xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                         <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
                             <img src="/logo192.png" alt="Trivify" style={{ height: 64, width: 64 }} />
                         </IconButton>
                     </Box>
 
-                    {/* Brand on md+ */}
+                    {/* Brand auf md+ */}
                     <Typography
                         component={RouterLink}
                         to="/"
@@ -95,7 +99,7 @@ const Navbar = () => {
                         <img src="/logo192.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
-                    {/* Nav-Buttons md+ */}
+                    {/* Nav Buttons auf md+ */}
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, mx: 'auto', alignItems: 'center' }}>
                         <Button component={RouterLink} to="/quizzes" color="inherit">Quizze</Button>
                         <Button component={RouterLink} to="/daily-quiz" color="inherit">Tägliches Quiz (KI)</Button>
@@ -202,7 +206,7 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
-                        {user?.role === 'ROLE_ADMIN' && (
+                        {user.role === 'ROLE_ADMIN' && (
                             <MenuItem component={RouterLink} to="/adminpanel" onClick={handleUserMenuClose}>
                                 Admin-Panel
                             </MenuItem>

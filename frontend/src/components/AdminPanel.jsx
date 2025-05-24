@@ -18,6 +18,7 @@ import {
     Pagination,
     Select,
     Snackbar,
+    Switch,
     TextField,
     Typography,
     CircularProgress,
@@ -48,7 +49,7 @@ const AdminUserPanel = () => {
     const [editLoading, setEditLoading] = useState(false);
 
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: '', userStatus: '', dailyQuizReminder: false });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: '', userStatus: '', dailyQuizReminder: false, dailyStreak: 0 });
     const [createLoading, setCreateLoading] = useState(false);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -145,6 +146,13 @@ const AdminUserPanel = () => {
     };
 
     const createUser = async () => {
+        const { name, email, password, role, userStatus } = newUser;
+
+        if (!name || !email || !password || !role || !userStatus) {
+            setSnackbar({ open: true, message: 'Bitte alle Pflichtfelder ausfüllen.', severity: 'error' });
+            return;
+        }
+
         setCreateLoading(true);
         try {
             await axios.post(`${process.env.REACT_APP_API_URL}/admin/users/create`, newUser);
@@ -229,11 +237,13 @@ const AdminUserPanel = () => {
                             <TextField margin="dense" label="Email" fullWidth value={editUser?.email || ''} onChange={(e) => handleEditChange('email', e.target.value)} disabled={editLoading} />
                             <TextField margin="dense" label="Passwort" fullWidth type="password" value={editUser?.password || ''} onChange={(e) => handleEditChange('password', e.target.value)} helperText="Nur ausfüllen, wenn Passwort geändert werden soll" disabled={editLoading} />
                             <FormControl fullWidth margin="dense">
-                                <InputLabel>Tägliche Erinnerung</InputLabel>
-                                <Select value={editUser?.dailyQuizReminder ? 'YES' : 'NO'} onChange={(e) => handleEditChange('dailyQuizReminder', e.target.value === 'YES')} disabled={editLoading}>
-                                    <MenuItem value="YES">Ja</MenuItem>
-                                    <MenuItem value="NO">Nein</MenuItem>
-                                </Select>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Typography>Tägliche Quiz-Erinnerung</Typography>
+                                    <Switch
+                                        checked={newUser.dailyQuizReminder}
+                                        onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.checked })}
+                                    />
+                                </Box>
                             </FormControl>
                             <TextField margin="dense" label="Daily Streak" fullWidth type="number" value={editUser?.dailyStreak || 0} onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))} disabled={editLoading} />
                             <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''} disabled />
@@ -265,11 +275,13 @@ const AdminUserPanel = () => {
                                 </Select>
                             </FormControl>
                             <FormControl fullWidth margin="dense">
-                                <InputLabel>Tägliche Erinnerung</InputLabel>
-                                <Select value={newUser.dailyQuizReminder ? 'YES' : 'NO'} onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.value === 'YES' })}>
-                                    <MenuItem value="YES">Ja</MenuItem>
-                                    <MenuItem value="NO">Nein</MenuItem>
-                                </Select>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Typography>Tägliche Quiz-Erinnerung</Typography>
+                                    <Switch
+                                        checked={newUser.dailyQuizReminder}
+                                        onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.checked })}
+                                    />
+                                </Box>
                             </FormControl>
                         </DialogContent>
                         <DialogActions>
