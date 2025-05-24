@@ -309,9 +309,9 @@ const MeineQuizze = () => {
                 {filtered.map((quiz) => (
                     <Grid item xs={12} sm={6} md={4} key={quiz.id} sx={{display: 'flex'}}>
                         <Card sx={{
-                            position: 'relative',
                             display: 'flex',
                             flexDirection: 'column',
+                            justifyContent: 'space-between',
                             flexGrow: 1,
                             height: '100%',
                         }}>
@@ -322,22 +322,25 @@ const MeineQuizze = () => {
                                     </IconButton>
                                 )}
                             </Box>
-                            <CardContent>
+
+                            <CardContent sx={{flexGrow: 1}}>
                                 <Typography variant='h6' gutterBottom>{quiz.title}</Typography>
                                 <Typography variant='body2' color='text.secondary' paragraph>
                                     {quiz.description}
                                 </Typography>
+
                                 <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
                                     {quiz.categories?.map(cat => (
-                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small"
-                                              color="primary"/>
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary"/>
                                     ))}
                                 </Box>
+
                                 {user?.role === 'ROLE_ADMIN' && quiz.creator && (
                                     <Typography variant='body2' color='text.secondary' mb={1}>
                                         Erstellt von: {quiz.creator.name}
                                     </Typography>
                                 )}
+
                                 {quiz.ratingCount > 0 ? (
                                     <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
                                         <Rating value={quiz.avgRating} precision={0.1} readOnly size='small'/>
@@ -349,17 +352,13 @@ const MeineQuizze = () => {
                                     </Typography>
                                 )}
                             </CardContent>
-                            <CardActions>
-                                <Button variant="contained"
-                                        color="primary"
-                                        size="small" onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
-                                <Button variant="contained"
-                                        color="primary"
-                                        size="small"
+
+                            <CardActions sx={{justifyContent: 'space-between', mt: 'auto'}}>
+                                <Button variant="contained" color="primary" size="small"
+                                        onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
+                                <Button variant="contained" color="primary" size="small"
                                         onClick={() => navigate(`/quizzes/edit/${quiz.id}`)}>Bearbeiten</Button>
-                                <Button variant="contained"
-                                        size="small"
-                                        color="error"
+                                <Button variant="contained" size="small" color="error"
                                         onClick={() => confirmDelete(quiz.id)}>Löschen</Button>
                             </CardActions>
                         </Card>
