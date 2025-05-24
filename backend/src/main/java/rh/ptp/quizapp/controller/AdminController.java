@@ -2,6 +2,7 @@ package rh.ptp.quizapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.model.Quiz;
@@ -43,40 +44,30 @@ public class AdminController {
     }
 
     @GetMapping("/users/states")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<String>> getUserStatesAdmin(@AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
-            return ResponseEntity.status(403).build(); // Forbidden if not admin
-        } else {
             return ResponseEntity.ok(UserStatus.getUserStates());
-        }
     }
 
 
     @PostMapping("/users/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
-            return ResponseEntity.status(403).build(); // Forbidden if not admin
-        } else {
             return ResponseEntity.ok(adminService.createUser(userToCreate));
-        }
     }
 
     @PutMapping("/users/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
-            return ResponseEntity.status(403).build(); // Forbidden if not admin
-        } else {
             return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
-        }
+
     }
 
     @DeleteMapping("/users/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        if(!user.getRole().equals(UserRole.ROLE_ADMIN)) {
-            return ResponseEntity.status(403).build(); // Forbidden if not admin
-        } else {
             adminService.deleteUser(id);
             return ResponseEntity.ok().build();
-        }
+
     }
 }

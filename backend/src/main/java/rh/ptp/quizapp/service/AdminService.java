@@ -98,10 +98,10 @@ public class AdminService {
         if (action == 0) {
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin erstellt!", "account-created", variables);
         } else if (action == 1) {
-            if (userUpdated.getRole() != null && userUpdated.getRole().equals(UserRole.ROLE_ADMIN) && !user.getRole().equals(UserRole.ADMIN)) {
+            if (userUpdated.getRole() != null && userUpdated.getRole().equals(UserRole.ROLE_ADMIN) && !user.getRole().equals(UserRole.ROLE_ADMIN)) {
                 emailService.sendEmail(user.getEmail(), "Du wurdest zum Admin ernannt!", "admin-promoted", variables);
                 customEmailSend = true;
-            } else if (userUpdated.getRole() != null && !userUpdated.getRole().equals(UserRole.ROLE_ADMIN) && user.getRole().equals(UserRole.ADMIN)) {
+            } else if (userUpdated.getRole() != null && !userUpdated.getRole().equals(UserRole.ROLE_ADMIN) && user.getRole().equals(UserRole.ROLE_ADMIN)) {
                 emailService.sendEmail(user.getEmail(), "Du wurdest zum normalen Benutzer degradiert!", "admin-demoted", variables);
                 customEmailSend = true;
             }
