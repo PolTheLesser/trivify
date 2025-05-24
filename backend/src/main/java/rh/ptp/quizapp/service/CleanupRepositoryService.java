@@ -75,6 +75,7 @@ public class CleanupRepositoryService {
     }
 
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    @Transactional
     public void completeDeletionRequests() {
         // 1) Warn all deletion requests older than 6 days
         LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
@@ -104,6 +105,7 @@ public class CleanupRepositoryService {
     }
 
     @Scheduled(cron = "0 * * * * *") // jede Minute
+    @Transactional
     public void deleteOldTokens() {
         // Delete all tokens older than 1 hour
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(1);
