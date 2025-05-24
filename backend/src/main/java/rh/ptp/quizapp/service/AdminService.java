@@ -31,6 +31,8 @@ public class AdminService {
     public User createUser(User user) {
         adminEmail(user, user, 0);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return user;
     }
@@ -38,17 +40,37 @@ public class AdminService {
     public User updateUser(Long id, User userUpdated) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         Map<String, Object> variables = adminEmail(user, userUpdated, 1);
-        user.setName(userUpdated.getName());
-        user.setEmail(userUpdated.getEmail());
-        user.setPassword(passwordEncoder.encode(userUpdated.getPassword()));
-        user.setUserStatus(userUpdated.getUserStatus());
-        user.setRole(userUpdated.getRole());
+        if (userUpdated.getName() != null) {
+            user.setName(userUpdated.getName());
+        }
+
+        if (userUpdated.getEmail() != null) {
+            user.setEmail(userUpdated.getEmail());
+        }
+
+        if (user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        if (userUpdated.getUserStatus() != null) {
+            user.setUserStatus(userUpdated.getUserStatus());
+        }
+
+        if (userUpdated.getRole() != null) {
+            user.setRole(userUpdated.getRole());
+        }
         user.setDailyQuizReminder(userUpdated.isDailyQuizReminder());
+
         user.setDailyStreak(userUpdated.getDailyStreak());
-        user.setLastDailyQuizPlayed(userUpdated.getLastDailyQuizPlayed());
+
+        if (userUpdated.getLastDailyQuizPlayed() != null) {
+            user.setLastDailyQuizPlayed(userUpdated.getLastDailyQuizPlayed());
+        }
+
         user.setUpdatedAt(LocalDateTime.now());
+
         userRepository.save(user);
-        if(!customEmailSend) {
+        if (!customEmailSend) {
             variables.replace("username", user.getName());
             variables.replace("email", user.getEmail());
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin aktualisiert!", "account-updated", variables);
@@ -73,9 +95,9 @@ public class AdminService {
         variables.put("loginUrl", frontendUrl + "/login");
         variables.put("password", userUpdated.getPassword());
         variables.put("registerUrl", frontendUrl + "/register");
-        if(action==0) {
+        if (action == 0) {
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin erstellt!", "account-created", variables);
-        } else if (action==1) {
+        } else if (action == 1) {
             if (userUpdated.getRole() != null && userUpdated.getRole().equals(UserRole.ADMIN) && !user.getRole().equals(UserRole.ADMIN)) {
                 emailService.sendEmail(user.getEmail(), "Du wurdest zum Admin ernannt!", "admin-promoted", variables);
                 customEmailSend = true;
@@ -94,7 +116,7 @@ public class AdminService {
                 emailService.sendEmail(user.getEmail(), "Dein Passwort wurde durch einen Admin geändert!", "password-changed", variables);
                 customEmailSend = true;
             }
-        } else if(action==2) {
+        } else if (action == 2) {
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin gelöscht!", "account-deleted", variables);
         }
         return variables;
