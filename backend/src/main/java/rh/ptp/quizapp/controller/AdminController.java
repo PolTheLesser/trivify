@@ -3,8 +3,8 @@ package rh.ptp.quizapp.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import rh.ptp.quizapp.dto.UserDTO;
 import rh.ptp.quizapp.model.Quiz;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserRole;
@@ -13,9 +13,10 @@ import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AdminService;
 import rh.ptp.quizapp.service.CleanupRepositoryService;
 import rh.ptp.quizapp.service.QuizService;
-import rh.ptp.quizapp.service.UserService;
 
 import java.util.List;
+
+import static rh.ptp.quizapp.mapper.UserMapper.*;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -39,8 +40,12 @@ public class AdminController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<User>> getUsersAdmin() {
-        return ResponseEntity.ok(userRepository.findAll());
+    public ResponseEntity<List<UserDTO>> getUsersAdmin() {
+        List<User> users = userRepository.findAll();
+        List<UserDTO> userDTOs = users.stream()
+                .map(UserDTO::fromUser)
+                .toList();
+        return ResponseEntity.ok(userDTOs);
     }
 
     @GetMapping("/users/roles")
@@ -58,16 +63,20 @@ public class AdminController {
 
     @PostMapping("/users/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate) {
-        return ResponseEntity.ok(adminService.createUser(userToCreate));
+    public ResponseEntity<UserDTO> createUserAdmin(@RequestBody UserDTO userToCreateDTO) {
+        User userToCreate = userDTOToUser(userToCreateDTO);
+        User createdUser = adminService.createUser(userToCreate);
+        return ResponseEntity.ok(UserDTO.fromUser(createdUser));
     }
 
     @PutMapping("/users/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate) {
-        return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
-
+    public ResponseEntity<UserDTO> updateUserAdmin(@PathVariable Long id, @RequestBody UserDTO userToUpdateDTO) {
+        User userToUpdate = userDTOToUser(userToUpdateDTO);
+        User updatedUser = adminService.updateUser(id, userToUpdate);
+        return ResponseEntity.ok(UserDTO.fromUser(updatedUser));
     }
+
 
     @DeleteMapping("/users/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

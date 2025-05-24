@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserRole;
+import rh.ptp.quizapp.model.UserStatus;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -26,9 +30,19 @@ public class UserDTO {
     @Size(min = 6, message = "Passwort muss mindestens 6 Zeichen lang sein")
     private String password;
 
+    private UserStatus userStatus;
+
     private Long id;
 
+    private UserRole role;
+
     private boolean dailyQuizReminder;
+
+    private int dailyStreak;
+
+    private LocalDateTime lastDailyQuizPlayed;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static UserDTO fromUser(User user) {
         UserDTO dto = new UserDTO();
@@ -36,6 +50,12 @@ public class UserDTO {
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setDailyQuizReminder(user.isDailyQuizReminder());
+        dto.setDailyStreak(user.getDailyStreak());
+        dto.setUserStatus(user.getUserStatus());
+        dto.setRole(user.getRole());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(user.getUpdatedAt());
+        dto.setLastDailyQuizPlayed(user.getLastDailyQuizPlayed());
         return dto;
     }
 } 
