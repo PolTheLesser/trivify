@@ -17,9 +17,7 @@ import {
     MenuItem,
     Pagination,
     Paper,
-    Select,
     Snackbar,
-    Switch,
     TextField,
     Typography,
     CircularProgress,
@@ -27,6 +25,7 @@ import {
 } from '@mui/material';
 import axios from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
+import {CustomSelect, CustomSwitch, PasswordField} from "../CustomElements";
 
 const ROWS_PER_PAGE = 9;
 
@@ -189,19 +188,37 @@ const AdminUserPanel = () => {
                            }}>
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <TextField label="Suche" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} size="small" />
-                            <FormControl>
+                            <FormControl size="small" sx={{ minWidth: 150 }}>
                                 <InputLabel>Status</InputLabel>
-                                <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} label="Status">
+                                <CustomSelect
+                                    fullWidth
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    label="Status"
+                                >
                                     <MenuItem value="ALL">Alle</MenuItem>
-                                    {userStatuses.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
-                                </Select>
+                                    {userStatuses.map(status => (
+                                        <MenuItem key={status} value={status}>
+                                            {status}
+                                        </MenuItem>
+                                    ))}
+                                </CustomSelect>
                             </FormControl>
-                            <FormControl>
+                            <FormControl size="small" sx={{ minWidth: 150 }}>
                                 <InputLabel>Rolle</InputLabel>
-                                <Select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} label="Rolle">
+                                <CustomSelect
+                                    fullWidth
+                                    value={filterRole}
+                                    onChange={(e) => setFilterRole(e.target.value)}
+                                    label="Rolle"
+                                >
                                     <MenuItem value="ALL">Alle</MenuItem>
-                                    {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
-                                </Select>
+                                    {userRoles.map(role => (
+                                        <MenuItem key={role} value={role}>
+                                            {role}
+                                        </MenuItem>
+                                    ))}
+                                </CustomSelect>
                             </FormControl>
                             <br/>
                             <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer erstellen</Button>
@@ -249,11 +266,11 @@ const AdminUserPanel = () => {
                         <DialogContent>
                             <TextField margin="dense" label="Name" fullWidth value={editUser?.name || ''} onChange={(e) => handleEditChange('name', e.target.value)} disabled={editLoading} />
                             <TextField margin="dense" label="Email" fullWidth value={editUser?.email || ''} onChange={(e) => handleEditChange('email', e.target.value)} disabled={editLoading} />
-                            <TextField margin="dense" label="Passwort" fullWidth type="password" value={editUser?.password || ''} onChange={(e) => handleEditChange('password', e.target.value)} helperText="Nur ausfüllen, wenn Passwort geändert werden soll" disabled={editLoading} />
+                            <PasswordField margin="dense" label="Passwort" fullWidth value={editUser?.password || ''} onChange={(e) => handleEditChange('password', e.target.value)} helperText="Nur ausfüllen, wenn Passwort geändert werden soll" disabled={editLoading} />
                             <FormControl fullWidth margin="dense">
                                 <Box display="flex" alignItems="center" justifyContent="space-between">
                                     <Typography>Tägliche Quiz-Erinnerung</Typography>
-                                    <Switch
+                                    <CustomSwitch
                                         checked={newUser.dailyQuizReminder}
                                         onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.checked })}
                                     />
@@ -278,20 +295,20 @@ const AdminUserPanel = () => {
                             <TextField margin="dense" label="Passwort" type="password" fullWidth value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
                             <FormControl fullWidth margin="dense">
                                 <InputLabel>Rolle</InputLabel>
-                                <Select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
+                                <CustomSelect value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
                                     {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
-                                </Select>
+                                </CustomSelect>
                             </FormControl>
                             <FormControl fullWidth margin="dense">
                                 <InputLabel>Status</InputLabel>
-                                <Select value={newUser.userStatus} onChange={(e) => setNewUser({ ...newUser, userStatus: e.target.value })}>
+                                <CustomSelect value={newUser.userStatus} onChange={(e) => setNewUser({ ...newUser, userStatus: e.target.value })}>
                                     {userStatuses.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
-                                </Select>
+                                </CustomSelect>
                             </FormControl>
                             <FormControl fullWidth margin="dense">
                                 <Box display="flex" alignItems="center" justifyContent="space-between">
                                     <Typography>Tägliche Quiz-Erinnerung</Typography>
-                                    <Switch
+                                    <CustomSwitch
                                         checked={newUser.dailyQuizReminder}
                                         onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.checked })}
                                     />

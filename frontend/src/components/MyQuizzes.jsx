@@ -79,7 +79,7 @@ const MeineQuizze = () => {
             const isAdmin = user?.role === 'ROLE_ADMIN';
             const endpoint = isAdmin
                 ? (showAll ? 'quizzes' : 'admin/quizzes')
-                : 'admin/quizzes';
+                : 'quizzes';
             const [quizRes, favRes] = await Promise.all([
                 axios.get(`${process.env.REACT_APP_API_URL}/${endpoint}`),
                 axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
@@ -279,20 +279,17 @@ const MeineQuizze = () => {
                         </CustomSelect>
                     </FormControl>
                     {user?.role === 'ROLE_ADMIN' && (
-                        <Box sx={{display: 'flex', gap: 2, mb: 2, ml: 2}}>
-                            <Button
-                                variant={!showAll ? 'contained' : 'outlined'}
-                                onClick={() => setShowAll(false)}
+                        <FormControl size="small" sx={{ minWidth: 150 }}>
+                            <InputLabel>Zeige</InputLabel>
+                            <CustomSelect
+                                value={showAll ? 'all' : 'mine'}
+                                label="Zeige"
+                                onChange={(e) => setShowAll(e.target.value === 'all')}
                             >
-                                Meine Quizze
-                            </Button>
-                            <Button
-                                variant={showAll ? 'contained' : 'outlined'}
-                                onClick={() => setShowAll(true)}
-                            >
-                                Alle Quizze
-                            </Button>
-                        </Box>
+                                <MenuItem value="mine">Meine Quizze</MenuItem>
+                                <MenuItem value="all">Alle Quizze</MenuItem>
+                            </CustomSelect>
+                        </FormControl>
                     )}
                     <br/>
                     <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
@@ -336,7 +333,7 @@ const MeineQuizze = () => {
                                               color="primary"/>
                                     ))}
                                 </Box>
-                                {user?.role === 'ADMIN' && quiz.creator && (
+                                {user?.role === 'ROLE_ADMIN' && quiz.creator && (
                                     <Typography variant='body2' color='text.secondary' mb={1}>
                                         Erstellt von: {quiz.creator.name}
                                     </Typography>
