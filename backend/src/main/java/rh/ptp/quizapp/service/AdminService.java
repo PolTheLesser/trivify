@@ -77,7 +77,6 @@ public class AdminService {
             variables.replace("email", user.getEmail());
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin aktualisiert!", "account-updated", variables);
         }
-        user.setPassword(null);
         return user;
     }
 
