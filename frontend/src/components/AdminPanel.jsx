@@ -167,14 +167,15 @@ const AdminUserPanel = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 3, mb: 6 }}>
-            {isNotAdmin ? (
+        <Container maxWidth="xl" sx={{ mt: 3, mb: 6 }}>
+        {isNotAdmin ? (
                 <Typography variant="h5" color="error" sx={{ mt: 6, textAlign: 'center' }}>
                     Zugriff verweigert. Nur Administratoren dürfen dieses Panel nutzen.
                 </Typography>
             ) : (
                 <>
-                    {/* Filterleiste */}
+                <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+                {/* Filterleiste */}
                     <Paper elevation={2}
                            sx={{
                                display: 'flex',
@@ -183,7 +184,7 @@ const AdminUserPanel = () => {
                                mb: 4,
                                px: 2,
                                py: 3,
-                               mx: 2,
+                               mx: 0,
                                mt: 2
                            }}>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
@@ -226,6 +227,7 @@ const AdminUserPanel = () => {
                             <Button color="error" onClick={() => { setSearchQuery(''); setFilterStatus('ALL'); setFilterRole('ALL'); }}>Filter zurücksetzen</Button>
                         </Box>
                     </Paper>
+                </Box>
 
                     {/* Benutzerliste */}
                     {loading ? (
