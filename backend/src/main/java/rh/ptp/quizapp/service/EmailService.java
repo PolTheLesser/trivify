@@ -1,5 +1,6 @@
 package rh.ptp.quizapp.service;
 
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(mailFrom);
+            helper.setFrom(new InternetAddress(mailFrom, "Trivify"));
             helper.setTo(to);
             helper.setSubject(subject);
 

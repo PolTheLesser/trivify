@@ -39,9 +39,6 @@ jobs:
             --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
-      - name: Push Frontend
-        run: docker push lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }}
-
       - name: Set Execution Permissions for Maven Wrapper
         run: chmod +x ./backend/mvnw
 
@@ -77,6 +74,9 @@ jobs:
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
           docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
+
+      - name: Push Frontend
+        run: docker push lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }}
 
       - name: Push Backend
         run: docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}
