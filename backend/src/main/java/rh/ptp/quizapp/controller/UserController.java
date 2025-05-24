@@ -29,7 +29,6 @@ public class UserController {
 
     private final UserService userService;
     private final QuizService quizService;
-    private final AccountCleanupService accountCleanupService;
     private final QuizFavoriteRepository quizFavoriteRepository;
     private final EmailService emailService;
     private final UserRepository userRepository;

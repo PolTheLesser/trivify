@@ -55,6 +55,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setUserStatus(UserStatus.ACTIVE);
         authenticationTokenRepository.deleteAllById(userId);
         userRepository.save(user);
     }
