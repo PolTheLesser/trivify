@@ -68,9 +68,6 @@ const Navbar = () => {
         setDarkMode(!darkMode);
     };
 
-    // erst hier checken, ob user ready ist
-    if (user === undefined) return null;
-
     return (
         <>
             <AppBar position="static">
@@ -105,6 +102,9 @@ const Navbar = () => {
                             <Button component={RouterLink} to="/quizzes/my-quizzes" color="inherit">
                                 Quizlabor
                             </Button>
+                        )}
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
                         )}
                     </Box>
 
@@ -189,6 +189,9 @@ const Navbar = () => {
                         Quizlabor
                     </MenuItem>
                 )}
+                {user?.role === 'ROLE_ADMIN' && (
+                    <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
+                )}
             </Menu>
 
             {/* User Account Menu */}
@@ -204,11 +207,6 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
-                        {user.role === 'ROLE_ADMIN' && (
-                            <MenuItem component={RouterLink} to="/adminpanel" onClick={handleUserMenuClose}>
-                                Admin-Panel
-                            </MenuItem>
-                        )}
                         <MenuItem onClick={() => { handleUserMenuClose(); logout(); navigate('/'); }}>Abmelden</MenuItem>
                     </>
                 ) : (
