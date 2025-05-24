@@ -1,5 +1,6 @@
 package rh.ptp.quizapp.service;
 
+import jakarta.transaction.Transactional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ROLE_ADMIN) {
+        if (!quiz.getCreator().getId().equals(userId) && isAdmin(userId)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz bearbeiten");
         }
 
@@ -123,11 +124,12 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    @Transactional
     public void deleteQuiz(Long quizId, Long userId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && userRepository.findById(userId).get().getRole()!= UserRole.ROLE_ADMIN) {
+        if (!quiz.getCreator().getId().equals(userId) && isAdmin(userId)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
@@ -402,5 +404,10 @@ public class QuizService {
                 }
             }
         }
+    }
+    private boolean isAdmin(Long userId) {
+        return userRepository.findById(userId)
+                .map(u -> u.getRole() == UserRole.ROLE_ADMIN)
+                .orElse(false);
     }
 }
