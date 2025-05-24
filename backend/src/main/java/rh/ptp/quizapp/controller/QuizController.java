@@ -71,7 +71,7 @@ public class QuizController {
         Quiz quiz = quizService.getQuizById(quizId);
         if (quiz != null) {
             if(userRepository.findByName(userDetails.getUsername()).isPresent()
-                    && userRepository.findByName(userDetails.getUsername()).get().getRole() != UserRole.ADMIN){
+                    && userRepository.findByName(userDetails.getUsername()).get().getRole() != UserRole.ROLE_ADMIN){
                 return ResponseEntity.ok(quiz);
             }
             else if (quiz.getCreator().getName().equals(userDetails.getUsername())){
