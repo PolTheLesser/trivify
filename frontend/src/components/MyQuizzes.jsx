@@ -76,10 +76,10 @@ const MeineQuizze = () => {
 
     const fetchData = async () => {
         try {
+            const isAdmin = user?.role === 'ROLE_ADMIN';
             const endpoint = isAdmin
                 ? (showAll ? 'quizzes' : 'admin/quizzes')
                 : 'admin/quizzes';
-            const isAdmin = user?.role === 'ROLE_ADMIN';
             const [quizRes, favRes] = await Promise.all([
                 axios.get(`${process.env.REACT_APP_API_URL}/${endpoint}`),
                 axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)

@@ -52,29 +52,29 @@ public class AdminController {
     @GetMapping("/users/states")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<String>> getUserStatesAdmin() {
-            return ResponseEntity.ok(UserStatus.getUserStates());
+        return ResponseEntity.ok(UserStatus.getUserStates());
     }
 
 
     @PostMapping("/users/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate) {
-            return ResponseEntity.ok(adminService.createUser(userToCreate));
+        return ResponseEntity.ok(adminService.createUser(userToCreate));
     }
 
     @PutMapping("/users/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate) {
-            return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
+        return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
 
     }
 
     @DeleteMapping("/users/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {
-            adminService.deleteUser(id);
-            cleanupRepositoryService.prepareDelete(id);
-            return ResponseEntity.ok().build();
+        cleanupRepositoryService.prepareDelete(id);
+        adminService.deleteUser(id);
+        return ResponseEntity.ok().build();
 
     }
 }

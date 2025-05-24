@@ -16,6 +16,7 @@ import {
     InputLabel,
     MenuItem,
     Pagination,
+    Paper,
     Select,
     Snackbar,
     Switch,
@@ -174,27 +175,40 @@ const AdminUserPanel = () => {
                 </Typography>
             ) : (
                 <>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    {/* Filterleiste */}
+                    <Paper elevation={2}
+                           sx={{
+                               display: 'flex',
+                               flexDirection: 'column',
+                               gap: 2,
+                               mb: 4,
+                               px: 2,
+                               py: 3,
+                               mx: 2,
+                               mt: 2
+                           }}>
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <TextField label="Suche" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} size="small" />
-                            <FormControl size="small">
+                            <FormControl>
                                 <InputLabel>Status</InputLabel>
                                 <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} label="Status">
                                     <MenuItem value="ALL">Alle</MenuItem>
                                     {userStatuses.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
                                 </Select>
                             </FormControl>
-                            <FormControl size="small">
+                            <FormControl>
                                 <InputLabel>Rolle</InputLabel>
                                 <Select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} label="Rolle">
                                     <MenuItem value="ALL">Alle</MenuItem>
                                     {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
                                 </Select>
                             </FormControl>
+                            <br/>
+                            <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer erstellen</Button>
+                            <Box sx={{flexGrow: 1}} />
                             <Button color="error" onClick={() => { setSearchQuery(''); setFilterStatus('ALL'); setFilterRole('ALL'); }}>Filter zurücksetzen</Button>
                         </Box>
-                        <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer erstellen</Button>
-                    </Box>
+                    </Paper>
 
                     {/* Benutzerliste */}
                     {loading ? (
