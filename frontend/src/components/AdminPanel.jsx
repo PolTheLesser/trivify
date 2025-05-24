@@ -186,8 +186,8 @@ const AdminUserPanel = () => {
                                mx: 2,
                                mt: 2
                            }}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <TextField label="Suche" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} size="small" />
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
+                        <TextField label="Suche" variant="outlined" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} size="small" />
                             <FormControl size="small" sx={{ minWidth: 150 }}>
                                 <InputLabel>Status</InputLabel>
                                 <CustomSelect
