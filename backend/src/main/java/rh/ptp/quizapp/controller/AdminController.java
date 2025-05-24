@@ -2,6 +2,7 @@ package rh.ptp.quizapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.model.Quiz;
 import rh.ptp.quizapp.model.User;
@@ -37,29 +38,45 @@ public class AdminController {
     }
 
     @GetMapping("/users/roles")
-    public ResponseEntity<List<String>> getUserRolesAdmin() {
+    public ResponseEntity<List<String>> getUserRolesAdmin(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserRole.getUserRoles());
     }
 
     @GetMapping("/users/states")
-    public ResponseEntity<List<String>> getUserStatesAdmin() {
-        return ResponseEntity.ok(UserStatus.getUserStates());
+    public ResponseEntity<List<String>> getUserStatesAdmin(@AuthenticationPrincipal User user) {
+        if(!user.getRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(403).build(); // Forbidden if not admin
+        } else {
+            return ResponseEntity.ok(UserStatus.getUserStates());
+        }
     }
 
 
     @PostMapping("/users/create")
-    public ResponseEntity<User> createUserAdmin(User user) {
-        return ResponseEntity.ok(adminService.createUser(user));
+    public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate, @AuthenticationPrincipal User user) {
+        if(!user.getRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(403).build(); // Forbidden if not admin
+        } else {
+            return ResponseEntity.ok(adminService.createUser(userToCreate));
+        }
     }
 
     @PutMapping("/users/update/{id}")
-    public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User user) {
-        return ResponseEntity.ok(adminService.updateUser(id, user));
+    public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate, @AuthenticationPrincipal User user) {
+        if(!user.getRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(403).build(); // Forbidden if not admin
+        } else {
+            return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
+        }
     }
 
     @DeleteMapping("/users/delete/{id}")
-    public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {
-        adminService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        if(!user.getRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(403).build(); // Forbidden if not admin
+        } else {
+            adminService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        }
     }
 }
