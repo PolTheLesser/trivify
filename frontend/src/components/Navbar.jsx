@@ -21,6 +21,7 @@ import { ThemeContext } from '../contexts/ThemeContext';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    if (user === undefined) return null; // Warten auf Auth-Status
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();

@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+// AdminUserPanel.jsx
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -23,48 +24,56 @@ import {
     CircularProgress,
     Alert,
 } from '@mui/material';
-import axios from '../api/api'; // dein axios-Setup
-import {useAuth} from '../contexts/AuthContext';
+import axios from '../api/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const ROWS_PER_PAGE = 9;
 
 const AdminUserPanel = () => {
-    const {user} = useAuth();
+    const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Filter states
+    const [userRoles, setUserRoles] = useState([]);
+    const [userStatuses, setUserStatuses] = useState([]);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [filterRole, setFilterRole] = useState('ALL');
-
-    // Pagination
     const [page, setPage] = useState(1);
 
-    // Edit dialog state
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editUser, setEditUser] = useState(null);
     const [editLoading, setEditLoading] = useState(false);
 
-    // Delete dialog state
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: '', userStatus: '', dailyQuizReminder: false });
+    const [createLoading, setCreateLoading] = useState(false);
+
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [toDeleteUser, setToDeleteUser] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
-    // Snackbar
-    const [snackbar, setSnackbar] = useState({open: false, message: '', severity: 'success'});
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-    // Rollen & Statusen (statisch)
-    const userRoles = ['USER', 'ADMIN'];
-    const userStatuses = ['ACTIVE', 'BLOCKED', 'INACTIVE'];
-    const isNotAdmin = user.role !== 'ROLE_ADMIN';
+    const isNotAdmin = user?.role !== 'ROLE_ADMIN';
 
     useEffect(() => {
-        if (user) {
-            fetchUsers();
+        if (user?.role === 'ROLE_ADMIN') {
+            axios.get(`${process.env.REACT_APP_API_URL}/users/roles`)
+                .then(res => setUserRoles(res.data))
+                .catch(() => setSnackbar({ open: true, message: 'Fehler beim Laden der Rollen.', severity: 'error' }));
+
+            axios.get(`${process.env.REACT_APP_API_URL}/users/states`)
+                .then(res => setUserStatuses(res.data))
+                .catch(() => setSnackbar({ open: true, message: 'Fehler beim Laden der Stati.', severity: 'error' }));
         }
+    }, [user]);
+
+    useEffect(() => {
+        if (user) fetchUsers();
     }, [user]);
 
     const fetchUsers = async () => {
@@ -73,327 +82,217 @@ const AdminUserPanel = () => {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/users`);
             setUsers(res.data);
             setError('');
-        } catch (e) {
+        } catch {
             setError('Fehler beim Laden der Benutzer.');
-            setSnackbar({open: true, message: 'Fehler beim Laden der Benutzer.', severity: 'error'});
+            setSnackbar({ open: true, message: 'Fehler beim Laden der Benutzer.', severity: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
-    // Filter & Pagination anwenden
     useEffect(() => {
-        if(user) {
+        if (user) {
             let filtered = [...users];
-
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(u =>
-                    u.name.toLowerCase().includes(q) ||
-                    u.email.toLowerCase().includes(q)
-                );
+                filtered = filtered.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
             }
-
-            if (filterStatus !== 'ALL') {
-                filtered = filtered.filter(u => u.userStatus === filterStatus);
-            }
-
-            if (filterRole !== 'ALL') {
-                filtered = filtered.filter(u => u.role === filterRole);
-            }
-
+            if (filterStatus !== 'ALL') filtered = filtered.filter(u => u.userStatus === filterStatus);
+            if (filterRole !== 'ALL') filtered = filtered.filter(u => u.role === filterRole);
             setFilteredUsers(filtered);
-            setPage(1); // reset pagination bei Filter-Änderung
+            setPage(1);
         }
     }, [searchQuery, filterStatus, filterRole, users, user]);
 
-    // Pagination Daten
     const paginatedUsers = filteredUsers.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
     const pageCount = Math.ceil(filteredUsers.length / ROWS_PER_PAGE);
 
-    // Dialog Handler
     const openEditDialog = (user) => {
-        setEditUser({...user, password: ''});
+        setEditUser({ ...user, password: '' });
         setEditDialogOpen(true);
     };
-
     const closeEditDialog = () => {
         setEditUser(null);
         setEditDialogOpen(false);
         setEditLoading(false);
     };
-
-    const handleEditChange = (field, value) => {
-        setEditUser(prev => ({...prev, [field]: value}));
-    };
-
+    const handleEditChange = (field, value) => setEditUser(prev => ({ ...prev, [field]: value }));
     const saveUser = async () => {
         setEditLoading(true);
         try {
             await axios.put(`${process.env.REACT_APP_API_URL}/admin/users/update/${editUser.id}`, editUser);
             await fetchUsers();
-            setSnackbar({open: true, message: 'Benutzer erfolgreich gespeichert.', severity: 'success'});
+            setSnackbar({ open: true, message: 'Benutzer erfolgreich gespeichert.', severity: 'success' });
             closeEditDialog();
         } catch {
-            setSnackbar({open: true, message: 'Fehler beim Speichern des Benutzers.', severity: 'error'});
+            setSnackbar({ open: true, message: 'Fehler beim Speichern des Benutzers.', severity: 'error' });
             setEditLoading(false);
         }
     };
 
-    const openDeleteDialog = (user) => {
-        setToDeleteUser(user);
-        setDeleteDialogOpen(true);
-    };
-
-    const closeDeleteDialog = () => {
-        setToDeleteUser(null);
-        setDeleteDialogOpen(false);
-        setDeleteLoading(false);
-    };
-
+    const openDeleteDialog = (user) => { setToDeleteUser(user); setDeleteDialogOpen(true); };
+    const closeDeleteDialog = () => { setToDeleteUser(null); setDeleteDialogOpen(false); setDeleteLoading(false); };
     const deleteUser = async () => {
         setDeleteLoading(true);
         try {
             await axios.delete(`${process.env.REACT_APP_API_URL}/admin/users/delete/${toDeleteUser.id}`);
             await fetchUsers();
-            setSnackbar({open: true, message: 'Benutzer erfolgreich gelöscht.', severity: 'success'});
+            setSnackbar({ open: true, message: 'Benutzer erfolgreich gelöscht.', severity: 'success' });
             closeDeleteDialog();
         } catch {
-            setSnackbar({open: true, message: 'Fehler beim Löschen des Benutzers.', severity: 'error'});
+            setSnackbar({ open: true, message: 'Fehler beim Löschen des Benutzers.', severity: 'error' });
             setDeleteLoading(false);
         }
     };
 
+    const createUser = async () => {
+        setCreateLoading(true);
+        try {
+            await axios.post(`${process.env.REACT_APP_API_URL}/admin/users/create`, newUser);
+            setSnackbar({ open: true, message: 'Benutzer erstellt.', severity: 'success' });
+            setCreateDialogOpen(false);
+            await fetchUsers();
+        } catch {
+            setSnackbar({ open: true, message: 'Fehler beim Erstellen.', severity: 'error' });
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
     return (
-        <Container maxWidth="lg" sx={{mt: 3, mb: 6}}>
+        <Container maxWidth="lg" sx={{ mt: 3, mb: 6 }}>
             {isNotAdmin ? (
-                <Typography variant="h5" color="error" sx={{mt: 6, textAlign: 'center'}}>
+                <Typography variant="h5" color="error" sx={{ mt: 6, textAlign: 'center' }}>
                     Zugriff verweigert. Nur Administratoren dürfen dieses Panel nutzen.
                 </Typography>
             ) : (
                 <>
-                    {/* Filterleiste */}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: 2,
-                            mb: 3,
-                            flexWrap: 'wrap',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <Box sx={{display: 'flex', gap: 2, flexWrap: 'wrap', flexGrow: 1}}>
-                            <TextField
-                                label="Suche"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                size="small"
-                                sx={{minWidth: 200, flexGrow: 1, maxWidth: 300}}
-                            />
-                            <FormControl size="small" sx={{minWidth: 150}}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <TextField label="Suche" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} size="small" />
+                            <FormControl size="small">
                                 <InputLabel>Status</InputLabel>
-                                <Select
-                                    value={filterStatus}
-                                    label="Status"
-                                    onChange={(e) => setFilterStatus(e.target.value)}
-                                >
+                                <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} label="Status">
                                     <MenuItem value="ALL">Alle</MenuItem>
-                                    {userStatuses.map((status) => (
-                                        <MenuItem key={status} value={status}>
-                                            {status}
-                                        </MenuItem>
-                                    ))}
+                                    {userStatuses.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
                                 </Select>
                             </FormControl>
-                            <FormControl size="small" sx={{minWidth: 150}}>
+                            <FormControl size="small">
                                 <InputLabel>Rolle</InputLabel>
-                                <Select
-                                    value={filterRole}
-                                    label="Rolle"
-                                    onChange={(e) => setFilterRole(e.target.value)}
-                                >
+                                <Select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} label="Rolle">
                                     <MenuItem value="ALL">Alle</MenuItem>
-                                    {userRoles.map((role) => (
-                                        <MenuItem key={role} value={role}>
-                                            {role}
-                                        </MenuItem>
-                                    ))}
+                                    {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
                                 </Select>
                             </FormControl>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => {
-                                    setSearchQuery('');
-                                    setFilterStatus('ALL');
-                                    setFilterRole('ALL');
-                                }}
-                                sx={{height: '40px', alignSelf: 'center'}}
-                            >
-                                Filter zurücksetzen
-                            </Button>
+                            <Button color="error" onClick={() => { setSearchQuery(''); setFilterStatus('ALL'); setFilterRole('ALL'); }}>Filter zurücksetzen</Button>
                         </Box>
+                        <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer erstellen</Button>
                     </Box>
 
-                    {/* User-Liste */}
+                    {/* Benutzerliste */}
                     {loading ? (
-                        <Box display="flex" justifyContent="center" mt={4}>
-                            <CircularProgress/>
-                        </Box>
+                        <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>
                     ) : error ? (
                         <Alert severity="error">{error}</Alert>
                     ) : filteredUsers.length === 0 ? (
-                        <Typography variant="body1" sx={{mt: 4}}>
-                            Keine Benutzer gefunden.
-                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 4 }}>Keine Benutzer gefunden.</Typography>
                     ) : (
                         <>
                             <Grid container spacing={3}>
-                                {paginatedUsers.map((u) => (
+                                {paginatedUsers.map(u => (
                                     <Grid item xs={12} sm={6} md={4} key={u.id}>
-                                        <Card
-                                            sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                height: '100%',
-                                            }}
-                                        >
-                                            <CardContent sx={{flexGrow: 1}}>
+                                        <Card>
+                                            <CardContent>
                                                 <Typography variant="h6">{u.name}</Typography>
-                                                <Typography color="text.secondary">{u.email}</Typography>
+                                                <Typography>{u.email}</Typography>
                                                 <Typography>Status: {u.userStatus}</Typography>
                                                 <Typography>Rolle: {u.role}</Typography>
-                                                <Typography>
-                                                    Tägliche Erinnerung: {u.dailyQuizReminder ? 'Ja' : 'Nein'}
-                                                </Typography>
+                                                <Typography>Daily Reminder: {u.dailyQuizReminder ? 'Ja' : 'Nein'}</Typography>
+                                                <Typography>Daily Streak: {u.dailyStreak}</Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <Button size="small" onClick={() => openEditDialog(u)}>
-                                                    Bearbeiten
-                                                </Button>
-                                                <Button size="small" color="error" onClick={() => openDeleteDialog(u)}>
-                                                    Löschen
-                                                </Button>
+                                                <Button onClick={() => openEditDialog(u)}>Bearbeiten</Button>
+                                                <Button color="error" onClick={() => openDeleteDialog(u)}>Löschen</Button>
                                             </CardActions>
                                         </Card>
                                     </Grid>
                                 ))}
                             </Grid>
-                            {/* Pagination */}
-                            {pageCount > 1 && (
-                                <Box
-                                    sx={{display: 'flex', justifyContent: 'center', mt: 4}}
-                                >
-                                    <Pagination
-                                        count={pageCount}
-                                        page={page}
-                                        onChange={(_, val) => setPage(val)}
-                                        color="primary"
-                                    />
-                                </Box>
-                            )}
+                            {pageCount > 1 && <Box display="flex" justifyContent="center" mt={4}><Pagination count={pageCount} page={page} onChange={(_, val) => setPage(val)} /></Box>}
                         </>
                     )}
 
-                    {/* Edit Dialog */}
+                    {/* Edit-Dialog */}
                     <Dialog open={editDialogOpen} onClose={closeEditDialog} maxWidth="sm" fullWidth>
                         <DialogTitle>Benutzer bearbeiten</DialogTitle>
                         <DialogContent>
-                            <TextField
-                                margin="dense"
-                                label="Name"
-                                fullWidth
-                                value={editUser?.name || ''}
-                                onChange={(e) => handleEditChange('name', e.target.value)}
-                                disabled={editLoading}
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Email"
-                                fullWidth
-                                type="email"
-                                value={editUser?.email || ''}
-                                onChange={(e) => handleEditChange('email', e.target.value)}
-                                disabled={editLoading}
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Passwort (neu setzen)"
-                                fullWidth
-                                type="password"
-                                value={editUser?.password || ''}
-                                onChange={(e) => handleEditChange('password', e.target.value)}
-                                helperText="Nur ausfüllen, wenn Passwort geändert werden soll"
-                                disabled={editLoading}
-                            />
-                            <FormControl margin="dense" fullWidth>
-                                <InputLabel>Tägliche Quiz Erinnerung</InputLabel>
-                                <Select
-                                    value={editUser?.dailyQuizReminder ? 'YES' : 'NO'}
-                                    label="Tägliche Quiz Erinnerung"
-                                    onChange={(e) => handleEditChange('dailyQuizReminder', e.target.value === 'YES')}
-                                    disabled={editLoading}
-                                >
+                            <TextField margin="dense" label="Name" fullWidth value={editUser?.name || ''} onChange={(e) => handleEditChange('name', e.target.value)} disabled={editLoading} />
+                            <TextField margin="dense" label="Email" fullWidth value={editUser?.email || ''} onChange={(e) => handleEditChange('email', e.target.value)} disabled={editLoading} />
+                            <TextField margin="dense" label="Passwort" fullWidth type="password" value={editUser?.password || ''} onChange={(e) => handleEditChange('password', e.target.value)} helperText="Nur ausfüllen, wenn Passwort geändert werden soll" disabled={editLoading} />
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Tägliche Erinnerung</InputLabel>
+                                <Select value={editUser?.dailyQuizReminder ? 'YES' : 'NO'} onChange={(e) => handleEditChange('dailyQuizReminder', e.target.value === 'YES')} disabled={editLoading}>
                                     <MenuItem value="YES">Ja</MenuItem>
                                     <MenuItem value="NO">Nein</MenuItem>
                                 </Select>
                             </FormControl>
-                            <TextField
-                                margin="dense"
-                                label="Status"
-                                fullWidth
-                                value={editUser?.userStatus || ''}
-                                disabled
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Rolle"
-                                fullWidth
-                                value={editUser?.role || ''}
-                                disabled
-                            />
+                            <TextField margin="dense" label="Daily Streak" fullWidth type="number" value={editUser?.dailyStreak || 0} onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))} disabled={editLoading} />
+                            <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''} disabled />
+                            <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''} disabled />
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={closeEditDialog} disabled={editLoading}>
-                                Abbrechen
-                            </Button>
-                            <Button onClick={saveUser} variant="contained" disabled={editLoading}>
-                                {editLoading ? <CircularProgress size={24}/> : 'Speichern'}
-                            </Button>
+                            <Button onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
+                            <Button onClick={saveUser} disabled={editLoading} variant="contained">{editLoading ? <CircularProgress size={24} /> : 'Speichern'}</Button>
                         </DialogActions>
                     </Dialog>
 
-                    {/* Delete Dialog */}
+                    {/* Create-Dialog */}
+                    <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
+                        <DialogTitle>Neuen Benutzer erstellen</DialogTitle>
+                        <DialogContent>
+                            <TextField margin="dense" label="Name" fullWidth value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} />
+                            <TextField margin="dense" label="Email" fullWidth value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
+                            <TextField margin="dense" label="Passwort" type="password" fullWidth value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Rolle</InputLabel>
+                                <Select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
+                                    {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
+                                </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Status</InputLabel>
+                                <Select value={newUser.userStatus} onChange={(e) => setNewUser({ ...newUser, userStatus: e.target.value })}>
+                                    {userStatuses.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
+                                </Select>
+                            </FormControl>
+                            <FormControl fullWidth margin="dense">
+                                <InputLabel>Tägliche Erinnerung</InputLabel>
+                                <Select value={newUser.dailyQuizReminder ? 'YES' : 'NO'} onChange={(e) => setNewUser({ ...newUser, dailyQuizReminder: e.target.value === 'YES' })}>
+                                    <MenuItem value="YES">Ja</MenuItem>
+                                    <MenuItem value="NO">Nein</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setCreateDialogOpen(false)} disabled={createLoading}>Abbrechen</Button>
+                            <Button onClick={createUser} disabled={createLoading} variant="contained">{createLoading ? <CircularProgress size={24} /> : 'Erstellen'}</Button>
+                        </DialogActions>
+                    </Dialog>
+
+                    {/* Delete-Dialog */}
                     <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
                         <DialogTitle>Benutzer löschen</DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
-                                Willst du den Benutzer <strong>{toDeleteUser?.name}</strong> wirklich löschen? Dieser
-                                Vorgang kann nicht rückgängig gemacht werden.
-                            </DialogContentText>
+                            <DialogContentText>Willst du den Benutzer <strong>{toDeleteUser?.name}</strong> wirklich löschen?</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={closeDeleteDialog} disabled={deleteLoading}>
-                                Abbrechen
-                            </Button>
-                            <Button color="error" variant="contained" onClick={deleteUser} disabled={deleteLoading}>
-                                {deleteLoading ? <CircularProgress size={24}/> : 'Löschen'}
-                            </Button>
+                            <Button onClick={closeDeleteDialog} disabled={deleteLoading}>Abbrechen</Button>
+                            <Button onClick={deleteUser} color="error" variant="contained" disabled={deleteLoading}>{deleteLoading ? <CircularProgress size={24} /> : 'Löschen'}</Button>
                         </DialogActions>
                     </Dialog>
 
-                    {/* Snackbar */}
-                    <Snackbar
-                        open={snackbar.open}
-                        autoHideDuration={4000}
-                        onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-                        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-                    >
-                        <Alert severity={snackbar.severity}
-                               onClose={() => setSnackbar(prev => ({...prev, open: false}))} sx={{width: '100%'}}>
-                            {snackbar.message}
-                        </Alert>
+                    <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+                        <Alert severity={snackbar.severity} onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} sx={{ width: '100%' }}>{snackbar.message}</Alert>
                     </Snackbar>
                 </>
             )}

@@ -61,11 +61,11 @@ public class AdminService {
         }
         user.setDailyQuizReminder(userUpdated.isDailyQuizReminder());
 
-        user.setDailyStreak(userUpdated.getDailyStreak());
-
-        if (userUpdated.getLastDailyQuizPlayed() != null) {
-            user.setLastDailyQuizPlayed(userUpdated.getLastDailyQuizPlayed());
+        if (userUpdated.getDailyStreak() != user.getDailyStreak()) {
+            user.setLastDailyQuizPlayed(LocalDateTime.now());
         }
+
+        user.setDailyStreak(userUpdated.getDailyStreak());
 
         user.setUpdatedAt(LocalDateTime.now());
 

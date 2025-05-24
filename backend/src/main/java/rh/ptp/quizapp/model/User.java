@@ -1,7 +1,6 @@
 package rh.ptp.quizapp.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -13,7 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 @Accessors(chain = true)
@@ -97,4 +97,9 @@ public class User implements UserDetails {
             return false;
         }
     }
+    @Override
+    public String toString() {
+        return name;
+    }
+
 } 
