@@ -3,13 +3,11 @@ package rh.ptp.quizapp.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import rh.ptp.quizapp.controller.UserController;
 import rh.ptp.quizapp.dto.AuthResponse;
 import rh.ptp.quizapp.dto.LoginRequest;
 import rh.ptp.quizapp.dto.RegisterRequest;
@@ -35,7 +33,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuthenticationTokenRepository authenticationTokenRepository;
     private final EmailService emailService;
-    private final UserController userController;
     @Value("${frontend.url}")
     private String frontendUrl;
 
@@ -44,7 +41,15 @@ public class AuthService {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            userController.forgotPassword(request.getEmail());
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+            createAuthenticationToken(user);
+            String token = authenticationTokenRepository.findTokenByQuizUser(user);
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("username", user.getName());
+            variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
+            emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
         }
 
         User pendingUser = new User()
