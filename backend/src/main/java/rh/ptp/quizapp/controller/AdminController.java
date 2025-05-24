@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.model.Quiz;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserRole;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.UserRepository;
+import rh.ptp.quizapp.service.AdminService;
 import rh.ptp.quizapp.service.QuizService;
 import rh.ptp.quizapp.service.UserService;
 
@@ -15,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
     @Autowired
-    private UserService userService;
+    private AdminService adminService;
 
     @Autowired
     private QuizService quizService;
@@ -33,19 +36,30 @@ public class AdminController {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
+    @GetMapping("/users/roles")
+    public ResponseEntity<List<String>> getUserRolesAdmin() {
+        return ResponseEntity.ok(UserRole.getUserRoles());
+    }
+
+    @GetMapping("/users/states")
+    public ResponseEntity<List<String>> getUserStatesAdmin() {
+        return ResponseEntity.ok(UserStatus.getUserStates());
+    }
+
+
     @PostMapping("/users/create")
     public ResponseEntity<User> createUserAdmin(User user) {
-        return ResponseEntity.ok(userService.createUser(user));
+        return ResponseEntity.ok(adminService.createUser(user));
     }
 
     @PutMapping("/users/update/{id}")
     public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User user) {
-        return ResponseEntity.ok(userService.updateUser(id, user));
+        return ResponseEntity.ok(adminService.updateUser(id, user));
     }
 
     @DeleteMapping("/users/delete/{id}")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {
-        userService.deleteUser(id);
+        adminService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 }

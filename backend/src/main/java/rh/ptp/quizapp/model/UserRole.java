@@ -1,5 +1,12 @@
 package rh.ptp.quizapp.model;
 
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@Getter
 public enum UserRole {
     USER("ROLE_USER"),
     ADMIN("ROLE_ADMIN");
@@ -10,7 +17,9 @@ public enum UserRole {
         this.role = role;
     }
 
-    public String getRole() {
-        return role;
+    public static List<String> getUserRoles() {
+        List<String> roles = new ArrayList<>();
+        Arrays.stream(UserRole.values()).forEach(userRole -> roles.add(userRole.getRole()));
+        return roles;
     }
 }
