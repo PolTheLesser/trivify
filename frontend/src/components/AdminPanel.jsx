@@ -61,13 +61,11 @@ const AdminUserPanel = () => {
     const userStatuses = ['ACTIVE', 'BLOCKED', 'INACTIVE'];
     const isNotAdmin = user.role !== 'ADMIN';
 
-    if (!user) {
-        return null;
-    }
-
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        if (user) {
+            fetchUsers();
+        }
+    }, [user]);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -85,27 +83,29 @@ const AdminUserPanel = () => {
 
     // Filter & Pagination anwenden
     useEffect(() => {
-        let filtered = [...users];
+        if(user) {
+            let filtered = [...users];
 
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            filtered = filtered.filter(u =>
-                u.name.toLowerCase().includes(q) ||
-                u.email.toLowerCase().includes(q)
-            );
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(u =>
+                    u.name.toLowerCase().includes(q) ||
+                    u.email.toLowerCase().includes(q)
+                );
+            }
+
+            if (filterStatus !== 'ALL') {
+                filtered = filtered.filter(u => u.userStatus === filterStatus);
+            }
+
+            if (filterRole !== 'ALL') {
+                filtered = filtered.filter(u => u.role === filterRole);
+            }
+
+            setFilteredUsers(filtered);
+            setPage(1); // reset pagination bei Filter-Änderung
         }
-
-        if (filterStatus !== 'ALL') {
-            filtered = filtered.filter(u => u.userStatus === filterStatus);
-        }
-
-        if (filterRole !== 'ALL') {
-            filtered = filtered.filter(u => u.role === filterRole);
-        }
-
-        setFilteredUsers(filtered);
-        setPage(1); // reset pagination bei Filter-Änderung
-    }, [searchQuery, filterStatus, filterRole, users]);
+    }, [searchQuery, filterStatus, filterRole, users, user]);
 
     // Pagination Daten
     const paginatedUsers = filteredUsers.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
