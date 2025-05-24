@@ -11,6 +11,7 @@ import rh.ptp.quizapp.model.UserRole;
 import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AdminService;
+import rh.ptp.quizapp.service.CleanupRepositoryService;
 import rh.ptp.quizapp.service.QuizService;
 import rh.ptp.quizapp.service.UserService;
 
@@ -27,6 +28,8 @@ public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CleanupRepositoryService cleanupRepositoryService;
 
     @GetMapping("/quizzes")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -42,34 +45,35 @@ public class AdminController {
 
     @GetMapping("/users/roles")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<String>> getUserRolesAdmin(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<String>> getUserRolesAdmin() {
         return ResponseEntity.ok(UserRole.getUserRoles());
     }
 
     @GetMapping("/users/states")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<String>> getUserStatesAdmin(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<String>> getUserStatesAdmin() {
             return ResponseEntity.ok(UserStatus.getUserStates());
     }
 
 
     @PostMapping("/users/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate, @AuthenticationPrincipal User user) {
+    public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate) {
             return ResponseEntity.ok(adminService.createUser(userToCreate));
     }
 
     @PutMapping("/users/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate, @AuthenticationPrincipal User user) {
+    public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate) {
             return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
 
     }
 
     @DeleteMapping("/users/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {
             adminService.deleteUser(id);
+            cleanupRepositoryService.prepareDelete(id);
             return ResponseEntity.ok().build();
 
     }

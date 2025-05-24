@@ -12,7 +12,6 @@ import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.QuizFavoriteRepository;
 import rh.ptp.quizapp.repository.UserRepository;
-import rh.ptp.quizapp.service.AccountCleanupService;
 import rh.ptp.quizapp.service.EmailService;
 import rh.ptp.quizapp.service.QuizService;
 import rh.ptp.quizapp.service.UserService;

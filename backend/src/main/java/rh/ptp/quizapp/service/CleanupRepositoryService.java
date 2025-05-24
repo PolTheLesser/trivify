@@ -74,6 +74,14 @@ public class CleanupRepositoryService {
                 .executeUpdate();
     }
 
+    @Transactional
+    public void prepareDelete(long userId) {
+        // 1. Lösche alle abhängigen Datensätze
+        deleteAllQuizResultsByUser(userId);
+        deleteAllQuizRatingsByUser(userId);
+        setAllCreatedQuizzesToAdmin(userId);
+    }
+
     @Scheduled(cron = "0 0 * * * *") // jede Stunde
     @Transactional
     public void completeDeletionRequests() {
@@ -100,6 +108,7 @@ public class CleanupRepositoryService {
             variables.put("loginUrl", frontendUrl + "/login");
             variables.put("registerUrl", frontendUrl + "/register");
             emailService.sendEmail(request.getEmail(), "Deine Benutzerdaten wurden gelöscht!", "account-deleted", variables);
+            prepareDelete(request.getId());
         }
         userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }

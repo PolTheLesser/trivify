@@ -62,11 +62,11 @@ const AdminUserPanel = () => {
 
     useEffect(() => {
         if (user?.role === 'ROLE_ADMIN') {
-            axios.get(`${process.env.REACT_APP_API_URL}/users/roles`)
+            axios.get(`${process.env.REACT_APP_API_URL}/admin/users/roles`)
                 .then(res => setUserRoles(res.data))
                 .catch(() => setSnackbar({ open: true, message: 'Fehler beim Laden der Rollen.', severity: 'error' }));
 
-            axios.get(`${process.env.REACT_APP_API_URL}/users/states`)
+            axios.get(`${process.env.REACT_APP_API_URL}/admin/users/states`)
                 .then(res => setUserStatuses(res.data))
                 .catch(() => setSnackbar({ open: true, message: 'Fehler beim Laden der Stati.', severity: 'error' }));
         }
