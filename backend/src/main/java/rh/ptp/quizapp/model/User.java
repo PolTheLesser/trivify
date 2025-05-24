@@ -37,6 +37,7 @@ public class User implements UserDetails {
     private UserStatus userStatus = UserStatus.PENDING_VERIFICATION;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
     @Column(nullable = false)

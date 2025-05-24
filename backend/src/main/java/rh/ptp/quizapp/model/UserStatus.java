@@ -8,10 +8,10 @@ import java.util.List;
 
 @Getter
 public enum UserStatus {
-    ACTIVE("aktiv"),
-    PENDING_VERIFICATION("Verifizierung ausstehend"),
-    PENDING_DELETE("Löschung ausstehend"),
-    BLOCKED("gesperrt");
+    ACTIVE("ACTIVE"),
+    PENDING_VERIFICATION("PENDING_VERIFICATION"),
+    PENDING_DELETE("PENDING_DELETE"),
+    BLOCKED("BLOCKED");
 
     private final String status;
 
