@@ -260,8 +260,8 @@ const AdminUserPanel = () => {
                                 </Box>
                             </FormControl>
                             <TextField margin="dense" label="Daily Streak" fullWidth type="number" value={editUser?.dailyStreak || 0} onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))} disabled={editLoading} />
-                            <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''} disabled />
-                            <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''} disabled />
+                            <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''} />
+                            <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
