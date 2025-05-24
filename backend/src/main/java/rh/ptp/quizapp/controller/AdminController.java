@@ -29,42 +29,45 @@ public class AdminController {
     private UserRepository userRepository;
 
     @GetMapping("/quizzes")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Quiz>> getQuizzesAdmin() {
         return ResponseEntity.ok(quizService.findAllWithRatings());
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<User>> getUsersAdmin() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
     @GetMapping("/users/roles")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<String>> getUserRolesAdmin(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserRole.getUserRoles());
     }
 
     @GetMapping("/users/states")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<String>> getUserStatesAdmin(@AuthenticationPrincipal User user) {
             return ResponseEntity.ok(UserStatus.getUserStates());
     }
 
 
     @PostMapping("/users/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<User> createUserAdmin(@RequestBody User userToCreate, @AuthenticationPrincipal User user) {
             return ResponseEntity.ok(adminService.createUser(userToCreate));
     }
 
     @PutMapping("/users/update/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<User> updateUserAdmin(@PathVariable Long id, @RequestBody User userToUpdate, @AuthenticationPrincipal User user) {
             return ResponseEntity.ok(adminService.updateUser(id, userToUpdate));
 
     }
 
     @DeleteMapping("/users/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id, @AuthenticationPrincipal User user) {
             adminService.deleteUser(id);
             return ResponseEntity.ok().build();

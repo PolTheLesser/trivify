@@ -25,8 +25,6 @@ const Navbar = () => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const { darkMode, setDarkMode } = useContext(ThemeContext);
-    const isAdmin = user?.role === 'ROLE_ADMIN';
-
     // User-Menu-Logik …
     const [anchorEl, setAnchorEl] = useState(null);
     const isUserMenuOpen = Boolean(anchorEl);
@@ -203,8 +201,10 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
-                        {isAdmin && (
-                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <MenuItem component={RouterLink} to="/adminpanel" onClick={handleUserMenuClose}>
+                                Admin-Panel
+                            </MenuItem>
                         )}
                         <MenuItem onClick={() => { handleUserMenuClose(); logout(); navigate('/'); }}>Abmelden</MenuItem>
                     </>
