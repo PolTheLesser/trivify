@@ -105,9 +105,6 @@ const Navbar = () => {
                                 Quizlabor
                             </Button>
                         )}
-                        {isAdmin && (
-                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
-                        )}
                     </Box>
 
                     {/* Suchfeld */}
@@ -191,9 +188,6 @@ const Navbar = () => {
                         Quizlabor
                     </MenuItem>
                 )}
-                {isAdmin && (
-                    <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
-                )}
             </Menu>
 
             {/* User Account Menu */}
@@ -209,6 +203,9 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
+                        {isAdmin && (
+                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
+                        )}
                         <MenuItem onClick={() => { handleUserMenuClose(); logout(); navigate('/'); }}>Abmelden</MenuItem>
                     </>
                 ) : (

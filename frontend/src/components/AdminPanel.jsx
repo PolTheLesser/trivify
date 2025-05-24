@@ -59,7 +59,7 @@ const AdminUserPanel = () => {
     // Rollen & Statusen (statisch)
     const userRoles = ['USER', 'ADMIN'];
     const userStatuses = ['ACTIVE', 'BLOCKED', 'INACTIVE'];
-    const isNotAdmin = user.role !== 'ADMIN';
+    const isNotAdmin = user.role !== 'ROLE_ADMIN';
 
     useEffect(() => {
         if (user) {
