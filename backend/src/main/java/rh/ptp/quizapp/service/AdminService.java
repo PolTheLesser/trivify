@@ -50,8 +50,8 @@ public class AdminService {
             user.setEmail(userUpdated.getEmail());
         }
 
-        if (user.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (userUpdated.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userUpdated.getPassword()));
         }
 
         if (userUpdated.getUserStatus() != null) {
@@ -77,6 +77,7 @@ public class AdminService {
             variables.replace("email", user.getEmail());
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin aktualisiert!", "account-updated", variables);
         }
+        user.setPassword(null);
         return user;
     }
 
@@ -115,7 +116,7 @@ public class AdminService {
                 emailService.sendEmail(user.getEmail(), "Deine Benutzersperre wurde durch einen Admin aufgehoben!", "account-unblocked", variables);
                 customEmailSend = true;
             }
-            if (!Objects.equals(passwordEncoder.encode(userUpdated.getPassword()), user.getPassword())) {
+            if (userUpdated.getPassword() != null && !passwordEncoder.matches(userUpdated.getPassword(), user.getPassword())) {
                 emailService.sendEmail(user.getEmail(), "Dein Passwort wurde durch einen Admin geändert!", "password-changed", variables);
                 customEmailSend = true;
             }
