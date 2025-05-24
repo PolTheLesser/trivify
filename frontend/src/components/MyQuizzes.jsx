@@ -309,6 +309,7 @@ const MeineQuizze = () => {
                 {filtered.map((quiz) => (
                     <Grid item xs={12} sm={6} md={4} key={quiz.id} sx={{display: 'flex'}}>
                         <Card sx={{
+                            position: 'relative',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',

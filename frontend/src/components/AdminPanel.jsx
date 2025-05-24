@@ -238,14 +238,17 @@ const AdminUserPanel = () => {
                                     </CustomSelect>
                                 </FormControl>
                                 <br/>
-                                <Box sx={{flexGrow: 1}}/>
+                                <Box>
                                 <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer
                                     erstellen</Button>
-                                <Button color="error" sx={{ml: 'auto'}} onClick={() => {
+                                <Box sx={{flexGrow: 1}}/>
+                                <Button variant="contained" color="error" sx={{ml: 'auto'}} onClick={() => {
                                     setSearchQuery('');
                                     setFilterStatus('ALL');
                                     setFilterRole('ALL');
-                                }}>Filter zurücksetzen</Button> </Box>
+                                }}>Filter zurücksetzen</Button>
+                                </Box>
+                            </Box>
                         </Paper>
                     </Box>
 
@@ -272,8 +275,8 @@ const AdminUserPanel = () => {
                                                 <Typography>Daily Streak: {u.dailyStreak}</Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <Button onClick={() => openEditDialog(u)}>Bearbeiten</Button>
-                                                <Button color="error"
+                                                <Button variant="contained" onClick={() => openEditDialog(u)}>Bearbeiten</Button>
+                                                <Button variant="contained" color="error"
                                                         onClick={() => openDeleteDialog(u)}>Löschen</Button>
                                             </CardActions>
                                         </Card>
@@ -305,8 +308,9 @@ const AdminUserPanel = () => {
                                 <Box display="flex" alignItems="center" justifyContent="space-between">
                                     <Typography>Tägliche Quiz-Erinnerung</Typography>
                                     <CustomSwitch
-                                        checked={newUser.dailyQuizReminder}
-                                        onChange={(e) => setNewUser({...newUser, dailyQuizReminder: e.target.checked})}
+                                        checked={editUser?.dailyQuizReminder || false}
+                                        onChange={(e) => handleEditChange('dailyQuizReminder', e.target.checked)}
+                                        disabled={editLoading}
                                     />
                                 </Box>
                             </FormControl>
@@ -318,7 +322,7 @@ const AdminUserPanel = () => {
                             <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''}/>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
+                            <Button color="error" onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
                             <Button onClick={saveUser} disabled={editLoading} variant="contained">{editLoading ?
                                 <CircularProgress size={24}/> : 'Speichern'}</Button>
                         </DialogActions>

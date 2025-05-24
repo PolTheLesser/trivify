@@ -420,21 +420,26 @@ const EditQuiz = () => {
                         ))}
                     </List>
 
-                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
-                        <Button variant="outlined" startIcon={<AddIcon/>} onClick={addQuestion}>
-                            Frage hinzufügen
-                        </Button>
-                        <Button type="submit" variant="contained" disabled={!isFormValid()}>
-                            Speichern
-                        </Button>
-                    </Box>
-                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
-                        <Button variant="outlined" color="error" onClick={handleResetClick}>
-                            Zurücksetzen
-                        </Button>
-                        <Button variant="outlined" onClick={handleCancleConfirm} sx={{ml: 2}}>
-                            Abbrechen
-                        </Button>
+                    <Box sx={{mt: 4, display: 'flex', flexDirection: 'column', gap: 2}}>
+                        {/* Zeile 1: Speichern | Abbrechen */}
+                        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                            <Button type="submit" variant="contained" disabled={!isFormValid()}>
+                                Speichern
+                            </Button>
+                            <Button variant="outlined" color="error" onClick={handleCancleConfirm}>
+                                Abbrechen
+                            </Button>
+                        </Box>
+
+                        {/* Zeile 2: Frage hinzufügen | Zurücksetzen */}
+                        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                            <Button variant="outlined" startIcon={<AddIcon />} onClick={addQuestion}>
+                                Frage hinzufügen
+                            </Button>
+                            <Button variant="outlined" color="error" onClick={handleResetClick}>
+                                Zurücksetzen
+                            </Button>
+                        </Box>
                     </Box>
                 </form>
                 <Dialog open={showResetDialog} onClose={handleResetCancel}>

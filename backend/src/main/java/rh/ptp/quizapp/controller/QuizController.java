@@ -67,21 +67,23 @@ public class QuizController {
     }
 
     @GetMapping("/toEdit/{quizId}")
-    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
         Quiz quiz = quizService.getQuizById(quizId);
-        if (quiz != null) {
-            if(userRepository.findByName(userDetails.getUsername()).isPresent()
-                    && userRepository.findByName(userDetails.getUsername()).get().getRole() != UserRole.ROLE_ADMIN){
-                return ResponseEntity.ok(quiz);
-            }
-            else if (quiz.getCreator().getName().equals(userDetails.getUsername())){
-                    return ResponseEntity.ok(quiz);
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        } else {
+        if (quiz == null) {
             return ResponseEntity.notFound().build();
         }
+
+        User user = userRepository.findByName(userDetails.getUsername())
+                                  .orElseThrow();
+        boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
+        boolean isCreator = quiz.getCreator().getName().equals(userDetails.getUsername());
+
+        if (isAdmin || isCreator) {
+            return ResponseEntity.ok(quiz);
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @PostMapping
