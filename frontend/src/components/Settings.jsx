@@ -172,7 +172,7 @@ const Settings = () => {
             <DialogTitle id="delete-account-dialog-title">Account löschen</DialogTitle>
             <DialogContent>
               <Typography>
-                Sind Sie sicher, dass Sie Ihren Account löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+                Sind Sie sicher, dass Sie Ihren Account zur Löschung vormerken möchten? 
               </Typography>
             </DialogContent>
             <DialogActions>
