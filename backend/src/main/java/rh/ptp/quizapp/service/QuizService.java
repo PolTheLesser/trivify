@@ -89,6 +89,22 @@ public class QuizService {
                 .collect(Collectors.toList());
 
         quiz.setQuestions(questions);
+        for (int i = 0; i < questions.size(); i++) {
+            QuizQuestion q = questions.get(i);
+            if (q.getAnswers() == null || q.getAnswers().isEmpty()
+                    || q.getAnswers().stream().anyMatch(a -> a == null || a.trim().isEmpty())) {
+                throw new IllegalArgumentException("Alle Antwortmöglichkeiten müssen bei Frage " + (i + 1) + " ausgefüllt sein");
+            }
+
+            long distinctCount = q.getAnswers().stream().distinct().count();
+            if (distinctCount != q.getAnswers().size()) {
+                throw new IllegalArgumentException("Antwortmöglichkeiten dürfen nicht identisch sein bei Frage " + (i + 1));
+            }
+
+            if (!q.getAnswers().contains(q.getCorrectAnswer())) {
+                throw new IllegalArgumentException("Richtige Antwort ist bei Frage " + (i + 1) + " nicht unter den gegebenen Antworten");
+            }
+        }
         return quizRepository.save(quiz);
     }
 
@@ -111,6 +127,7 @@ public class QuizService {
                     question.setQuestion(q.getQuestion());
                     question.setAnswers(q.getAnswers());
                     question.setCorrectAnswer(q.getCorrectAnswer());
+                    question.setQuestionType(q.getQuestionType());
                     question.setDifficulty(q.getDifficulty());
                     question.setSource(q.getSource());
                     question.setSource(q.getSource());
@@ -147,11 +164,11 @@ public class QuizService {
     public QuizDTO getDailyQuiz() {
         LocalDate today = LocalDate.now();
         List<Quiz> dailyQuizzes = quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, today);
-        
+
         if (dailyQuizzes.isEmpty()) {
             throw new RuntimeException("Das tägliche Quiz wird jeden Tag um Mitternacht aktualisiert. Bitte versuchen Sie es später erneut.");
         }
-        
+
         Quiz dailyQuiz = dailyQuizzes.get(0);
         if (dailyQuiz.getQuestions() == null || dailyQuiz.getQuestions().isEmpty()) {
             throw new RuntimeException("Keine Fragen im täglichen Quiz gefunden");
@@ -171,16 +188,16 @@ public class QuizService {
 
         // Konvertiere die Fragen in DTOs
         List<QuizQuestionDTO> questionDTOs = dailyQuiz.getQuestions().stream()
-            .map(q -> {
-                QuizQuestionDTO dto = new QuizQuestionDTO();
-                dto.setId(q.getId());
-                dto.setQuestion(q.getQuestion());
-                dto.setAnswers(q.getAnswers());
-                dto.setDifficulty(q.getDifficulty());
-                dto.setSource(q.getSource());
-                return dto;
-            })
-            .collect(Collectors.toList());
+                .map(q -> {
+                    QuizQuestionDTO dto = new QuizQuestionDTO();
+                    dto.setId(q.getId());
+                    dto.setQuestion(q.getQuestion());
+                    dto.setAnswers(q.getAnswers());
+                    dto.setDifficulty(q.getDifficulty());
+                    dto.setSource(q.getSource());
+                    return dto;
+                })
+                .collect(Collectors.toList());
 
         quizDTO.setQuestions(questionDTOs);
         return quizDTO;
@@ -189,7 +206,7 @@ public class QuizService {
     public void updateDailyQuiz(JSONArray questions, QuizCategory category) {
         try {
             Quiz dailyQuiz = new Quiz();
-            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now()+", Kategorie: " + category.getDisplayName());
+            dailyQuiz.setTitle("Tägliches Quiz vom " + LocalDate.now() + ", Kategorie: " + category.getDisplayName());
             dailyQuiz.setDescription("Teste dein Wissen mit unserem täglichen Quiz!");
             dailyQuiz.setCategories(List.of(QuizCategory.DAILY_QUIZ, category));
             dailyQuiz.setDate(LocalDate.now());
@@ -243,7 +260,7 @@ public class QuizService {
 
     public boolean hasCompletedDailyQuiz(Long userId) {
         LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        return quizResultRepository.existsByUserIdAndQuizCategoriesAndPlayedAtAfter(userId,QuizCategory.DAILY_QUIZ, today);
+        return quizResultRepository.existsByUserIdAndQuizCategoriesAndPlayedAtAfter(userId, QuizCategory.DAILY_QUIZ, today);
     }
 
     public QuizQuestion findQuestionById(Long questionId) {
@@ -253,7 +270,7 @@ public class QuizService {
     }
 
     public boolean checkAnswer(String userAnswer, String correctAnswer) {
-        if(userAnswer == null || correctAnswer == null) {
+        if (userAnswer == null || correctAnswer == null) {
             return false;
         }
         return userAnswer.trim().equalsIgnoreCase(correctAnswer.trim());
@@ -266,14 +283,14 @@ public class QuizService {
         }
 
         boolean isCorrect = checkAnswer(userAnswer, question.getCorrectAnswer());
-        
+
         QuizResultDTO result = new QuizResultDTO();
         result.setCorrect(isCorrect);
         result.setUserAnswer(userAnswer);
         result.setCorrectAnswer(question.getCorrectAnswer());
         result.setQuestion(question.getQuestion());
         result.setAnswers(question.getAnswers());
-        
+
         return result;
     }
 
@@ -306,10 +323,10 @@ public class QuizService {
     public boolean toggleFavorite(Long quizId, UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
         Quiz quiz = getQuizById(quizId);
-        
+
         Optional<QuizFavorite> existingFavorite = quizFavoriteRepository
                 .findByUserIdAndQuizId(user.getId(), quizId);
-        
+
         if (existingFavorite.isPresent()) {
             quizFavoriteRepository.delete(existingFavorite.get());
             return false;
@@ -324,33 +341,35 @@ public class QuizService {
 
     public List<QuizHistoryDTO> getQuizHistory(UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
-        
+
         // Hole alle QuizResults für den User
         List<QuizResult> quizResults = quizResultRepository.findByUserId(user.getId());
-        
+
         // Konvertiere die QuizResults in DTOs
         return quizResults.stream()
-            .map(result -> {
-                QuizHistoryDTO dto = new QuizHistoryDTO();
-                dto.setId(result.getId());
-                dto.setQuizId(result.getQuiz().getId());
-                dto.setQuizTitle(result.getQuiz().getTitle());
-                dto.setScore(result.getScore());
-                dto.setMaxPossibleScore(result.getMaxPossibleScore());
-                dto.setPlayedAt(result.getPlayedAt());
-                // Optional: Füge weitere Felder hinzu, die Sie in der Historie anzeigen möchten
-                return dto;
-            })
-            .collect(Collectors.toList());
+                .map(result -> {
+                    QuizHistoryDTO dto = new QuizHistoryDTO();
+                    dto.setId(result.getId());
+                    dto.setQuizId(result.getQuiz().getId());
+                    dto.setQuizTitle(result.getQuiz().getTitle());
+                    dto.setScore(result.getScore());
+                    dto.setMaxPossibleScore(result.getMaxPossibleScore());
+                    dto.setPlayedAt(result.getPlayedAt());
+                    // Optional: Füge weitere Felder hinzu, die Sie in der Historie anzeigen möchten
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    /** Für GET /quizzes: hol alle Quizzes als QuizDTO mit Rating-Aggregaten */
+    /**
+     * Für GET /quizzes: hol alle Quizzes als QuizDTO mit Rating-Aggregaten
+     */
     public List<Quiz> findAllWithRatings() {
         List<Quiz> quizzes = quizRepository.findAll();
         return quizzes.stream()
                 .map(q -> {
-                    Double avg   = quizRatingRepository.findAverageByQuizId(q.getId());
-                    Long   cnt   = quizRatingRepository.countByQuizId(q.getId());
+                    Double avg = quizRatingRepository.findAverageByQuizId(q.getId());
+                    Long cnt = quizRatingRepository.countByQuizId(q.getId());
                     q.setAvgRating(avg != null ? avg : 0.0);
                     q.setRatingCount(cnt);
                     return q;
@@ -370,7 +389,7 @@ public class QuizService {
         if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Titel darf nicht leer sein");
         }
-        if(quizDTO.getCategories() == null || quizDTO.getCategories().size() > 3) {
+        if (quizDTO.getCategories() == null || quizDTO.getCategories().size() > 3) {
             throw new IllegalArgumentException("Es min. 1 und maximal 3 Kategorien ausgewählt werden");
         }
 
@@ -387,11 +406,11 @@ public class QuizService {
 
             if (q.getQuestionType() != QuestionType.TEXT_INPUT) {
 
-                if(q.getAnswers() == null || q.getAnswers().size() < 2) {
+                if (q.getAnswers() == null || q.getAnswers().size() < 2) {
                     throw new IllegalArgumentException("Es müssen mindestens 2 Antwortmöglichkeiten bei Frage " + (i + 1) + " angegeben werden");
                 }
 
-                if(q.getAnswers().size() > 4) {
+                if (q.getAnswers().size() > 4) {
                     throw new IllegalArgumentException("Es dürfen maximal 4 Antwortmöglichkeiten bei Frage " + (i + 1) + " angegeben werden");
                 }
 
@@ -405,6 +424,7 @@ public class QuizService {
             }
         }
     }
+
     private boolean isAdmin(Long userId) {
         return userRepository.findById(userId)
                 .map(u -> u.getRole() == UserRole.ROLE_ADMIN)
