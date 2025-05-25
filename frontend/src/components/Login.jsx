@@ -14,7 +14,7 @@ import {useAuth} from '../contexts/AuthContext';
 import {PasswordField} from '../CustomElements';
 
 const Login = () => {
-    const [identifier, setIdentifier] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [warning, setWarning] = useState('');
@@ -47,7 +47,7 @@ const Login = () => {
             setError('');
             setLoading(true);
             // Retrieve the response from the login function
-            const response = await login(identifier, password);
+            const response = await login(email, password);
             console.log('Login response:', response);
             // Adjust depending on the response structure. For example:
             const userId = response.id;
@@ -88,13 +88,14 @@ const Login = () => {
                             margin="normal"
                             required
                             fullWidth
-                            id="identifier"
-                            label="Benutzername oder E-Mail"
-                            name="identifier"
-                            autoComplete="username"
+                            id="email"
+                            type="email"
+                            label="E-Mail-Adresse"
+                            name="email"
+                            autoComplete="email"
                             autoFocus
-                            value={identifier}
-                            onChange={(e) => setIdentifier(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         <PasswordField
                             margin="normal"
