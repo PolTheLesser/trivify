@@ -78,7 +78,7 @@ public class QuizController {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Benutzer nicht gefunden"));
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
-        boolean isCreator = quiz.getCreator().getName().equals(userDetails.getUsername());
+        boolean isCreator = quiz.getCreator().getEmail().equals(userDetails.getUsername());
 
         if (isAdmin || isCreator) {
             return ResponseEntity.ok(quiz);

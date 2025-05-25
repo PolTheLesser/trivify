@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from '../api/api';
 
 const AuthContext = createContext(null);
@@ -31,6 +31,23 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  }, []);
+
+  useEffect(() => {
+    const handleUnload = () => {
+      logout();
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [logout]);
+
   const login = async (email, password) => {
     try {
       const response = await axios.post(process.env.REACT_APP_API_URL + '/auth/login', { email, password });
@@ -59,12 +76,6 @@ export const AuthProvider = ({ children }) => {
       const errorMessage = error.response?.data?.message || 'Ein Fehler ist aufgetreten';
       throw new Error(errorMessage);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
   };
 
   const forgotPassword = async (email) => {
