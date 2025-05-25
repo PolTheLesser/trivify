@@ -384,7 +384,7 @@ const MeineQuizze = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-                    <Button color="error" onClick={() => {
+                    <Button color="error" variant="contained" onClick={() => {
                         handleDelete(toDeleteId);
                     }}>Löschen</Button>
                 </DialogActions>
