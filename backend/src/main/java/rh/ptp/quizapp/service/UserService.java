@@ -50,13 +50,11 @@ public class UserService {
     }
 
     public void resetPassword(String token, String newPassword) {
-        long userId = authenticationTokenRepository.findIdByToken(token)
+        User user = authenticationTokenRepository.findQuizUserByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Token"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setUserStatus(UserStatus.ACTIVE);
-        authenticationTokenRepository.deleteAllById(userId);
+        authenticationTokenRepository.deleteAllById(user.getId());
         userRepository.save(user);
     }
 
