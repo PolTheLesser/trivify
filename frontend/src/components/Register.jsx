@@ -59,9 +59,7 @@ const Register = () => {
         }
       });
     } catch (error) {
-      if (error.message.includes('email')) {
-        setError('Diese E-Mail-Adresse wird bereits verwendet');
-      } else if (error.message.includes('name')) {
+      if (error.message.includes('name')) {
         setError('Dieser Benutzername ist bereits vergeben');
       } else {
         setError('Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.');

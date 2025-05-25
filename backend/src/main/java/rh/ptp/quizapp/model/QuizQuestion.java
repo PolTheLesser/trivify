@@ -3,6 +3,7 @@ package rh.ptp.quizapp.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class QuizQuestion {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
+    @ToString.Exclude
     private Quiz quiz;
 
     @Column(nullable = false)

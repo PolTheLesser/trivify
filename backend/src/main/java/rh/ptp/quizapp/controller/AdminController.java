@@ -1,0 +1,89 @@
+package rh.ptp.quizapp.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import rh.ptp.quizapp.dto.UserDTO;
+import rh.ptp.quizapp.model.Quiz;
+import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserRole;
+import rh.ptp.quizapp.model.UserStatus;
+import rh.ptp.quizapp.repository.UserRepository;
+import rh.ptp.quizapp.service.AdminService;
+import rh.ptp.quizapp.service.CleanupRepositoryService;
+import rh.ptp.quizapp.service.QuizService;
+
+import java.util.List;
+
+import static rh.ptp.quizapp.mapper.UserMapper.*;
+
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+    @Autowired
+    private AdminService adminService;
+
+    @Autowired
+    private QuizService quizService;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CleanupRepositoryService cleanupRepositoryService;
+
+    @GetMapping("/quizzes")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Quiz>> getQuizzesAdmin() {
+        return ResponseEntity.ok(quizService.findAllWithRatings());
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<UserDTO>> getUsersAdmin() {
+        List<User> users = userRepository.findAll();
+        List<UserDTO> userDTOs = users.stream()
+                .map(UserDTO::fromUser)
+                .toList();
+        return ResponseEntity.ok(userDTOs);
+    }
+
+    @GetMapping("/users/roles")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<String>> getUserRolesAdmin() {
+        return ResponseEntity.ok(UserRole.getUserRoles());
+    }
+
+    @GetMapping("/users/states")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<String>> getUserStatesAdmin() {
+        return ResponseEntity.ok(UserStatus.getUserStates());
+    }
+
+
+    @PostMapping("/users/create")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserDTO> createUserAdmin(@RequestBody UserDTO userToCreateDTO) {
+        User userToCreate = userDTOToUser(userToCreateDTO);
+        User createdUser = adminService.createUser(userToCreate);
+        return ResponseEntity.ok(UserDTO.fromUser(createdUser));
+    }
+
+    @PutMapping("/users/update/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<UserDTO> updateUserAdmin(@PathVariable Long id, @RequestBody UserDTO userToUpdateDTO) {
+        User userToUpdate = userDTOToUser(userToUpdateDTO);
+        User updatedUser = adminService.updateUser(id, userToUpdate);
+        return ResponseEntity.ok(UserDTO.fromUser(updatedUser));
+    }
+
+
+    @DeleteMapping("/users/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {
+        cleanupRepositoryService.prepareDelete(id);
+        adminService.deleteUser(id);
+        return ResponseEntity.ok().build();
+
+    }
+}

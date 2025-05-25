@@ -420,20 +420,18 @@ const EditQuiz = () => {
                         ))}
                     </List>
 
-                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
-                        <Button variant="outlined" startIcon={<AddIcon/>} onClick={addQuestion}>
+                    <Box sx={{mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap'}}>
+                        <Button variant="outlined" startIcon={<AddIcon />} onClick={addQuestion}>
                             Frage hinzufügen
                         </Button>
                         <Button type="submit" variant="contained" disabled={!isFormValid()}>
                             Speichern
                         </Button>
-                    </Box>
-                    <Box sx={{mt: 2, display: 'flex', gap: 2}}>
-                        <Button variant="outlined" color="error" onClick={handleResetClick}>
-                            Zurücksetzen
-                        </Button>
-                        <Button variant="outlined" onClick={handleCancleConfirm} sx={{ml: 2}}>
+                        <Button variant="contained" color="error" onClick={handleCancleConfirm}>
                             Abbrechen
+                        </Button>
+                        <Button variant="contained" color="error" onClick={handleResetClick}>
+                            Zurücksetzen
                         </Button>
                     </Box>
                 </form>

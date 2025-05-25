@@ -57,6 +57,9 @@ const MeineQuizze = () => {
     const [quizzes, setQuizzes] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [categoryLabels, setCategoryLabels] = useState({});
+    const [showAll, setShowAll] = useState(
+        user?.role === 'ROLE_ADMIN' && searchParams.get('showAll') === 'true'
+    );
 
     // UI states
     const [loading, setLoading] = useState(true);
@@ -73,17 +76,18 @@ const MeineQuizze = () => {
 
     const fetchData = async () => {
         try {
-            const [quizRes, favRes] = user
-                ? await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
-                ])
-                : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
-
+            const isAdmin = user?.role === 'ROLE_ADMIN';
+            const endpoint = isAdmin
+                ? (showAll ? 'quizzes' : 'admin/quizzes')
+                : 'quizzes';
+            const [quizRes, favRes] = await Promise.all([
+                axios.get(`${process.env.REACT_APP_API_URL}/${endpoint}`),
+                axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
+            ]);
             const favoriteIds = new Set(favRes.data || []);
 
             const ownQuizzes = quizRes.data
-                .filter(q => q.creator?.id === user.id)
+                .filter(q => isAdmin || q.creator?.id === user.id)
                 .map(q => ({
                     ...q,
                     isFavorite: favoriteIds.has(q.id),
@@ -146,7 +150,7 @@ const MeineQuizze = () => {
         if (onlyRated) params.onlyRated = 'true';
         if (minQuestions > 0) params.minQuestions = minQuestions.toString();
         if (sortOrder && sortOrder !== 'desc') params.sortOrder = sortOrder;
-
+        if (showAll && user?.role === 'ROLE_ADMIN') params.showAll = 'true';
         setSearchParams(params, {replace: true});
     }, [searchQuery, onlyFavorites, onlyRated, minQuestions, sortOrder, setSearchParams]);
 
@@ -241,49 +245,65 @@ const MeineQuizze = () => {
                        mx: 2,
                        mt: 2
                    }}>
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
+                        <TextField
+                            label="Suche"
+                            variant="outlined"
+                            size="small"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <CustomFormControlLabel
+                            control={<Checkbox checked={onlyFavorites}
+                                               onChange={e => setOnlyFavorites(e.target.checked)}/>}
+                            label="Nur Favoriten"
+                        />
 
-                <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
-                    <TextField
-                        label="Suche"
-                        variant="outlined"
-                        size="small"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <CustomFormControlLabel
-                        control={<Checkbox checked={onlyFavorites}
-                                           onChange={e => setOnlyFavorites(e.target.checked)}/>}
-                        label="Nur Favoriten"
-                    />
+                        <CustomFormControlLabel
+                            control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
+                            label="Nur bewertete"
+                        />
 
-                    <CustomFormControlLabel
-                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
-                        label="Nur bewertete"
-                    />
+                        <Box sx={{width: 150}}>
+                            <Typography gutterBottom>≥ Fragen</Typography>
+                            <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)}
+                                    valueLabelDisplay="auto"
+                                    min={0} max={20}/>
+                        </Box>
 
-                    <Box sx={{width: 150}}>
-                        <Typography gutterBottom>≥ Fragen</Typography>
-                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto"
-                                min={0} max={20}/>
+                        <FormControl size="small" sx={{minWidth: 150}}>
+                            <InputLabel>Sortieren</InputLabel>
+                            <CustomSelect value={sortOrder} label="Sortieren"
+                                          onChange={e => setSortOrder(e.target.value)}>
+                                <MenuItem value="desc">Neueste zuerst</MenuItem>
+                                <MenuItem value="asc">Älteste zuerst</MenuItem>
+                            </CustomSelect>
+                        </FormControl>
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <FormControl size="small" sx={{minWidth: 150}}>
+                                <InputLabel>Zeige</InputLabel>
+                                <CustomSelect
+                                    value={showAll ? 'all' : 'mine'}
+                                    label="Zeige"
+                                    onChange={(e) => setShowAll(e.target.value === 'all')}
+                                >
+                                    <MenuItem value="mine">Meine Quizze</MenuItem>
+                                    <MenuItem value="all">Alle Quizze</MenuItem>
+                                </CustomSelect>
+                            </FormControl>
+                        )}
                     </Box>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
+                            Neues Quiz erstellen
+                        </Button>
 
-                    <FormControl size="small" sx={{minWidth: 150}}>
-                        <InputLabel>Sortieren</InputLabel>
-                        <CustomSelect value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
-                            <MenuItem value="desc">Neueste zuerst</MenuItem>
-                            <MenuItem value="asc">Älteste zuerst</MenuItem>
-                        </CustomSelect>
-                    </FormControl>
-                    <br/>
-                    <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
-                        Neues Quiz erstellen
-                    </Button>
-
-                    {/* Roter Zurücksetzen-Button rechts */}
-                    <Box sx={{flexGrow: 1}} />
-                    <Button variant="contained" color="error" onClick={resetFilters}>
-                        Filter zurücksetzen
-                    </Button>
+                        {/* Roter Zurücksetzen-Button rechts */}
+                        <Button variant="contained" color="error" onClick={resetFilters}>
+                            Filter zurücksetzen
+                        </Button>
+                    </Box>
                 </Box>
             </Paper>
 
@@ -295,6 +315,7 @@ const MeineQuizze = () => {
                             position: 'relative',
                             display: 'flex',
                             flexDirection: 'column',
+                            justifyContent: 'space-between',
                             flexGrow: 1,
                             height: '100%',
                         }}>
@@ -305,17 +326,26 @@ const MeineQuizze = () => {
                                     </IconButton>
                                 )}
                             </Box>
-                            <CardContent>
+
+                            <CardContent sx={{flexGrow: 1}}>
                                 <Typography variant='h6' gutterBottom>{quiz.title}</Typography>
                                 <Typography variant='body2' color='text.secondary' paragraph>
                                     {quiz.description}
                                 </Typography>
+
                                 <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
                                     {quiz.categories?.map(cat => (
                                         <Chip key={cat} label={categoryLabels[cat] || cat} size="small"
                                               color="primary"/>
                                     ))}
                                 </Box>
+
+                                {user?.role === 'ROLE_ADMIN' && quiz.creator && (
+                                    <Typography variant='body2' color='text.secondary' mb={1}>
+                                        Erstellt von: {quiz.creator.name}
+                                    </Typography>
+                                )}
+
                                 {quiz.ratingCount > 0 ? (
                                     <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
                                         <Rating value={quiz.avgRating} precision={0.1} readOnly size='small'/>
@@ -327,17 +357,13 @@ const MeineQuizze = () => {
                                     </Typography>
                                 )}
                             </CardContent>
-                            <CardActions>
-                                <Button variant="contained"
-                                        color="primary"
-                                        size="small" onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
-                                <Button variant="contained"
-                                        color="primary"
-                                        size="small"
+
+                            <CardActions sx={{justifyContent: 'space-between', mt: 'auto'}}>
+                                <Button variant="contained" color="primary" size="small"
+                                        onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
+                                <Button variant="contained" color="primary" size="small"
                                         onClick={() => navigate(`/quizzes/edit/${quiz.id}`)}>Bearbeiten</Button>
-                                <Button variant="contained"
-                                        size="small"
-                                        color="error"
+                                <Button variant="contained" size="small" color="error"
                                         onClick={() => confirmDelete(quiz.id)}>Löschen</Button>
                             </CardActions>
                         </Card>
@@ -358,7 +384,7 @@ const MeineQuizze = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-                    <Button color="error" onClick={() => {
+                    <Button color="error" variant="contained" onClick={() => {
                         handleDelete(toDeleteId);
                     }}>Löschen</Button>
                 </DialogActions>

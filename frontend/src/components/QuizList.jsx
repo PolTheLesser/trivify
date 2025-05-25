@@ -272,83 +272,85 @@ const QuizList = () => {
                 elevation={2}
                 sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}
             >
-                <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
-                    {user && (
-                        <>
-                            <CustomFormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={onlyFavorites}
-                                        onChange={e => setOnlyFavorites(e.target.checked)}
-                                    />
-                                }
-                                label="Nur Favoriten"
-                            />
-                            <CustomFormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={onlyUnplayed}
-                                        onChange={e => setOnlyUnplayed(e.target.checked)}
-                                    />
-                                }
-                                label="Noch nie gespielt"
-                            />
-                        </>
-                    )}
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
+                        {user && (
+                            <>
+                                <CustomFormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={onlyFavorites}
+                                            onChange={e => setOnlyFavorites(e.target.checked)}
+                                        />
+                                    }
+                                    label="Nur Favoriten"
+                                />
+                                <CustomFormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={onlyUnplayed}
+                                            onChange={e => setOnlyUnplayed(e.target.checked)}
+                                        />
+                                    }
+                                    label="Noch nie gespielt"
+                                />
+                            </>
+                        )}
 
-                    <CustomFormControlLabel
-                        control={
-                            <Checkbox
-                                checked={onlyRated}
-                                onChange={e => setOnlyRated(e.target.checked)}
-                            />
-                        }
-                        label="Nur bewertete"
-                    />
-
-                    <FormControl size="small" sx={{minWidth: 200}}>
-                        <InputLabel>Tägliche Quizze</InputLabel>
-                        <CustomSelect
-                            value={dailyQuizFilter}
-                            label="Tägliche Quizze"
-                            onChange={e => setDailyQuizFilter(e.target.value)}
-                        >
-                            <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
-                            <MenuItem value="all">Alle Quizze</MenuItem>
-                        </CustomSelect>
-                    </FormControl>
-
-                    <Box sx={{width: 150}}>
-                        <Typography gutterBottom>≥ Fragen</Typography>
-                        <Slider
-                            value={minQuestions}
-                            onChange={(e, v) => setMinQuestions(v)}
-                            valueLabelDisplay="auto"
-                            min={0}
-                            max={20}
+                        <CustomFormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={onlyRated}
+                                    onChange={e => setOnlyRated(e.target.checked)}
+                                />
+                            }
+                            label="Nur bewertete"
                         />
-                    </Box>
 
-                    <FormControl size="small" sx={{minWidth: 150}}>
-                        <InputLabel>Sortieren</InputLabel>
-                        <CustomSelect
-                            value={sortOrder}
-                            label="Sortieren"
-                            onChange={e => setSortOrder(e.target.value)}
-                        >
-                            <MenuItem value="desc">Neueste zuerst</MenuItem>
-                            <MenuItem value="asc">Älteste zuerst</MenuItem>
-                        </CustomSelect>
-                    </FormControl>
-                    <br/>
-                    <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
-                        Zufälliges Quiz
-                    </Button>
-                    {/* Roter Zurücksetzen-Button rechts */}
-                    <Box sx={{flexGrow: 1}} />
-                    <Button variant="contained" color="error" onClick={resetFilters}>
-                        Filter zurücksetzen
-                    </Button>
+                        <FormControl size="small" sx={{minWidth: 200}}>
+                            <InputLabel>Tägliche Quizze</InputLabel>
+                            <CustomSelect
+                                value={dailyQuizFilter}
+                                label="Tägliche Quizze"
+                                onChange={e => setDailyQuizFilter(e.target.value)}
+                            >
+                                <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
+                                <MenuItem value="all">Alle Quizze</MenuItem>
+                            </CustomSelect>
+                        </FormControl>
+
+                        <Box sx={{width: 150}}>
+                            <Typography gutterBottom>≥ Fragen</Typography>
+                            <Slider
+                                value={minQuestions}
+                                onChange={(e, v) => setMinQuestions(v)}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={20}
+                            />
+                        </Box>
+
+                        <FormControl size="small" sx={{minWidth: 150}}>
+                            <InputLabel>Sortieren</InputLabel>
+                            <CustomSelect
+                                value={sortOrder}
+                                label="Sortieren"
+                                onChange={e => setSortOrder(e.target.value)}
+                            >
+                                <MenuItem value="desc">Neueste zuerst</MenuItem>
+                                <MenuItem value="asc">Älteste zuerst</MenuItem>
+                            </CustomSelect>
+                        </FormControl>
+                    </Box>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
+                            Zufälliges Quiz
+                        </Button>
+                        {/* Roter Zurücksetzen-Button rechts */}
+                        <Button variant="contained" color="error" onClick={resetFilters}>
+                            Filter zurücksetzen
+                        </Button>
+                    </Box>
                 </Box>
             </Paper>
 
@@ -371,7 +373,7 @@ const QuizList = () => {
                                         color="warning"
                                         onClick={() => toggleFavorite(q.id)}
                                     >
-                                        {q.isFavorite ? <StarIcon /> : <StarBorderIcon />}
+                                        {q.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
                                     </IconButton>
                                 )}
                             </Box>
@@ -394,7 +396,7 @@ const QuizList = () => {
                                 </Box>
                                 {q.ratingCount > 0 ? (
                                     <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
-                                        <Rating value={q.avgRating} precision={0.1} readOnly size="small" />
+                                        <Rating value={q.avgRating} precision={0.1} readOnly size="small"/>
                                         <Typography variant="body2" sx={{ml: 1}}>
                                             ({q.ratingCount})
                                         </Typography>

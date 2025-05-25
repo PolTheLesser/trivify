@@ -9,10 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import rh.ptp.quizapp.dto.*;
-import rh.ptp.quizapp.model.QuestionType;
-import rh.ptp.quizapp.model.Quiz;
-import rh.ptp.quizapp.model.QuizCategory;
+import rh.ptp.quizapp.model.*;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.QuizService;
@@ -69,13 +68,23 @@ public class QuizController {
     }
 
     @GetMapping("/toEdit/{quizId}")
-    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId) {
+    public ResponseEntity<Quiz> getQuiztoEdit(@PathVariable Long quizId,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
         Quiz quiz = quizService.getQuizById(quizId);
-        if (quiz != null) {
-            return ResponseEntity.ok(quiz);
-        } else {
+        if (quiz == null) {
             return ResponseEntity.notFound().build();
         }
+
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Benutzer nicht gefunden"));
+        boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
+        boolean isCreator = quiz.getCreator().getEmail().equals(userDetails.getUsername());
+
+        if (isAdmin || isCreator) {
+            return ResponseEntity.ok(quiz);
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @PostMapping

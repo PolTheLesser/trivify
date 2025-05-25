@@ -401,20 +401,20 @@ const CreateQuiz = () => {
                             Frage hinzufügen
                         </Button>
                         <Button
-                            variant="contained"
-                            color="error"
-                            onClick={handleReset}
-                            navigate="/quizzes/my-quizzes"
-                        >
-                            Abbrechen
-                        </Button>
-                        <Button
                             type="submit"
                             variant="contained"
                             color="primary"
                             disabled={!isFormValid()}
                         >
                             Quiz speichern
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleReset}
+                            navigate="/quizzes/my-quizzes"
+                        >
+                            Abbrechen
                         </Button>
                     </Box>
                 </form>

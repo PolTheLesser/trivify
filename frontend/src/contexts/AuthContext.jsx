@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from '../api/api';
 
 const AuthContext = createContext(null);
@@ -9,21 +9,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Initiale Authentifizierung prüfen
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await axios.get(process.env.REACT_APP_API_URL+ '/auth/me');
+          const response = await axios.get(process.env.REACT_APP_API_URL + '/auth/me');
           setUser(response.data);
         } catch (error) {
           localStorage.removeItem('token');
           delete axios.defaults.headers.common['Authorization'];
           setUser(null);
         }
-      }
-      else {
+      } else {
         setUser(null);
       }
       setLoading(false);
@@ -32,6 +32,27 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Logout Funktion
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  }, []);
+
+  // Optional: vor dem Tab-Schließen kann man z. B. die Zeit merken
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Hier KEIN logout() mehr!
+      sessionStorage.setItem('lastUnload', Date.now().toString());
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  // Login Funktion
   const login = async (email, password) => {
     try {
       const response = await axios.post(process.env.REACT_APP_API_URL + '/auth/login', { email, password });
@@ -45,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Registrierung
   const register = async (userData) => {
     try {
       const response = await axios.post(process.env.REACT_APP_API_URL + '/auth/register', {
@@ -62,12 +84,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
-  };
-
+  // Passwort vergessen
   const forgotPassword = async (email) => {
     try {
       await axios.post(process.env.REACT_APP_API_URL + '/users/reset-password-request', { email });
@@ -76,6 +93,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Passwort zurücksetzen
   const resetPassword = async (token, password) => {
     try {
       await axios.post(process.env.REACT_APP_API_URL + `/users/reset-password/${token}`, { newPassword: password });
