@@ -76,7 +76,7 @@ public class AuthService {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl+"/logo192.png");
             variables.put("username", user.getName());
-            variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken);
+            variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken.getToken());
             variables.put("dataUrl", frontendUrl + "/datenschutz");
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
         }

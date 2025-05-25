@@ -102,7 +102,7 @@ spec:
               done
       containers:
         - name: backend
-          image: lesommer2019/trivify-backend:beta
+          image: lesommer2019/trivify-backend:latest
           ports:
             - containerPort: 9090
           env:
@@ -172,7 +172,7 @@ spec:
               done
       containers:
         - name: frontend
-          image: lesommer2019/trivify-frontend:beta
+          image: lesommer2019/trivify-frontend:latest
           ports:
             - containerPort: 80
           env:
