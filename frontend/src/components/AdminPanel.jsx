@@ -180,221 +180,219 @@ const AdminUserPanel = () => {
             setCreateLoading(false);
         }
     };
-
-    return (
-        <Container maxWidth="xl" sx={{mt: 3, mb: 6}}>
-            {isNotAdmin ? (
+    if (isNotAdmin) {
+        return (
+            <Container maxWidth="xl" sx={{mt: 3, mb: 6}}>
                 <Typography variant="h5" color="error" sx={{mt: 6, textAlign: 'center'}}>
                     Zugriff verweigert. Nur Administratoren dürfen dieses Panel nutzen.
                 </Typography>
-            ) : (
-                <>
-                    <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
-                        {/* Filterleiste */}
-                        <Paper elevation={2}
-                               sx={{
-                                   display: 'flex',
-                                   flexDirection: 'column',
-                                   gap: 2,
-                                   mb: 4,
-                                   px: 2,
-                                   py: 3,
-                                   mx: 0,
-                                   mt: 2
-                               }}>
-                            <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
-                                <TextField label="Suche" variant="outlined" value={searchQuery}
-                                           onChange={(e) => setSearchQuery(e.target.value)} size="small"/>
-                                <FormControl size="small" sx={{minWidth: 150}}>
-                                    <InputLabel>Status</InputLabel>
-                                    <CustomSelect
-                                        fullWidth
-                                        value={filterStatus}
-                                        onChange={(e) => setFilterStatus(e.target.value)}
-                                        label="Status"
-                                    >
-                                        <MenuItem value="ALL">Alle</MenuItem>
-                                        {userStatuses.map(status => (
-                                            <MenuItem key={status} value={status}>
-                                                {status}
-                                            </MenuItem>
-                                        ))}
-                                    </CustomSelect>
-                                </FormControl>
-                                <FormControl size="small" sx={{minWidth: 150}}>
-                                    <InputLabel>Rolle</InputLabel>
-                                    <CustomSelect
-                                        fullWidth
-                                        value={filterRole}
-                                        onChange={(e) => setFilterRole(e.target.value)}
-                                        label="Rolle"
-                                    >
-                                        <MenuItem value="ALL">Alle</MenuItem>
-                                        {userRoles.map(role => (
-                                            <MenuItem key={role} value={role}>
-                                                {role}
-                                            </MenuItem>
-                                        ))}
-                                    </CustomSelect>
-                                </FormControl>
-                                <br/>
-                                <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>Benutzer
-                                    erstellen</Button>
-                                <Box sx={{flexGrow: 1}}/>
-                                <Button variant="contained" color="error" sx={{ml: 'auto'}} onClick={() => {
-                                    setSearchQuery('');
-                                    setFilterStatus('ALL');
-                                    setFilterRole('ALL');
-                                }}>Filter zurücksetzen</Button>
-                            </Box>
-                        </Paper>
+            </Container>
+        )
+    }
+
+    return (
+        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+            {/* Filterleiste */}
+            <Paper
+                elevation={2}
+                sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}
+            >
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    {/* Erste Zeile: Filterfelder */}
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center'}}>
+                        <TextField label="Suche" variant="outlined" value={searchQuery}
+                                   onChange={(e) => setSearchQuery(e.target.value)} size="small"/>
+                        <FormControl size="small" sx={{minWidth: 150}}>
+                            <InputLabel>Status</InputLabel>
+                            <CustomSelect
+                                fullWidth
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                label="Status"
+                            >
+                                <MenuItem value="ALL">Alle</MenuItem>
+                                {userStatuses.map(status => (
+                                    <MenuItem key={status} value={status}>{status}</MenuItem>
+                                ))}
+                            </CustomSelect>
+                        </FormControl>
+                        <FormControl size="small" sx={{minWidth: 150}}>
+                            <InputLabel>Rolle</InputLabel>
+                            <CustomSelect
+                                fullWidth
+                                value={filterRole}
+                                onChange={(e) => setFilterRole(e.target.value)}
+                                label="Rolle"
+                            >
+                                <MenuItem value="ALL">Alle</MenuItem>
+                                {userRoles.map(role => (
+                                    <MenuItem key={role} value={role}>{role}</MenuItem>
+                                ))}
+                            </CustomSelect>
+                        </FormControl>
                     </Box>
 
-                    {/* Benutzerliste */}
-                    {loading ? (
-                        <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>
-                    ) : error ? (
-                        <Alert severity="error">{error}</Alert>
-                    ) : filteredUsers.length === 0 ? (
-                        <Typography variant="body1" sx={{mt: 4}}>Keine Benutzer gefunden.</Typography>
-                    ) : (
-                        <>
-                            <Grid container spacing={3}>
-                                {paginatedUsers.map(u => (
-                                    <Grid item xs={12} sm={6} md={4} key={u.id}>
-                                        <Card>
-                                            <CardContent>
-                                                <Typography variant="h6">{u.name}</Typography>
-                                                <Typography>{u.email}</Typography>
-                                                <Typography>Status: {u.userStatus}</Typography>
-                                                <Typography>Rolle: {u.role}</Typography>
-                                                <Typography>Daily
-                                                    Reminder: {u.dailyQuizReminder ? 'Ja' : 'Nein'}</Typography>
-                                                <Typography>Daily Streak: {u.dailyStreak}</Typography>
-                                            </CardContent>
-                                            <CardActions>
-                                                <Button variant="contained" onClick={() => openEditDialog(u)}>Bearbeiten</Button>
-                                                <Button variant="contained" color="error"
-                                                        onClick={() => openDeleteDialog(u)}>Löschen</Button>
-                                            </CardActions>
-                                        </Card>
-                                    </Grid>
-                                ))}
+                    {/* Zweite Zeile: Buttons */}
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+                            Benutzer erstellen
+                        </Button>
+                        <Button variant="contained" color="error" onClick={() => {
+                            setSearchQuery('');
+                            setFilterStatus('ALL');
+                            setFilterRole('ALL');
+                        }}>
+                            Filter zurücksetzen
+                        </Button>
+                    </Box>
+                </Box>
+            </Paper>
+
+            {/* Benutzerliste */}
+            {loading ? (
+                <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>
+            ) : error ? (
+                <Alert severity="error">{error}</Alert>
+            ) : filteredUsers.length === 0 ? (
+                <Typography variant="body1" sx={{mt: 4}}>Keine Benutzer gefunden.</Typography>
+            ) : (
+                <>
+                    <Grid container spacing={3}>
+                        {paginatedUsers.map(u => (
+                            <Grid item xs={12} sm={6} md={4} key={u.id}>
+                                <Card>
+                                    <CardContent>
+                                        <Typography variant="h6">{u.name}</Typography>
+                                        <Typography>{u.email}</Typography>
+                                        <Typography>Status: {u.userStatus}</Typography>
+                                        <Typography>Rolle: {u.role}</Typography>
+                                        <Typography>Daily
+                                            Reminder: {u.dailyQuizReminder ? 'Ja' : 'Nein'}</Typography>
+                                        <Typography>Daily Streak: {u.dailyStreak}</Typography>
+                                    </CardContent>
+                                    <CardActions>
+                                        <Button variant="contained"
+                                                onClick={() => openEditDialog(u)}>Bearbeiten</Button>
+                                        <Button variant="contained" color="error"
+                                                onClick={() => openDeleteDialog(u)}>Löschen</Button>
+                                    </CardActions>
+                                </Card>
                             </Grid>
-                            {pageCount > 1 &&
-                                <Box display="flex" justifyContent="center" mt={4}><Pagination count={pageCount}
-                                                                                               page={page}
-                                                                                               onChange={(_, val) => setPage(val)}/></Box>}
-                        </>
-                    )}
-
-                    {/* Edit-Dialog */}
-                    <Dialog open={editDialogOpen} onClose={closeEditDialog} maxWidth="sm" fullWidth>
-                        <DialogTitle>Benutzer bearbeiten</DialogTitle>
-                        <DialogContent>
-                            <TextField margin="dense" label="Name" fullWidth value={editUser?.name || ''}
-                                       onChange={(e) => handleEditChange('name', e.target.value)}
-                                       disabled={editLoading}/>
-                            <TextField margin="dense" label="Email" fullWidth value={editUser?.email || ''}
-                                       onChange={(e) => handleEditChange('email', e.target.value)}
-                                       disabled={editLoading}/>
-                            <PasswordField margin="dense" label="Passwort" fullWidth value={editUser?.password || ''}
-                                           onChange={(e) => handleEditChange('password', e.target.value)}
-                                           helperText="Nur ausfüllen, wenn Passwort geändert werden soll"
-                                           disabled={editLoading}/>
-                            <FormControl fullWidth margin="dense">
-                                <Box display="flex" alignItems="center" justifyContent="space-between">
-                                    <Typography>Tägliche Quiz-Erinnerung</Typography>
-                                    <CustomSwitch
-                                        checked={editUser?.dailyQuizReminder || false}
-                                        onChange={(e) => handleEditChange('dailyQuizReminder', e.target.checked)}
-                                        disabled={editLoading}
-                                    />
-                                </Box>
-                            </FormControl>
-                            <TextField margin="dense" label="Daily Streak" fullWidth type="number"
-                                       value={editUser?.dailyStreak || 0}
-                                       onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))}
-                                       disabled={editLoading}/>
-                            <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''}/>
-                            <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''}/>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button color="error" variant="contained" onClick={closeEditDialog} disabled={editLoading}>Abbrechen</Button>
-                            <Button onClick={saveUser} disabled={editLoading} variant="contained">{editLoading ?
-                                <CircularProgress size={24}/> : 'Speichern'}</Button>
-                        </DialogActions>
-                    </Dialog>
-
-                    {/* Create-Dialog */}
-                    <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
-                        <DialogTitle>Neuen Benutzer erstellen</DialogTitle>
-                        <DialogContent>
-                            <TextField margin="dense" label="Name" fullWidth value={newUser.name}
-                                       onChange={(e) => setNewUser({...newUser, name: e.target.value})}/>
-                            <TextField margin="dense" label="Email" fullWidth value={newUser.email}
-                                       onChange={(e) => setNewUser({...newUser, email: e.target.value})}/>
-                            <TextField margin="dense" label="Passwort" type="password" fullWidth
-                                       value={newUser.password}
-                                       onChange={(e) => setNewUser({...newUser, password: e.target.value})}/>
-                            <FormControl fullWidth margin="dense">
-                                <InputLabel>Rolle</InputLabel>
-                                <CustomSelect value={newUser.role}
-                                              onChange={(e) => setNewUser({...newUser, role: e.target.value})}>
-                                    {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
-                                </CustomSelect>
-                            </FormControl>
-                            <FormControl fullWidth margin="dense">
-                                <InputLabel>Status</InputLabel>
-                                <CustomSelect value={newUser.userStatus}
-                                              onChange={(e) => setNewUser({...newUser, userStatus: e.target.value})}>
-                                    {userStatuses.map(status => <MenuItem key={status}
-                                                                          value={status}>{status}</MenuItem>)}
-                                </CustomSelect>
-                            </FormControl>
-                            <FormControl fullWidth margin="dense">
-                                <Box display="flex" alignItems="center" justifyContent="space-between">
-                                    <Typography>Tägliche Quiz-Erinnerung</Typography>
-                                    <CustomSwitch
-                                        checked={newUser.dailyQuizReminder}
-                                        onChange={(e) => setNewUser({...newUser, dailyQuizReminder: e.target.checked})}
-                                    />
-                                </Box>
-                            </FormControl>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => setCreateDialogOpen(false)}
-                                    disabled={createLoading}>Abbrechen</Button>
-                            <Button onClick={createUser} disabled={createLoading} variant="contained">{createLoading ?
-                                <CircularProgress size={24}/> : 'Erstellen'}</Button>
-                        </DialogActions>
-                    </Dialog>
-
-                    {/* Delete-Dialog */}
-                    <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
-                        <DialogTitle>Benutzer löschen</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>Willst du den Benutzer <strong>{toDeleteUser?.name}</strong> wirklich
-                                löschen?</DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={closeDeleteDialog} disabled={deleteLoading}>Abbrechen</Button>
-                            <Button onClick={deleteUser} color="error" variant="contained"
-                                    disabled={deleteLoading}>{deleteLoading ?
-                                <CircularProgress size={24}/> : 'Löschen'}</Button>
-                        </DialogActions>
-                    </Dialog>
-
-                    <Snackbar open={snackbar.open} autoHideDuration={4000}
-                              onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-                              anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
-                        <Alert severity={snackbar.severity}
-                               onClose={() => setSnackbar(prev => ({...prev, open: false}))}
-                               sx={{width: '100%'}}>{snackbar.message}</Alert>
-                    </Snackbar>
+                        ))}
+                    </Grid>
+                    {pageCount > 1 &&
+                        <Box display="flex" justifyContent="center" mt={4}><Pagination count={pageCount}
+                                                                                       page={page}
+                                                                                       onChange={(_, val) => setPage(val)}/></Box>}
                 </>
             )}
-        </Container>
+
+            {/* Edit-Dialog */}
+            <Dialog open={editDialogOpen} onClose={closeEditDialog} maxWidth="sm" fullWidth>
+                <DialogTitle>Benutzer bearbeiten</DialogTitle>
+                <DialogContent>
+                    <TextField margin="dense" label="Name" fullWidth value={editUser?.name || ''}
+                               onChange={(e) => handleEditChange('name', e.target.value)}
+                               disabled={editLoading}/>
+                    <TextField margin="dense" label="Email" fullWidth value={editUser?.email || ''}
+                               onChange={(e) => handleEditChange('email', e.target.value)}
+                               disabled={editLoading}/>
+                    <PasswordField margin="dense" label="Passwort" fullWidth value={editUser?.password || ''}
+                                   onChange={(e) => handleEditChange('password', e.target.value)}
+                                   helperText="Nur ausfüllen, wenn Passwort geändert werden soll"
+                                   disabled={editLoading}/>
+                    <FormControl fullWidth margin="dense">
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                            <Typography>Tägliche Quiz-Erinnerung</Typography>
+                            <CustomSwitch
+                                checked={editUser?.dailyQuizReminder || false}
+                                onChange={(e) => handleEditChange('dailyQuizReminder', e.target.checked)}
+                                disabled={editLoading}
+                            />
+                        </Box>
+                    </FormControl>
+                    <TextField margin="dense" label="Daily Streak" fullWidth type="number"
+                               value={editUser?.dailyStreak || 0}
+                               onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))}
+                               disabled={editLoading}/>
+                    <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''}/>
+                    <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''}/>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="error" variant="contained" onClick={closeEditDialog}
+                            disabled={editLoading}>Abbrechen</Button>
+                    <Button onClick={saveUser} disabled={editLoading} variant="contained">{editLoading ?
+                        <CircularProgress size={24}/> : 'Speichern'}</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Create-Dialog */}
+            <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Neuen Benutzer erstellen</DialogTitle>
+                <DialogContent>
+                    <TextField margin="dense" label="Name" fullWidth value={newUser.name}
+                               onChange={(e) => setNewUser({...newUser, name: e.target.value})}/>
+                    <TextField margin="dense" label="Email" fullWidth value={newUser.email}
+                               onChange={(e) => setNewUser({...newUser, email: e.target.value})}/>
+                    <TextField margin="dense" label="Passwort" type="password" fullWidth
+                               value={newUser.password}
+                               onChange={(e) => setNewUser({...newUser, password: e.target.value})}/>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel>Rolle</InputLabel>
+                        <CustomSelect value={newUser.role}
+                                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}>
+                            {userRoles.map(role => <MenuItem key={role} value={role}>{role}</MenuItem>)}
+                        </CustomSelect>
+                    </FormControl>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel>Status</InputLabel>
+                        <CustomSelect value={newUser.userStatus}
+                                      onChange={(e) => setNewUser({...newUser, userStatus: e.target.value})}>
+                            {userStatuses.map(status => <MenuItem key={status}
+                                                                  value={status}>{status}</MenuItem>)}
+                        </CustomSelect>
+                    </FormControl>
+                    <FormControl fullWidth margin="dense">
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                            <Typography>Tägliche Quiz-Erinnerung</Typography>
+                            <CustomSwitch
+                                checked={newUser.dailyQuizReminder}
+                                onChange={(e) => setNewUser({...newUser, dailyQuizReminder: e.target.checked})}
+                            />
+                        </Box>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setCreateDialogOpen(false)}
+                            disabled={createLoading}>Abbrechen</Button>
+                    <Button onClick={createUser} disabled={createLoading} variant="contained">{createLoading ?
+                        <CircularProgress size={24}/> : 'Erstellen'}</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete-Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
+                <DialogTitle>Benutzer löschen</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Willst du den Benutzer <strong>{toDeleteUser?.name}</strong> wirklich
+                        löschen?</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDeleteDialog} disabled={deleteLoading}>Abbrechen</Button>
+                    <Button onClick={deleteUser} color="error" variant="contained"
+                            disabled={deleteLoading}>{deleteLoading ?
+                        <CircularProgress size={24}/> : 'Löschen'}</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar open={snackbar.open} autoHideDuration={4000}
+                      onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                      anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
+                <Alert severity={snackbar.severity}
+                       onClose={() => setSnackbar(prev => ({...prev, open: false}))}
+                       sx={{width: '100%'}}>{snackbar.message}</Alert>
+            </Snackbar>
+        </Box>
     );
 };
 

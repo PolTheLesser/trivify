@@ -190,7 +190,7 @@ const Navbar = () => {
                     </MenuItem>
                 )}
                 {user?.role === 'ROLE_ADMIN' && (
-                    <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
+                    <Button onClick={handleMobileMenuClose} component={RouterLink} to="/adminpanel">Admin-Panel</Button>
                 )}
             </Menu>
 

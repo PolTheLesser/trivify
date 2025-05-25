@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.*;
 import rh.ptp.quizapp.repository.QuizRepository;
@@ -74,8 +75,8 @@ public class QuizController {
             return ResponseEntity.notFound().build();
         }
 
-        User user = userRepository.findByName(userDetails.getUsername())
-                                  .orElseThrow();
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Benutzer nicht gefunden"));
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;
         boolean isCreator = quiz.getCreator().getName().equals(userDetails.getUsername());
 

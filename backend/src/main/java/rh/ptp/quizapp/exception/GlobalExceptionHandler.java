@@ -38,6 +38,13 @@ public class GlobalExceptionHandler {
                 .body(errorBody("Nicht gefunden: " + ex.getMessage()));
     }
 
+    //  Für ResponseStatusException, z.B. bei @ResponseStatus
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<?> handleResponseStatusException(org.springframework.web.server.ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(errorBody(ex.getReason() != null ? ex.getReason() : "Fehler: " + ex.getMessage()));
+    }
+
     //  Optionale Methode für mehr Kontext
     private Map<String, Object> errorBody(String message) {
         return Map.of(

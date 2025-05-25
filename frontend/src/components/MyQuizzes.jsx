@@ -245,62 +245,65 @@ const MeineQuizze = () => {
                        mx: 2,
                        mt: 2
                    }}>
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
+                        <TextField
+                            label="Suche"
+                            variant="outlined"
+                            size="small"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <CustomFormControlLabel
+                            control={<Checkbox checked={onlyFavorites}
+                                               onChange={e => setOnlyFavorites(e.target.checked)}/>}
+                            label="Nur Favoriten"
+                        />
 
-                <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
-                    <TextField
-                        label="Suche"
-                        variant="outlined"
-                        size="small"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <CustomFormControlLabel
-                        control={<Checkbox checked={onlyFavorites}
-                                           onChange={e => setOnlyFavorites(e.target.checked)}/>}
-                        label="Nur Favoriten"
-                    />
+                        <CustomFormControlLabel
+                            control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
+                            label="Nur bewertete"
+                        />
 
-                    <CustomFormControlLabel
-                        control={<Checkbox checked={onlyRated} onChange={e => setOnlyRated(e.target.checked)}/>}
-                        label="Nur bewertete"
-                    />
+                        <Box sx={{width: 150}}>
+                            <Typography gutterBottom>≥ Fragen</Typography>
+                            <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)}
+                                    valueLabelDisplay="auto"
+                                    min={0} max={20}/>
+                        </Box>
 
-                    <Box sx={{width: 150}}>
-                        <Typography gutterBottom>≥ Fragen</Typography>
-                        <Slider value={minQuestions} onChange={(e, v) => setMinQuestions(v)} valueLabelDisplay="auto"
-                                min={0} max={20}/>
-                    </Box>
-
-                    <FormControl size="small" sx={{minWidth: 150}}>
-                        <InputLabel>Sortieren</InputLabel>
-                        <CustomSelect value={sortOrder} label="Sortieren" onChange={e => setSortOrder(e.target.value)}>
-                            <MenuItem value="desc">Neueste zuerst</MenuItem>
-                            <MenuItem value="asc">Älteste zuerst</MenuItem>
-                        </CustomSelect>
-                    </FormControl>
-                    {user?.role === 'ROLE_ADMIN' && (
-                        <FormControl size="small" sx={{ minWidth: 150 }}>
-                            <InputLabel>Zeige</InputLabel>
-                            <CustomSelect
-                                value={showAll ? 'all' : 'mine'}
-                                label="Zeige"
-                                onChange={(e) => setShowAll(e.target.value === 'all')}
-                            >
-                                <MenuItem value="mine">Meine Quizze</MenuItem>
-                                <MenuItem value="all">Alle Quizze</MenuItem>
+                        <FormControl size="small" sx={{minWidth: 150}}>
+                            <InputLabel>Sortieren</InputLabel>
+                            <CustomSelect value={sortOrder} label="Sortieren"
+                                          onChange={e => setSortOrder(e.target.value)}>
+                                <MenuItem value="desc">Neueste zuerst</MenuItem>
+                                <MenuItem value="asc">Älteste zuerst</MenuItem>
                             </CustomSelect>
                         </FormControl>
-                    )}
-                    <br/>
-                    <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
-                        Neues Quiz erstellen
-                    </Button>
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <FormControl size="small" sx={{minWidth: 150}}>
+                                <InputLabel>Zeige</InputLabel>
+                                <CustomSelect
+                                    value={showAll ? 'all' : 'mine'}
+                                    label="Zeige"
+                                    onChange={(e) => setShowAll(e.target.value === 'all')}
+                                >
+                                    <MenuItem value="mine">Meine Quizze</MenuItem>
+                                    <MenuItem value="all">Alle Quizze</MenuItem>
+                                </CustomSelect>
+                            </FormControl>
+                        )}
+                    </Box>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Button variant="contained" onClick={() => navigate('/quizzes/create')}>
+                            Neues Quiz erstellen
+                        </Button>
 
-                    {/* Roter Zurücksetzen-Button rechts */}
-                    <Box sx={{flexGrow: 1}} />
-                    <Button variant="contained" color="error" onClick={resetFilters}>
-                        Filter zurücksetzen
-                    </Button>
+                        {/* Roter Zurücksetzen-Button rechts */}
+                        <Button variant="contained" color="error" onClick={resetFilters}>
+                            Filter zurücksetzen
+                        </Button>
+                    </Box>
                 </Box>
             </Paper>
 
@@ -332,7 +335,8 @@ const MeineQuizze = () => {
 
                                 <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
                                     {quiz.categories?.map(cat => (
-                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary"/>
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small"
+                                              color="primary"/>
                                     ))}
                                 </Box>
 
