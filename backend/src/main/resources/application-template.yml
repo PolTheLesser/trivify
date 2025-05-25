@@ -14,8 +14,8 @@ spring:
       hibernate:
         format_sql: false
   mail:
-    host: mail.gmx.net
-    port: 587
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
     username: ${MAIL_USER}
     password: ${MAIL_PASS}
     from: ${MAIL_USER}
