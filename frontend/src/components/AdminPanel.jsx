@@ -196,7 +196,16 @@ const AdminUserPanel = () => {
             {/* Filterleiste */}
             <Paper
                 elevation={2}
-                sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    mb: 4,
+                    px: 2,
+                    py: 3,
+                    mx: 2,
+                    mt: 2
+                }}
             >
                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                     {/* Erste Zeile: Filterfelder */}
@@ -326,8 +335,35 @@ const AdminUserPanel = () => {
                                value={editUser?.dailyStreak || 0}
                                onChange={(e) => handleEditChange('dailyStreak', parseInt(e.target.value, 10))}
                                disabled={editLoading}/>
-                    <TextField margin="dense" label="Status" fullWidth value={editUser?.userStatus || ''}/>
-                    <TextField margin="dense" label="Rolle" fullWidth value={editUser?.role || ''}/>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel>Status</InputLabel>
+                        <CustomSelect
+                            value={editUser?.userStatus || ''}
+                            onChange={(e) => handleEditChange('userStatus', e.target.value)}
+                            disabled={editLoading}
+                        >
+                            {userStatuses.map(status => (
+                                <MenuItem key={status} value={status}>
+                                    {status}
+                                </MenuItem>
+                            ))}
+                        </CustomSelect>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel>Rolle</InputLabel>
+                        <CustomSelect
+                            value={editUser?.role || ''}
+                            onChange={(e) => handleEditChange('role', e.target.value)}
+                            disabled={editLoading}
+                        >
+                            {userRoles.map(role => (
+                                <MenuItem key={role} value={role}>
+                                    {role}
+                                </MenuItem>
+                            ))}
+                        </CustomSelect>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <Button color="error" variant="contained" onClick={closeEditDialog}
