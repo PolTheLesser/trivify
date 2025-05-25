@@ -71,6 +71,8 @@ jobs:
           MAIL_PASS: ${{ secrets.MAIL_PASS }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          MAIL_HOSTING: ${{ secrets.MAIL_HOSTING }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
 
       - name: Build Backend
         run: |
