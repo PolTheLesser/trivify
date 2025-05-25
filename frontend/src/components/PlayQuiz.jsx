@@ -65,59 +65,81 @@ const PlayQuiz = () => {
         updateAnswer(currentQuestionIndex, e.target.value);
     };
 
+    const recalculateScore = async (answersObject) => {
+        let correctCount = 0;
+        const updatedWrongAnswers = [];
+
+        for (let i = 0; i < quiz.questions.length; i++) {
+            const question = quiz.questions[i];
+            const userAnswer = answersObject[i];
+            if (!userAnswer) continue;
+
+            try {
+                const res = await axios.post(
+                    process.env.REACT_APP_API_URL + `/${quiz.id}/submit`,
+                    {questionId: question.id, answer: userAnswer}
+                );
+
+                if (res.data.correct) {
+                    correctCount += 1;
+                } else {
+                    updatedWrongAnswers.push({
+                        question: question.question,
+                        selectedAnswer: userAnswer,
+                        correctAnswer: res.data.correctAnswer || question.correctAnswer || 'N/V'
+                    });
+                }
+            } catch (err) {
+                console.error('Fehler bei Re-Scoring:', err);
+            }
+        }
+
+        setScore(correctCount);
+        setWrongAnswers(updatedWrongAnswers);
+        return correctCount;
+    };
+
     const handleNext = async () => {
         const selectedAnswer = answers[currentQuestionIndex];
         if (!selectedAnswer) return;
 
+        const updatedAnswers = { ...answers };
         const question = quiz.questions[currentQuestionIndex];
 
         try {
-            const response = await axios.post(
+            await axios.post(
                 process.env.REACT_APP_API_URL + `/${quiz.id}/submit`,
                 {questionId: question.id, answer: selectedAnswer}
             );
 
-            if (response.data.correct) {
-                setScore(prev => prev + 1);
-            } else {
-                const correctAnswer =
-                    response.data.correctAnswer || question.correctAnswer || 'N/V';
-                setWrongAnswers(prev => [
-                    ...prev,
-                    {
-                        question: question.question,
-                        selectedAnswer,
-                        correctAnswer
-                    }
-                ]);
-            }
+            // Neu berechnen, auch für korrigierte Antworten
+            const newScore = await recalculateScore(updatedAnswers);
 
-            // **WICHTIG: Stellt sicher, dass das Quiz auch für die letzte Frage aktualisiert wird**
             if (currentQuestionIndex === quiz.questions.length - 1) {
                 setShowResults(true);
                 setFinished(true);
 
-                // Warten, bis der Score für die letzte Frage aktualisiert wurde
-                setTimeout(() => {
-                    // Aktualisiere die Ergebnisse und sende das Score
-                    axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
-                        userId,
-                        quizId,
-                        score: score + (response.data.correct ? 1 : 0),  // Score korrekt hinzufügen
-                        maxPossibleScore
-                    }).then(response => {
-                        console.log(response.data.message);
-                    })
-                        .catch(error => {
-                            console.error('Fehler beim Aktualisieren des Scores:', error);
+                if (user) {
+                    try {
+                        await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
+                            userId,
+                            quizId,
+                            score: newScore,
+                            maxPossibleScore
                         });
-                }, 500); // Ein bisschen Verzögerung, um den Wert korrekt zu setzen
+                        console.log('Score gespeichert:', newScore);
+                    } catch (error) {
+                        console.error('Fehler beim Speichern des Scores:', error);
+                    }
+                }
+
                 localStorage.removeItem(storageKey);
                 localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
             } else {
                 updateCurrentQuestionIndex(prev => prev + 1);
             }
-        } catch {
+
+        } catch (err) {
             setError('Fehler beim Einreichen der Antwort');
         }
     };

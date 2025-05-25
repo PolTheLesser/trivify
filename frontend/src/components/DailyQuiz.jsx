@@ -63,6 +63,29 @@ const DailyQuiz = () => {
         updateAnswer(currentQuestionIndex, e.target.value);
     };
 
+    const recalculateScore = async (answersObject) => {
+        let correctCount = 0;
+
+        for (let i = 0; i < quiz.questions.length; i++) {
+            const question = quiz.questions[i];
+            const userAnswer = answersObject[i];
+            if (!userAnswer) continue;
+
+            try {
+                const res = await axios.post(
+                    process.env.REACT_APP_API_URL + '/' + quiz.id + '/submit',
+                    {questionId: question.id, answer: userAnswer}
+                );
+                if (res.data.correct) correctCount += 1;
+            } catch (err) {
+                console.error('Fehler beim Score-Recheck:', err);
+            }
+        }
+
+        setScore(correctCount);
+        return correctCount;
+    };
+
     const handleSubmit = async () => {
         const selectedAnswer = answers[currentQuestionIndex];
         if (!selectedAnswer) return;
@@ -76,40 +99,42 @@ const DailyQuiz = () => {
             );
 
             const isCorrect = response.data.correct;
+            const correctAnswer = response.data.correctAnswer || currentQuestion.correctAnswer || 'N/V';
 
-            if (isCorrect) {
-                setScore(prev => prev + 1);
-            } else {
-                const correctAnswer = response.data.correctAnswer || currentQuestion.correctAnswer || 'N/V';
-                setWrongAnswers(prev => [
-                    ...prev,
-                    {
+            setWrongAnswers(prev => {
+                const updated = prev.filter(item => item.question !== currentQuestion.question);
+                if (!isCorrect) {
+                    updated.push({
                         question: currentQuestion.question,
                         selectedAnswer,
                         correctAnswer
-                    }
-                ]);
-            }
+                    });
+                }
+                return updated;
+            });
+
+            const updatedAnswers = {...answers, [currentQuestionIndex]: selectedAnswer};
+            const newScore = await recalculateScore(updatedAnswers); // ✅ Verwende neuen Score
 
             if (currentQuestionIndex < quiz.questions.length - 1) {
                 updateCurrentQuestionIndex(currentQuestionIndex + 1);
             } else {
-                const finalScore = score + (isCorrect ? 1 : 0); // letzter Punkt wird direkt dazugerechnet
-
                 setCompleted(true);
 
                 const userId = user?.id;
                 const quizId = quiz?.id;
                 const maxPossibleScore = quiz?.questions?.length;
+
                 if (user) {
                     await axios.post(process.env.REACT_APP_API_URL + '/users/daily-quiz/completed');
                     await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
                         userId,
                         quizId,
-                        score: finalScore,
+                        score: newScore, // ✅ korrekt gespeicherter Score
                         maxPossibleScore
                     });
                 }
+
                 console.log('Tägliches Quiz abgeschlossen & Score gespeichert');
                 localStorage.removeItem(storageKey);
                 localStorage.removeItem(`${storageKey}-currentQuestionIndex`);

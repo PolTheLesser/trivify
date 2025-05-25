@@ -183,16 +183,16 @@ const AdminUserPanel = () => {
     };
     if (isNotAdmin) {
         return (
-            <Container maxWidth="xl" sx={{mt: 3, mb: 6}}>
+            <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden', mt: 3, mb: 6}}>
                 <Typography variant="h5" color="error" sx={{mt: 6, textAlign: 'center'}}>
                     Zugriff verweigert. Nur Administratoren dürfen dieses Panel nutzen.
                 </Typography>
-            </Container>
-        )
+            </Box>
+        );
     }
 
     return (
-        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden', mt: 3, mb: 6}}>
             {/* Filterleiste */}
             <Paper
                 elevation={2}
@@ -249,6 +249,7 @@ const AdminUserPanel = () => {
                 </Box>
             </Paper>
 
+
             {/* Benutzerliste */}
             {loading ? (
                 <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>
@@ -261,13 +262,20 @@ const AdminUserPanel = () => {
                     <Grid container spacing={3} sx={{px: 2, pb: 6}}>
                         {paginatedUsers.map(u => (
                             <Grid item xs={12} sm={6} md={4} key={u.id} sx={{display: 'flex'}}>
-                                <Card>
+                                <Card sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    flexGrow: 1,
+                                    height: '100%'
+                                }}>
                                     <CardContent>
                                         <Typography variant="h6">{u.name}</Typography>
                                         <Typography>{u.email}</Typography>
                                         <Typography>Status: {u.userStatus}</Typography>
                                         <Typography>Rolle: {u.role}</Typography>
-                                        <Typography>Erstellt am: {new Date(u.createdAt).toLocaleDateString()}</Typography>
+                                        <Typography>Erstellt
+                                            am: {new Date(u.createdAt).toLocaleDateString()}</Typography>
                                         <Typography>Daily
                                             Reminder: {u.dailyQuizReminder ? 'Ja' : 'Nein'}</Typography>
                                         <Typography>Daily Streak: {u.dailyStreak}</Typography>
@@ -283,9 +291,10 @@ const AdminUserPanel = () => {
                         ))}
                     </Grid>
                     {pageCount > 1 &&
-                        <Box display="flex" justifyContent="center" mt={4}><Pagination count={pageCount}
-                                                                                       page={page}
-                                                                                       onChange={(_, val) => setPage(val)}/></Box>}
+                        <Box display="flex" justifyContent="center" mt={4}>
+                            <Pagination count={pageCount} page={page} onChange={(_, val) => setPage(val)}/>
+                        </Box>
+                    }
                 </>
             )}
 
