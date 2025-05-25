@@ -36,7 +36,7 @@ public class AuthService {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public User register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (userRepository.existsByName(request.getName())) {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
@@ -61,10 +61,9 @@ public class AuthService {
 
         pendingUser = userRepository.save(pendingUser);
         createAuthenticationToken(pendingUser);
-        return pendingUser;
     }
 
-    AuthenticationToken createAuthenticationToken(User user) {
+    void createAuthenticationToken(User user) {
         AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
         logger.info("Existing token: " + existingToken);
         if (existingToken != null) {
@@ -80,17 +79,18 @@ public class AuthService {
             variables.put("dataUrl", frontendUrl + "/datenschutz");
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
         }
-        return authenticationTokenRepository.save(newToken);
+        authenticationTokenRepository.save(newToken);
     }
 
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getIdentifier(), request.getPassword())
             );
 
-            User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+            User user = userRepository.findByEmail(request.getIdentifier())
+                    .or(() -> userRepository.findByName(request.getIdentifier()))
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
 
             if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
                 throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
@@ -116,7 +116,7 @@ public class AuthService {
         }
     }
 
-    public User verifyEmail(String token) {
+    public void verifyEmail(String token) {
         AuthenticationToken authenticationToken = authenticationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
 
@@ -129,7 +129,6 @@ public class AuthService {
 
         userRepository.save(user);
         authenticationTokenRepository.delete(authenticationToken);
-        return user;
     }
 
     public User getCurrentUser(String token) {
