@@ -56,7 +56,8 @@ const AdminUserPanel = () => {
         role: '',
         userStatus: '',
         dailyQuizReminder: false,
-        dailyStreak: 0
+        dailyStreak: 0,
+        createdAt: new Date().toISOString(),
     });
     const [createLoading, setCreateLoading] = useState(false);
 
@@ -257,15 +258,16 @@ const AdminUserPanel = () => {
                 <Typography variant="body1" sx={{mt: 4}}>Keine Benutzer gefunden.</Typography>
             ) : (
                 <>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={3} sx={{px: 2, pb: 6}}>
                         {paginatedUsers.map(u => (
-                            <Grid item xs={12} sm={6} md={4} key={u.id}>
+                            <Grid item xs={12} sm={6} md={4} key={u.id} sx={{display: 'flex'}}>
                                 <Card>
                                     <CardContent>
                                         <Typography variant="h6">{u.name}</Typography>
                                         <Typography>{u.email}</Typography>
                                         <Typography>Status: {u.userStatus}</Typography>
                                         <Typography>Rolle: {u.role}</Typography>
+                                        <Typography>Erstellt am: {new Date(u.createdAt).toLocaleDateString()}</Typography>
                                         <Typography>Daily
                                             Reminder: {u.dailyQuizReminder ? 'Ja' : 'Nein'}</Typography>
                                         <Typography>Daily Streak: {u.dailyStreak}</Typography>

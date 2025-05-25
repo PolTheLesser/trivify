@@ -96,7 +96,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && isAdmin(userId)) {
+        if (!quiz.getCreator().getId().equals(userId) && !isAdmin(userId)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz bearbeiten");
         }
 
@@ -129,7 +129,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && isAdmin(userId)) {
+        if (!quiz.getCreator().getId().equals(userId) && !isAdmin(userId)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
