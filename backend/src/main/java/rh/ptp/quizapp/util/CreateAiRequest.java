@@ -38,9 +38,6 @@ public class CreateAiRequest {
     @Value("${ai.api.base-url}")
     private String apiUrl;
 
-    @Value("${ai.api.model}")
-    private String model;
-
     @Value("${frontend.url}")
     private String frontendUrl;
 
@@ -111,17 +108,14 @@ public class CreateAiRequest {
 
     public JSONArray fetchQuizFromAPI(HttpClient httpClient, String prompt) throws IOException, InterruptedException {
         JSONObject requestBody = new JSONObject()
-                .put("model", model)
-                .put("messages", new JSONArray()
+                .put("parts", new JSONArray()
                         .put(new JSONObject()
-                                .put("role", "user")
-                                .put("content", prompt)));
+                                .put("text", prompt)));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(apiUrl))
+                .uri(URI.create(apiUrl + apiKey))
                 .timeout(Duration.ofSeconds(60))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
                 .build();
 
@@ -131,10 +125,11 @@ public class CreateAiRequest {
 
         JSONObject responseJson = new JSONObject(responseBody);
 
-        String content = responseJson.getJSONArray("choices")
+        JSONArray candidates = responseJson.getJSONArray("candidates");
+        String content = candidates.getJSONObject(0)
+                .getJSONArray("content")
                 .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content");
+                .getString("text");
 
         // Bereinigung der Antwort
         content = content.replaceAll("(?s)```json|```", "").trim();
