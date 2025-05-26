@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>Fehler bei der Quiz-Generierung</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            color: #333;
+        }
+        .logo img {
+            max-width: 80px;
+            height: auto;
+            margin-bottom: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #dc3545;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #dc3545;
+        }
+        .footer {
+            font-size: 12px;
+            color: #999;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <img th:src="${logoUrl}" alt="Trivify Logo" />
+    </div>
+    <div class="icon">⚠️</div>
+    <h1>Fehler bei der Generierung des täglichen Quizzes</h1>
+    <p>Hallo <span th:text="${adminName}">Admin</span>,</p>
+    <p>bei der automatischen Generierung des täglichen Quizzes am <strong th:text="${generationDate}">Datum</strong> ist ein Fehler aufgetreten.</p>
+    <p>Fehlermeldung: <br /><code th:text="${errorMessage}">Unbekannter Fehler</code></p>
+    <p>Letzte Antwort der KI: <br> <code th:text="${response}">Keine Antwort</code></p>
+    <p>Bitte überprüfe das System und behebe den Fehler zeitnah.</p>
+    <div class="footer">© 2025 Trivify – Diese E-Mail wurde automatisch generiert.</div>
+</div>
+</body>
+</html>

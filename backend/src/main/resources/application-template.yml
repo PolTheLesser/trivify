@@ -63,3 +63,7 @@ logging:
     rh:
       ptp:
         quizapp: INFO
+ai:
+  api:
+    key: ${AI_API_KEY}
+    base-url: ${AI_URL}

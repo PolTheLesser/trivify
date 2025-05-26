@@ -79,20 +79,11 @@ public class DailyQuizSchedulerService {
                 return;
             }
 
-            JSONArray fragen = null;
-            boolean valid = false;
             QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
-    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
-    .toArray(QuizCategory[]::new);
+                    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
+                    .toArray(QuizCategory[]::new);
             QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
-            while (!valid) {
-                try {
-                    fragen = createAiRequest.fetchQuizFromAPI(randomCategory.getDisplayName());
-                    valid = true;
-                } catch (IOException | InterruptedException | JSONException ignored) {
-                    log.warn("Invalid JSON-Format, retrying...");
-                }
-            }
+            JSONArray fragen = createAiRequest.fetchQuizFromAPI(randomCategory.getDisplayName());
 
             quizService.updateDailyQuiz(fragen, randomCategory);
 
@@ -101,7 +92,7 @@ public class DailyQuizSchedulerService {
             List<User> usersToRemind = userRepository.findByDailyQuizReminderIsTrue();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
 
             for (User user : usersToRemind) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -115,8 +106,8 @@ public class DailyQuizSchedulerService {
                     userRepository.save(user);
                     variables.put("username", user.getName());
                     variables.put("oldStreak", oldStreak);
-                    emailService.sendEmail(user.getEmail(), "Daily-Streak verloren 😔", "daily-quiz-streak-lost" ,variables);
-                } else{
+                    emailService.sendEmail(user.getEmail(), "Daily-Streak verloren 😔", "daily-quiz-streak-lost", variables);
+                } else {
                     variables.put("username", user.getName());
                     emailService.sendEmail(user.getEmail(), "Tägliche Quiz-Erinnerung ⁉️", "daily-quiz-reminder", variables);
                 }
@@ -136,11 +127,11 @@ public class DailyQuizSchedulerService {
             boolean missedUntilNow = lastPlayed == null || lastPlayed.isBefore(LocalDate.now());
             if (user.getDailyStreak() > 0 && missedUntilNow) {
                 Map<String, Object> variables = new HashMap<>();
-                variables.put("logoUrl", frontendUrl+"/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
                 variables.put("username", user.getName());
-                variables.put("quizUrl", frontendUrl+"/daily-quiz");
+                variables.put("quizUrl", frontendUrl + "/daily-quiz");
                 variables.put("streak", user.getDailyStreak());
-                variables.put("logoUrl", frontendUrl+"/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
                 emailService.sendEmail(user.getEmail(), "Deine Streak ist in Gefahr! ⏳", "daily-quiz-streak-reminder", variables);
             }
         }
