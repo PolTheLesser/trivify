@@ -45,6 +45,7 @@ public class CreateAiRequest {
     public JSONArray fetchQuizFromAPI(String category){
         int invalidRetrys = 0;
         String errorMessage = "";
+        JSONArray quizList = new JSONArray();
         while(invalidRetrys<5){
             try {
                 String prompt =
@@ -72,7 +73,8 @@ public class CreateAiRequest {
                                         Gib **nur** das JSON-Array zurück – ohne Markdown, Erläuterungen oder zusätzliche Zeichen.
                                         """;
 
-                return fetchQuizFromAPI(HttpClient.newHttpClient(), prompt);
+                quizList = fetchQuizFromAPI(HttpClient.newHttpClient(), prompt);
+                return quizList;
             } catch (Exception e) {
                 invalidRetrys++;
                 errorMessage = e.getMessage();
@@ -87,6 +89,7 @@ public class CreateAiRequest {
 
         for(User admin: admins) {
             variables.replace("adminName", admin.getUsername());
+            variables.put("response", quizList.toString());
             emailService.sendEmail(adminEmail, "Fehler bei der Generierung des täglichen Quizzes!", "failed-generation-daily", variables);
         }
         throw new RuntimeException("Fehler beim Abrufen des Quiz von der API nach 5 Versuchen");
