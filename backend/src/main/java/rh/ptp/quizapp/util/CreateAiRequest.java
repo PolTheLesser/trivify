@@ -73,7 +73,7 @@ public class CreateAiRequest {
                                         """;
 
                 return fetchQuizFromAPI(HttpClient.newHttpClient(), prompt);
-            } catch (IOException | InterruptedException e) {
+            } catch (Exception e) {
                 invalidRetrys++;
                 errorMessage = e.getMessage();
             }
