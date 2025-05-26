@@ -57,6 +57,8 @@ jobs:
           echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
           echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
           echo "MAIL_PASS=${{ secrets.MAIL_PASS }}" >> $GITHUB_OUTPUT
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_OUTPUT
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_OUTPUT
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_OUTPUT
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_OUTPUT
           echo "AI_URL=${{ vars.AI_URL }}" >> $GITHUB_OUTPUT
