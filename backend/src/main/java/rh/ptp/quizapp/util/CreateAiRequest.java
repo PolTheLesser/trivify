@@ -109,6 +109,7 @@ public class CreateAiRequest {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         JSONObject responseJson = new JSONObject(response.body());
+        logger.info(responseJson.toString());
 
         String content = responseJson.getJSONObject("message").getString("content");
 
