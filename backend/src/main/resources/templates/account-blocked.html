@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Konto gesperrt</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafb;
+      color: #333;
+    }
+    .logo img {
+      max-width: 80px;
+      height: auto;
+      margin-bottom: 24px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #dc3545; /* Rot */
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: #dc3545;
+    }
+    .footer {
+      font-size: 12px;
+      color: #999;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img th:src="${logoUrl}" alt="Trivify Logo" />
+    </div>
+    <div class="icon">🚫</div>
+    <h1>Konto gesperrt</h1>
+    <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
+    <p>dein Benutzerkonto wurde durch einen Administrator gesperrt. Du kannst dich derzeit nicht einloggen.</p>
+    <p>Falls du Fragen hast oder Unterstützung benötigst, antworte gerne auf diese E-Mail.</p>
+    <div class="footer">© 2025 Trivify – Diese E-Mail wurde automatisch generiert.</div>
+  </div>
+</body>
+</html>

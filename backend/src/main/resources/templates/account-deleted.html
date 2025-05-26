@@ -11,6 +11,10 @@
       background-color: #f9fafb;
       color: #333;
     }
+    .logo img {
+      max-width: 80px;
+      height: auto;
+    }
     .container {
       max-width: 600px;
       margin: 40px auto;
@@ -39,6 +43,16 @@
       font-size: 48px;
       margin-bottom: 16px;
     }
+    .cta-button {
+      display: inline-block;
+      margin: 30px auto;
+      padding: 12px 24px;
+      background-color: #0d6efd;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -47,15 +61,22 @@
     <img th:src="${logoUrl}" alt="Trivify Logo">
   </div>
   <div class="icon">🗑️</div>
-  <h1>Dein Account wurde gelöscht</h1>
+  <h1>Deine Daten wurde gelöscht</h1>
 
   <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
 
-  <p>dein Benutzerkonto bei <strong>Trivify</strong> wurde erfolgreich gelöscht. Alle damit verbundenen Daten wurden aus unserem System entfernt.</p>
+  <p>deine Benutzerdaten bei <strong>Trivify</strong> wurde erfolgreich gelöscht. Alle damit verbundenen Daten wurden aus unserem System entfernt.</p>
 
-  <p>Wir bedauern, dich als Quizzer zu verlieren – aber du bist jederzeit willkommen, zurückzukommen!</p>
+  <p>Wir bedauern, dich nicht als Quizzer halten zu können – aber du bist jederzeit willkommen, zurückzukommen!</p>
 
   <p>Sollte dies ein Fehler gewesen sein, du Verbesserungsvorschläge haben oder du Fragen zur Löschung hast, antworte gerne auf diese E-Mail.</p>
+
+  <p>Du kannst dich jederzeit erneut registrieren:</p>
+  <p style="text-align: center;">
+    <a class="cta-button" th:href="${registerUrl}">Registrieren</a>
+  </p>
+  <p>Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
+  <p style="word-break: break-all; color: #666;" th:text="${registerUrl}"></p>
 
   <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 

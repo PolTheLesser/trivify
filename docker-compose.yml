@@ -2,6 +2,7 @@ version: "3.9"
 services:
   quizapp-db:
     image: postgres:latest
+    pull_policy: always
     restart: always
     container_name: quizapp-db
     environment:
@@ -21,7 +22,8 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   quizapp-backend:
-    image: lesommer2019/quizapp-backend:latest
+    image: lesommer2019/trivify-backend:latest
+    pull_policy: always
     container_name: quizapp-backend
     ports:
       - "9090:9090"
@@ -37,14 +39,15 @@ services:
       test: [ "CMD-SHELL", "wget -q -O - http://localhost:9090/actuator/health | grep -q 'UP'" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 25
       start_period: 20s
     depends_on:
       quizapp-db:
         condition: service_healthy
 
   quizapp-frontend:
-    image: lesommer2019/quizapp-frontend:latest
+    image: lesommer2019/trivify-frontend:latest
+    pull_policy: always
     container_name: quizapp-frontend
     ports:
       - "3000:80"
@@ -54,6 +57,12 @@ services:
       quizapp-backend:
         condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://127.0.0.1 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 15s
 
 volumes:
   pgdata:

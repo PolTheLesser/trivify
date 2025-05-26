@@ -58,6 +58,10 @@
       color: #999;
       margin-top: 40px;
     }
+    .logo img {
+      max-width: 80px;
+      height: auto;
+    }
   </style>
 </head>
 <body>
@@ -72,13 +76,16 @@
   <p>Hallo <span th:text="${username}">Benutzer</span>,</p>
 
   <p>du hast dein Benutzerkonto bei <strong>Trivify</strong> zur Löschung markiert.</p>
-  <p>Bitte beachte: <strong>Wenn du dich nicht erneut anmeldest, wird dein Account in sieben Tagen unwiderruflich gelöscht.</strong></p>
+  <p>Bitte beachte: <strong>Wenn du dich nicht erneut anmeldest, wird dein Account in 7 Tagen unwiderruflich gelöscht.</strong></p>
 
   <p>Du kannst dich einfach anmelden, um deinen Account zu reaktivieren:</p>
 
   <p style="text-align: center;">
     <a class="cta-button" th:href="${loginUrl}">Account reactivieren</a>
   </p>
+  <p>Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
+  <p style="word-break: break-all; color: #666;" th:text="${loginUrl}"></p>
+    <p>Falls du Fragen hast oder Unterstützung benötigst, antworte gerne auf diese E-Mail.</p>
   <div class="footer">
     © 2025 Trivify – Diese E-Mail wurde automatisch generiert.
   </div>

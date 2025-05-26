@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Switch,
-  FormControlLabel,
-  Divider,
   Alert,
+  Box,
+  Button,
   CircularProgress,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
-  DialogActions
+  DialogTitle,
+  Divider,
+  Paper,
+  TextField,
+  Typography
 } from '@mui/material';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
+import {PasswordField, CustomSwitch, CustomFormControlLabel } from "../CustomElements";
 
 const Settings = () => {
   const { user, logout } = useAuth();
@@ -125,8 +124,8 @@ const Settings = () => {
                 onChange={e => setProfile({ ...profile, email: e.target.value })}
                 margin="normal" required
             />
-            <FormControlLabel
-                control={<Switch checked={profile.dailyQuizReminder} onChange={handleDailyQuizReminderChange} />}
+            <CustomFormControlLabel
+                control={<CustomSwitch checked={profile.dailyQuizReminder} onChange={handleDailyQuizReminderChange} />}
                 label="Tägliche Quiz-Erinnerungen"
             />
             <Button type="submit" variant="contained" sx={{ mt: 2 }}>Profil aktualisieren</Button>
@@ -136,20 +135,20 @@ const Settings = () => {
 
           <Typography variant="h5" gutterBottom>Passwort ändern</Typography>
           <form onSubmit={handlePasswordChange}>
-            <TextField
-                fullWidth label="Aktuelles Passwort" type="password"
+            <PasswordField
+                fullWidth label="Aktuelles Passwort"
                 value={password.currentPassword}
                 onChange={e => setPassword({ ...password, currentPassword: e.target.value })}
                 margin="normal" required
             />
-            <TextField
-                fullWidth label="Neues Passwort" type="password"
+            <PasswordField
+                fullWidth label="Neues Passwort"
                 value={password.newPassword}
                 onChange={e => setPassword({ ...password, newPassword: e.target.value })}
                 margin="normal" required
             />
-            <TextField
-                fullWidth label="Passwort bestätigen" type="password"
+            <PasswordField
+                fullWidth label="Passwort bestätigen"
                 value={password.confirmPassword}
                 onChange={e => setPassword({ ...password, confirmPassword: e.target.value })}
                 margin="normal" required
@@ -173,7 +172,7 @@ const Settings = () => {
             <DialogTitle id="delete-account-dialog-title">Account löschen</DialogTitle>
             <DialogContent>
               <Typography>
-                Sind Sie sicher, dass Sie Ihren Account löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.
+                Sind Sie sicher, dass Sie Ihren Account zur Löschung vormerken möchten? 
               </Typography>
             </DialogContent>
             <DialogActions>

@@ -11,6 +11,10 @@
             background-color: #f9fafb;
             color: #333;
         }
+        .logo img {
+            max-width: 80px;
+            height: auto;
+        }
         .container {
             max-width: 600px;
             margin: 40px auto;
@@ -32,7 +36,7 @@
             display: inline-block;
             margin-top: 20px;
             padding: 12px 24px;
-            background-color: #0d6efd;
+            background-color: #dc3545;
             color: #fff;
             text-decoration: none;
             border-radius: 6px;
@@ -66,13 +70,12 @@
 
     <p>Aber kein Grund zur Sorge – heute ist ein neuer Tag, um wieder durchzustarten! 🚀</p>
 
-    <div style="text-align: center;">
-        <button class="button"> <a th:href="${quizUrl}" class="cta-button">Tägliches Quiz starten</a></button>
-    </div>
-
-    <p style="margin-top: 20px;">Oder öffne diesen Link direkt:<br/>
-        <span style="color: #666; word-break: break-word;" th:text="${quizUrl}">http://localhost:3000/daily-quiz</span>
+    <p style="text-align: center;">
+        <a class="cta-button" th:href="${quizUrl}">Tägliches Quiz starten</a>
     </p>
+
+    <p style="margin-top: 20px;">Oder öffne diesen Link direkt:<br/></p>
+    <p style="color: #666; word-break: break-word;" th:text="${quizUrl}"></p>
 
     <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 

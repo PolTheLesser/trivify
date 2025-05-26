@@ -4,8 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Data
 @Configuration
+@Data
 @ConfigurationProperties(prefix = "app")
 public class SecretsConfig {
     private String jwtSecret;
@@ -16,5 +16,4 @@ public class SecretsConfig {
     private int mailPort;
     private String frontendUrl;
     private String adminPassword;
-
 }

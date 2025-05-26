@@ -20,21 +20,32 @@ import { useAuth } from '../contexts/AuthContext';
 import { ThemeContext } from '../contexts/ThemeContext';
 
 const Navbar = () => {
-    const { user, logout } = useAuth();
+    // Hooks ganz oben aufrufen, nicht konditional
     const navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { darkMode, setDarkMode } = useContext(ThemeContext);
-
-    // lokaler State für das Eingabefeld
     const [searchTerm, setSearchTerm] = useState('');
+    const { darkMode, setDarkMode } = useContext(ThemeContext);
+    const { user, logout } = useAuth();
 
-    // URL-Query → local State
+    // User Menu State
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isUserMenuOpen = Boolean(anchorEl);
+    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
+    const handleUserMenuClose = () => setAnchorEl(null);
+
+    // Mobile Menu State
+    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
+    const isMobileMenuOpen = Boolean(mobileAnchorEl);
+    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
+    const handleMobileMenuClose = () => setMobileAnchorEl(null);
+
+    // URL-Query → local State synchronisieren
     useEffect(() => {
         setSearchTerm(searchParams.get('query') || '');
     }, [searchParams]);
 
-    // bei Eingabe: State updaten; auf /quizzes auch direkt den URL-Param
+    // Suchfeld Eingabe
     const handleSearchChange = e => {
         const val = e.target.value;
         setSearchTerm(val);
@@ -44,7 +55,7 @@ const Navbar = () => {
         }
     };
 
-    // bei Enter: immer (auch außerhalb /quizzes) zur QuizList mit Query navigieren
+    // Enter im Suchfeld navigiert zur Quizliste mit Query
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchTerm.trim();
@@ -52,34 +63,23 @@ const Navbar = () => {
         }
     };
 
+    // Dark Mode toggle
     const handleToggle = () => {
         setDarkMode(!darkMode);
     };
-
-    // User-Menu-Logik …
-    const [anchorEl, setAnchorEl] = useState(null);
-    const isUserMenuOpen = Boolean(anchorEl);
-    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
-    const handleUserMenuClose = () => setAnchorEl(null);
-
-    // Mobile-Menu …
-    const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
-    const isMobileMenuOpen = Boolean(mobileAnchorEl);
-    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
-    const handleMobileMenuClose = () => setMobileAnchorEl(null);
 
     return (
         <>
             <AppBar position="static">
                 <Toolbar>
-                    {/* Logo / Burger on xs */}
+                    {/* Logo / Burger auf xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                         <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
-                            <img src="/logo192.png" alt="Trivify" style={{ height: 32, width: 32 }} />
+                            <img src="/logo192.png" alt="Trivify" style={{ height: 64, width: 64 }} />
                         </IconButton>
                     </Box>
 
-                    {/* Brand on md+ */}
+                    {/* Brand auf md+ */}
                     <Typography
                         component={RouterLink}
                         to="/"
@@ -94,14 +94,17 @@ const Navbar = () => {
                         <img src="/logo192.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
-                    {/* Nav-Buttons md+ */}
+                    {/* Nav Buttons auf md+ */}
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, mx: 'auto', alignItems: 'center' }}>
                         <Button component={RouterLink} to="/quizzes" color="inherit">Quizze</Button>
                         <Button component={RouterLink} to="/daily-quiz" color="inherit">Tägliches Quiz (KI)</Button>
                         {user && (
                             <Button component={RouterLink} to="/quizzes/my-quizzes" color="inherit">
-                                Meine Quizze
+                                Quizlabor
                             </Button>
+                        )}
+                        {user?.role === 'ROLE_ADMIN' && (
+                            <Button component={RouterLink} to="/adminpanel" color="inherit">Admin-Panel</Button>
                         )}
                     </Box>
 
@@ -110,7 +113,7 @@ const Navbar = () => {
                         <TextField
                             size="small"
                             variant="outlined"
-                            placeholder="Quiz suchen..."
+                            placeholder="Quiz spielen..."
                             value={searchTerm}
                             onChange={handleSearchChange}
                             onKeyDown={handleSearchKeyDown}
@@ -179,12 +182,15 @@ const Navbar = () => {
                 {!user && (
                     <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Startseite</MenuItem>
                 )}
-                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes">Quizze</MenuItem>
+                <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes">Quizze spielen</MenuItem>
                 <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/daily-quiz">Tägliches Quiz (KI)</MenuItem>
                 {user && (
                     <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/quizzes/my-quizzes">
-                        Meine Quizze
+                        Quizlabor
                     </MenuItem>
+                )}
+                {user?.role === 'ROLE_ADMIN' && (
+                    <MenuItem onClick={handleMobileMenuClose} component={RouterLink} to="/adminpanel">Admin-Panel</MenuItem>
                 )}
             </Menu>
 
@@ -201,7 +207,7 @@ const Navbar = () => {
                     <>
                         <MenuItem component={RouterLink} to="/welcome" onClick={handleUserMenuClose}>Profil</MenuItem>
                         <MenuItem component={RouterLink} to="/settings" onClick={handleUserMenuClose}>Einstellungen</MenuItem>
-                        <MenuItem onClick={() => { handleUserMenuClose(); logout(); }}>Abmelden</MenuItem>
+                        <MenuItem onClick={() => { handleUserMenuClose(); logout(); navigate('/'); }}>Abmelden</MenuItem>
                     </>
                 ) : (
                     <>

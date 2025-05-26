@@ -1,7 +1,8 @@
 package rh.ptp.quizapp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,53 +12,75 @@ import rh.ptp.quizapp.dto.AuthResponse;
 import rh.ptp.quizapp.dto.LoginRequest;
 import rh.ptp.quizapp.dto.RegisterRequest;
 import rh.ptp.quizapp.dto.UserDTO;
-import rh.ptp.quizapp.model.RegistrationRequest;
+import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
-import rh.ptp.quizapp.repository.RegistrationRequestRepository;
+import rh.ptp.quizapp.model.UserStatus;
+import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.security.JwtService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
+    private final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepository;
-    private final RegistrationRequestRepository registrationRequestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    @Autowired
-    private EmailService emailService;
+    private final AuthenticationTokenRepository authenticationTokenRepository;
+    private final EmailService emailService;
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public RegistrationRequest register(RegisterRequest request) {
-        if (userRepository.existsByName(request.getName()) || registrationRequestRepository.existsByName(request.getName())) {
+    public User register(RegisterRequest request) {
+        if (userRepository.existsByName(request.getName())) {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
-        if (userRepository.existsByEmail(request.getEmail()) || 
-            registrationRequestRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("E-Mail-Adresse wird bereits verwendet");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+            createAuthenticationToken(user);
+            String token = authenticationTokenRepository.findTokenByQuizUser(user);
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("username", user.getName());
+            variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
+            emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
         }
 
-        RegistrationRequest registrationRequest = new RegistrationRequest();
-        registrationRequest.setName(request.getName());
-        registrationRequest.setEmail(request.getEmail());
-        registrationRequest.setPassword(passwordEncoder.encode(request.getPassword()));
-        registrationRequest.setDailyQuizReminder(request.isDailyQuizReminder());
-        registrationRequest.setVerificationToken(UUID.randomUUID().toString());
-        registrationRequest.setExpiryDate(LocalDateTime.now().plusHours(24));
+        User pendingUser = new User()
+                .setName(request.getName())
+                .setEmail(request.getEmail())
+                .setPassword(passwordEncoder.encode(request.getPassword()))
+                .setUserStatus(UserStatus.PENDING_VERIFICATION)
+                .setDailyQuizReminder(request.isDailyQuizReminder());
 
-        registrationRequest = registrationRequestRepository.save(registrationRequest);
+        pendingUser = userRepository.save(pendingUser);
+        createAuthenticationToken(pendingUser);
+        return pendingUser;
+    }
 
-        sendVerificationEmail(request.getEmail(), request.getName(), registrationRequest.getVerificationToken());
-
-        return registrationRequest;
+    AuthenticationToken createAuthenticationToken(User user) {
+        AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
+        logger.info("Existing token: " + existingToken);
+        if (existingToken != null) {
+            authenticationTokenRepository.deleteById(existingToken.getId());
+            authenticationTokenRepository.flush();
+        }
+        AuthenticationToken newToken = new AuthenticationToken(user);
+        if(user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("username", user.getName());
+            variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken.getToken());
+            variables.put("dataUrl", frontendUrl + "/datenschutz");
+            emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
+        }
+        return authenticationTokenRepository.save(newToken);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -69,8 +92,18 @@ public class AuthService {
             User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
 
-            if (!user.isEmailVerified()) {
+            if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
                 throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
+            } else if (user.getUserStatus()==UserStatus.BLOCKED) {
+                throw new RuntimeException("Benutzerkonto ist gesperrt");
+            } else if (user.getUserStatus()==UserStatus.PENDING_DELETE) {
+                user.setUserStatus(UserStatus.ACTIVE);
+                userRepository.save(user);
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
+                variables.put("username", user.getName());
+                variables.put("quizUrl", frontendUrl + "/daily-quiz");
+                emailService.sendEmail(user.getEmail(), "Account reaktiviert", "account-reactivated", variables);
             }
 
             String token = jwtService.generateToken(user);
@@ -84,34 +117,19 @@ public class AuthService {
     }
 
     public User verifyEmail(String token) {
-        RegistrationRequest request = registrationRequestRepository.findByVerificationToken(token)
-            .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
+        AuthenticationToken authenticationToken = authenticationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
 
-        if (request.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (authenticationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Verifizierungslink ist abgelaufen");
         }
 
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setEmailVerified(true);
-        user.setDailyQuizReminder(request.isDailyQuizReminder());
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        User user = authenticationToken.getQuizUser();
+        user.setUserStatus(UserStatus.ACTIVE);
 
-        user = userRepository.save(user);
-        registrationRequestRepository.delete(request);
-
+        userRepository.save(user);
+        authenticationTokenRepository.delete(authenticationToken);
         return user;
-    }
-
-    private void sendVerificationEmail(String email, String name, String token) {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl+"/logo192.png");
-        variables.put("username", name);
-        variables.put("verificationUrl", frontendUrl + "/verify-email/" + token);
-        emailService.sendEmail(email, "E-Mail-Adresse verifizieren", "verification-email", variables);
     }
 
     public User getCurrentUser(String token) {

@@ -2,11 +2,14 @@ package rh.ptp.quizapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
 @Table(name = "QUIZ_QUESTIONS")
 public class QuizQuestion {
     @Id
@@ -32,28 +35,12 @@ public class QuizQuestion {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
+    @ToString.Exclude
     private Quiz quiz;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private QuestionType questionType = QuestionType.MULTIPLE_CHOICE;
-
-    // Getters und Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
 
     public List<String> getAnswers() {
         if (answers == null) {
@@ -61,48 +48,4 @@ public class QuizQuestion {
         }
         return answers;
     }
-
-    public void setAnswers(List<String> answers) {
-        this.answers = answers;
-    }
-
-    public String getCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
-
-    public int getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public Quiz getQuiz() {
-        return quiz;
-    }
-
-    public void setQuiz(Quiz quiz) {
-        this.quiz = quiz;
-    }
-
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(QuestionType questionType) {
-        this.questionType = questionType;
-    }
-} 
+}

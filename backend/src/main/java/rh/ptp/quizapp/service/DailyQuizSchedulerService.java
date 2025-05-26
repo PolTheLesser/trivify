@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.repository.QuizRepository;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.util.CreateAiRequest;
@@ -24,12 +25,11 @@ import java.util.Map;
  * Service zur automatischen Erstellung und Speicherung eines täglichen Quiz.
  * <p>
  * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt
- * und speichert ein generiertes Quiz im JSON-Format unter {@code src/main/resources/daily.json}.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DailyQuizScheduler {
+public class DailyQuizSchedulerService {
 
     /**
      * Hilfsklasse zum Erstellen von API-Anfragen für Quizdaten.
@@ -74,28 +74,31 @@ public class DailyQuizScheduler {
 
         try {
             LocalDate today = LocalDate.now();
-            if (!quizRepository.findByIsDailyQuizTrueAndDate(today).isEmpty()) {
+            if (!quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, today).isEmpty()) {
                 log.info("Quiz für heute existiert bereits");
                 return;
             }
 
             JSONArray fragen = null;
             boolean valid = false;
-
+            QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
+    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
+    .toArray(QuizCategory[]::new);
+            QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
             while (!valid) {
                 try {
-                    fragen = createAiRequest.fetchQuizFromAPI();
+                    fragen = createAiRequest.fetchQuizFromAPI(randomCategory.getDisplayName());
                     valid = true;
                 } catch (IOException | InterruptedException | JSONException ignored) {
                     log.warn("Invalid JSON-Format, retrying...");
                 }
             }
 
-            quizService.updateDailyQuiz(fragen);
+            quizService.updateDailyQuiz(fragen, randomCategory);
 
             log.info("Tägliches Quiz wurde aktualisiert");
 
-            List<User> usersToRemind = userRepository.findByDailyQuizReminderIsNotNull();
+            List<User> usersToRemind = userRepository.findByDailyQuizReminderIsTrue();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
             variables.put("logoUrl", frontendUrl+"/logo192.png");
@@ -126,7 +129,7 @@ public class DailyQuizScheduler {
 
     @Scheduled(cron = "0 0 18 * * ?") // Täglich um 18 Uhr
     public void dailyQuizStreakReminder() {
-        for (User user : userRepository.findByDailyQuizReminderIsNotNull()) {
+        for (User user : userRepository.findByDailyQuizReminderIsTrue()) {
             LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
                     ? user.getLastDailyQuizPlayed().toLocalDate()
                     : null;

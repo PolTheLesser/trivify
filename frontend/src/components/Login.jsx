@@ -11,11 +11,14 @@ import {
     Alert,
 } from '@mui/material';
 import {useAuth} from '../contexts/AuthContext';
+import {PasswordField} from '../CustomElements';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [warning, setWarning] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const {login} = useAuth();
     const navigate = useNavigate();
@@ -23,7 +26,15 @@ const Login = () => {
 
     useEffect(() => {
         if (location.state?.message) {
-            setError(location.state.message);
+            if (location.state?.severity === 'error') {
+                setError(location.state.message);
+            } else if (location.state?.severity === 'warning') {
+                setWarning(location.state.message);
+            } else if (location.state?.severity === 'success') {
+                setSuccess(location.state.message)
+            } else {
+                setError(location.state.message)
+            }
             // Entferne die Nachricht aus dem State, damit sie nicht erneut angezeigt wird
             navigate(location.pathname, {state: {}});
         }
@@ -62,12 +73,23 @@ const Login = () => {
                             {error}
                         </Alert>
                     )}
+                    {warning && (
+                        <Alert severity="warning" sx={{mb: 2}}>
+                            {warning}
+                        </Alert>
+                    )}
+                    {success && (
+                        <Alert severity="success" sx={{mb: 2}}>
+                            {success}
+                        </Alert>
+                    )}
                     <form onSubmit={handleSubmit}>
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             id="email"
+                            type="email"
                             label="E-Mail-Adresse"
                             name="email"
                             autoComplete="email"
@@ -75,13 +97,12 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <TextField
+                        <PasswordField
                             margin="normal"
                             required
                             fullWidth
                             name="password"
                             label="Passwort"
-                            type="password"
                             id="password"
                             autoComplete="current-password"
                             value={password}

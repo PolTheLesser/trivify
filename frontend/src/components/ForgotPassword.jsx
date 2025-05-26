@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -18,6 +18,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const { forgotPassword } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +27,12 @@ const ForgotPassword = () => {
       setMessage('');
       setLoading(true);
       await forgotPassword(email);
-      setMessage('Überprüfen Sie Ihren Posteingang für weitere Anweisungen');
+      navigate('/login', {
+        state: {
+          message: 'Ein Link zum Zurücksetzen des Passworts wurde an Ihre E-Mail-Adresse gesendet.',
+          severity: 'success'
+        }
+      });
     } catch (error) {
       setError(error.message || 'Fehler beim Zurücksetzen des Passworts');
     } finally {
@@ -57,6 +63,7 @@ const ForgotPassword = () => {
               required
               fullWidth
               id="email"
+              type="email"
               label="E-Mail-Adresse"
               name="email"
               autoComplete="email"

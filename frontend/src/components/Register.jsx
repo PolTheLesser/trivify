@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Link,
-  Box,
   Alert,
+  Box,
+  Button,
+  Container,
   Grid,
-  FormControlLabel,
-  Checkbox,
+  Link,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
+import {PasswordField, CustomFormControlLabel, CustomSwitch } from "../CustomElements";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -55,13 +54,12 @@ const Register = () => {
       });
       navigate('/login', { 
         state: { 
-          message: 'Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails und klicken Sie auf den Verifizierungslink, um Ihr Konto zu aktivieren. Nach der Verifizierung können Sie sich anmelden.' 
+          message: 'Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails und klicken Sie auf den Verifizierungslink, um Ihr Konto zu aktivieren. Nach der Verifizierung können Sie sich anmelden.',
+          severity: 'success'
         }
       });
     } catch (error) {
-      if (error.message.includes('email')) {
-        setError('Diese E-Mail-Adresse wird bereits verwendet');
-      } else if (error.message.includes('name')) {
+      if (error.message.includes('name')) {
         setError('Dieser Benutzername ist bereits vergeben');
       } else {
         setError('Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.');
@@ -110,6 +108,7 @@ const Register = () => {
                   required
                   fullWidth
                   id="email"
+                  type="email"
                   label="E-Mail-Adresse"
                   name="email"
                   autoComplete="email"
@@ -118,43 +117,37 @@ const Register = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Passwort"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
+                <PasswordField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Passwort"
+                    id="password"
+                    autoComplete="new-password"
+                    value={formData.password}
+                    onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <PasswordField
                   required
                   fullWidth
                   name="confirmPassword"
                   label="Passwort bestätigen"
-                  type="password"
                   id="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
+                <CustomFormControlLabel
                   control={
-                    <Checkbox
-                      checked={formData.dailyQuizReminder}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        dailyQuizReminder: e.target.checked 
-                      })}
+                    <CustomSwitch checked={formData.dailyQuizReminder} onChange={(e) => setFormData({
+                      ...formData,
+                      dailyQuizReminder: e.target.checked
+                    })} />}
+                        label="Tägliche Quiz-Erinnerungen aktivieren"
                     />
-                  }
-                  label="Tägliche Quiz-Erinnerung aktivieren"
-                />
               </Grid>
             </Grid>
             <Button

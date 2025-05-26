@@ -11,6 +11,10 @@
             background-color: #f9fafb;
             color: #333;
         }
+        .logo img {
+            max-width: 80px;
+            height: auto;
+        }
         .container {
             max-width: 600px;
             margin: 40px auto;
@@ -77,10 +81,8 @@
         <a class="cta-button" th:href="${quizUrl}">Jetzt Quiz starten</a>
     </p>
 
-    <p>Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
-    <p style="word-break: break-all; color: #666;">
-        <span th:text="${quizUrl}">Link</span>
-    </p>
+    <p style="word-break: break-all; color: #666;">Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
+    <p style="word-break: break-all; color: #666;" th:text="${quizUrl}"></p>
 
     <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 

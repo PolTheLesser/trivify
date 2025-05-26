@@ -24,6 +24,10 @@
       margin-bottom: 24px;
     }
     .logo img {
+      max-width: 80px;
+      height: auto;
+    }
+    .logo img {
       max-width: 120px;
       height: auto;
     }
@@ -77,8 +81,13 @@
   <p>Du kannst dich einfach anmelden, um deinen Account zu reaktivieren:</p>
 
   <p style="text-align: center;">
-    <a class="cta-button" th:href="${loginUrl}">Account reactivieren</a>
+    <a class="cta-button" th:href="${loginUrl}">Account reaktivieren</a>
   </p>
+
+  <p>Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:</p>
+  <p style="word-break: break-all; color: #666;" th:text="${loginUrl}"></p>
+
+    <p>Falls du Fragen hast oder Unterstützung benötigst, antworte gerne auf diese E-Mail.</p>
   <div class="footer">
     © 2025 Trivify – Diese E-Mail wurde automatisch generiert.
   </div>

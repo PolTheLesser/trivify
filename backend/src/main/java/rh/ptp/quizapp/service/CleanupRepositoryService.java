@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rh.ptp.quizapp.model.RegistrationRequest;
-import rh.ptp.quizapp.repository.RegistrationRequestRepository;
+import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
+import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
+import rh.ptp.quizapp.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,11 +20,17 @@ import java.util.Map;
 @Service
 public class CleanupRepositoryService {
 
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CleanupRepositoryService.class);
+
     @PersistenceContext
     private EntityManager em;
 
     @Autowired
-    private RegistrationRequestRepository registrationRequestRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationTokenRepository authenticationTokenRepository;
+
     @Autowired
     private EmailService emailService;
     @Value("${frontend.url}")
@@ -65,28 +73,58 @@ public class CleanupRepositoryService {
                 .setParameter("userId", userId)
                 .executeUpdate();
     }
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde //ToDo: implement account status, implement rest of mails
-    public void cleanupOldRegistrations() {
-        LocalDateTime warningTime = LocalDateTime.now().minusHours(23);
-        List<RegistrationRequest> requests = registrationRequestRepository.findAllByCreatedAtBefore(warningTime);
-        for (RegistrationRequest request : requests) {
+
+    @Transactional
+    public void prepareDelete(long userId) {
+        // 1. Lösche alle abhängigen Datensätze
+        deleteAllQuizResultsByUser(userId);
+        deleteAllQuizRatingsByUser(userId);
+        setAllCreatedQuizzesToAdmin(userId);
+    }
+
+    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    @Transactional
+    public void completeDeletionRequests() {
+        // 1) Warn all deletion requests older than 6 days
+        LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
+        List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_DELETE));
+
+        for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/logo192.png");
             variables.put("username", request.getName());
-            variables.put("verificationUrl", frontendUrl + "/verify-email/" + request.getVerificationToken());
+            variables.put("verificationUrl", frontendUrl + "/verify-email/" + authenticationTokenRepository.findTokenByQuizUser(request));
             variables.put("loginUrl", frontendUrl + "/login");
-            //if(user.status="registration"){
-            emailService.sendEmail(request.getEmail(), "Erinnerung: Registrierung", "registration-delete-warning", variables);
-            //} else{
-            //    emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables); }
+            emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
         }
-        LocalDateTime expiryTime = LocalDateTime.now().minusHours(24);
-        requests = registrationRequestRepository.findAllByCreatedAtBefore(expiryTime);
-        for (RegistrationRequest request : requests) {
+
+        // 2) Delete all deletion requests older than 7 days
+        LocalDateTime expiryTime = LocalDateTime.now().minusDays(7);
+        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
+        for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
             variables.put("username", request.getName());
+            variables.put("loginUrl", frontendUrl + "/login");
+            variables.put("registerUrl", frontendUrl + "/register");
+            emailService.sendEmail(request.getEmail(), "Deine Benutzerdaten wurden gelöscht!", "account-deleted", variables);
+            prepareDelete(request.getId());
         }
-        registrationRequestRepository.deleteAllByCreatedAtBefore(expiryTime);
+        userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
+    }
+
+    @Scheduled(cron = "0 * * * * *") // jede Minute
+    @Transactional
+    public void deleteOldTokens() {
+        // Delete all tokens older than 1 hour
+        LocalDateTime expiryTime = LocalDateTime.now().minusHours(1);
+        List<User> users = authenticationTokenRepository.findQuizUserByExpiryDateBefore(expiryTime);
+        authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);
+        for (User user : users) {
+            if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+                logger.info("Deleting user {} with status PENDING_VERIFICATION", user.getEmail());
+                userRepository.deleteById(user.getId());
+            }
+        }
     }
 }

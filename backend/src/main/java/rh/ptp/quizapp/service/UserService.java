@@ -9,7 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rh.ptp.quizapp.dto.UserDTO;
+import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.*;
 
 import java.time.LocalDate;
@@ -25,39 +27,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final CleanupRepositoryService cleanupRepo;
-    private final QuizResultRepository     quizResultRepo;
-    private final UserRepository           userRepo;
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final QuizResultRepository quizResultRepository;
+    private final AuthenticationTokenRepository authenticationTokenRepository;
+    private final AuthService authService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
-
-    public User loginUser(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Ungültiges Passwort");
-        }
-
-        if (!user.isEmailVerified()) {
-            throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
-        }
-
-        return user;
-    }
 
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
         
-        String token = UUID.randomUUID().toString();
-        user.setResetPasswordToken(token);
-        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(1));
-        userRepository.save(user);
-
+        authService.createAuthenticationToken(user);
+        String token = authenticationTokenRepository.findTokenByQuizUser(user);
         Map<String, Object> variables = new HashMap<>();
         variables.put("logoUrl", frontendUrl+"/logo192.png");
         variables.put("username", user.getName());
@@ -67,16 +50,11 @@ public class UserService {
     }
 
     public void resetPassword(String token, String newPassword) {
-        User user = userRepository.findByResetPasswordToken(token)
+        User user = authenticationTokenRepository.findQuizUserByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Token"));
-
-        if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Der Token ist abgelaufen");
-        }
-
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setResetPasswordToken(null);
-        user.setResetPasswordTokenExpiry(null);
+        user.setUserStatus(UserStatus.ACTIVE);
+        authenticationTokenRepository.deleteAllById(user.getId());
         userRepository.save(user);
     }
 
@@ -125,7 +103,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
         log.info("Incrementing daily quiz streak for user: {}", user.getEmail());
         boolean alreadyPlayedToday = quizResultRepository
-                .existsByUserIdAndQuizIsDailyQuizTrueAndPlayedAtAfter(user.getId(), today.atStartOfDay());
+                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(),QuizCategory.DAILY_QUIZ, today.atStartOfDay());
         user.setLastDailyQuizPlayed(LocalDateTime.now());
 
         if (alreadyPlayedToday) {
