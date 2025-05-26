@@ -110,11 +110,7 @@ public class CreateAiRequest {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         JSONObject responseJson = new JSONObject(response.body());
 
-        String content = responseJson
-                .getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content");
+        String content = responseJson.getJSONObject("message").getString("content");
 
         // Remove JSON markdown formatting if any
         content = content.replaceAll("(?s)```json|```", "").trim();
