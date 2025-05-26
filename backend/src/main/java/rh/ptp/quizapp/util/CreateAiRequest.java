@@ -108,9 +108,12 @@ public class CreateAiRequest {
 
     public JSONArray fetchQuizFromAPI(HttpClient httpClient, String prompt) throws IOException, InterruptedException {
         JSONObject requestBody = new JSONObject()
-                .put("parts", new JSONArray()
+                .put("contents", new JSONArray()
                         .put(new JSONObject()
-                                .put("text", prompt)));
+                                .put("role", "user")
+                                .put("parts", new JSONArray()
+                                        .put(new JSONObject()
+                                                .put("text", prompt)))));
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl + apiKey))
@@ -126,14 +129,16 @@ public class CreateAiRequest {
         JSONObject responseJson = new JSONObject(responseBody);
 
         JSONArray candidates = responseJson.getJSONArray("candidates");
-        String content = candidates.getJSONObject(0)
-                .getJSONArray("content")
-                .getJSONObject(0)
-                .getString("text");
+        JSONObject contentObj = candidates.getJSONObject(0).getJSONObject("content");
+        JSONArray parts = contentObj.getJSONArray("parts");
+        String content = parts.getJSONObject(0).getString("text");
 
         // Bereinigung der Antwort
-        content = content.replaceAll("(?s)```json|```", "").trim();
-        content = content.replaceAll("(?s)<think>.*?</think>\\s*", "").trim();
+        content = content.replaceAll("(?s)```json|```", "")     // Entferne Markdown
+                .replace("\\n", "")                    // Entferne \n
+                .replace("\\\"", "\"")                // Entescape "
+                .replaceAll("\\\\", "")               // Entferne alle \
+                .trim();
 
         if (!content.startsWith("[")) {
             throw new RuntimeException("JSON content does not start with '[' nach Bereinigung: " + content);
