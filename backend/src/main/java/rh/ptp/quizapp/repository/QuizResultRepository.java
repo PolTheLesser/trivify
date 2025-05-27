@@ -12,6 +12,10 @@ import rh.ptp.quizapp.model.QuizResult;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Repository für den Zugriff auf {@link rh.ptp.quizapp.model.QuizResult}.
+ * Stellt Abfragen zur Verfügung für Ergebnisse nach Benutzer, Quiz, Highscores sowie zur Bereinigung von Resultaten.
+ */
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
     List<QuizResult> findByUserId(Long userId);
 

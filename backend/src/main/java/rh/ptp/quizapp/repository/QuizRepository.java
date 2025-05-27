@@ -12,6 +12,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository zur Verwaltung von {@link rh.ptp.quizapp.model.Quiz} Entitäten.
+ * Bietet Methoden zur Suche nach Quizzes basierend auf Ersteller, Kategorie, Datum sowie zur gezielten Löschung.
+ */
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
     List<Quiz> findByCreatorId(Long creatorId);
     @Transactional

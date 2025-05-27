@@ -14,12 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Service für administrative Benutzerverwaltungsfunktionen.
+ * Ermöglicht das Erstellen, Aktualisieren und Löschen von Benutzern durch Admins
+ * sowie das Versenden von entsprechenden Benachrichtigungs-E-Mails.
+ */
 @Service
 public class AdminService {
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private EmailService emailService;
 
@@ -28,6 +35,13 @@ public class AdminService {
 
     private boolean customEmailSend = false;
 
+    /**
+     * Erstellt einen neuen Benutzer mit verschlüsseltem Passwort und speichert ihn.
+     * Sendet eine E-Mail-Benachrichtigung an den neuen Benutzer.
+     *
+     * @param user Benutzerobjekt mit den zu speichernden Daten (inkl. Klartext-Passwort)
+     * @return Gespeicherter Benutzer mit unverändertem Klartext-Passwort im Rückgabeobjekt
+     */
     public User createUser(User user) {
         String password = user.getPassword();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -39,25 +53,31 @@ public class AdminService {
         return user;
     }
 
+    /**
+     * Aktualisiert einen existierenden Benutzer mit den neuen Daten.
+     * Sendet bei Änderungen entsprechende Benachrichtigungen.
+     *
+     * @param id           ID des zu aktualisierenden Benutzers
+     * @param userUpdated  Benutzerobjekt mit neuen Werten (kann teilweise leer sein)
+     * @return Aktualisierter Benutzer
+     * @throws RuntimeException wenn Benutzer nicht gefunden wird
+     */
     public User updateUser(Long id, User userUpdated) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         Map<String, Object> variables = adminEmail(user, userUpdated, 1);
+
         if (userUpdated.getName() != null) {
             user.setName(userUpdated.getName());
         }
-
         if (userUpdated.getEmail() != null) {
             user.setEmail(userUpdated.getEmail());
         }
-
         if (userUpdated.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userUpdated.getPassword()));
         }
-
         if (userUpdated.getUserStatus() != null) {
             user.setUserStatus(userUpdated.getUserStatus());
         }
-
         if (userUpdated.getRole() != null) {
             user.setRole(userUpdated.getRole());
         }
@@ -66,12 +86,12 @@ public class AdminService {
         if (userUpdated.getDailyStreak() != user.getDailyStreak()) {
             user.setLastDailyQuizPlayed(LocalDateTime.now());
         }
-
         user.setDailyStreak(userUpdated.getDailyStreak());
 
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);
+
         if (!customEmailSend) {
             variables.replace("username", user.getName());
             variables.replace("email", user.getEmail());
@@ -80,6 +100,13 @@ public class AdminService {
         return user;
     }
 
+    /**
+     * Löscht einen Benutzer anhand seiner ID.
+     * Sendet eine Benachrichtigung über die Löschung.
+     *
+     * @param id ID des zu löschenden Benutzers
+     * @throws RuntimeException bei Fehlern während der Löschung
+     */
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).get();
         try {
@@ -90,6 +117,15 @@ public class AdminService {
         }
     }
 
+    /**
+     * Hilfsmethode zum Versenden von Admin-bezogenen E-Mails
+     * bei Erstellung, Aktualisierung oder Löschung eines Benutzers.
+     *
+     * @param user        Alter Benutzerzustand
+     * @param userUpdated Neuer Benutzerzustand
+     * @param action      Aktionstyp: 0=Erstellung, 1=Update, 2=Löschung
+     * @return Map mit Template-Variablen für die E-Mail
+     */
     private Map<String, Object> adminEmail(User user, User userUpdated, int action) {
         customEmailSend = false;
         Map<String, Object> variables = new HashMap<>();
@@ -98,6 +134,7 @@ public class AdminService {
         variables.put("loginUrl", frontendUrl + "/login");
         variables.put("password", userUpdated.getPassword());
         variables.put("registerUrl", frontendUrl + "/register");
+
         if (action == 0) {
             emailService.sendEmail(user.getEmail(), "Dein Benutzerkonto wurde durch einen Admin erstellt!", "account-created", variables);
         } else if (action == 1) {

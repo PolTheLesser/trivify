@@ -24,7 +24,8 @@ import java.util.Map;
 /**
  * Service zur automatischen Erstellung und Speicherung eines täglichen Quiz.
  * <p>
- * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt
+ * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt.
+ * </p>
  */
 @Slf4j
 @Service
@@ -40,11 +41,9 @@ public class DailyQuizSchedulerService {
     private final QuizRepository quizRepository;
     private final QuizService quizService;
 
-    /**
-     * Pfad zur Daily-Quiz-Datei.
-     */
     @Autowired
     private EmailService emailService;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -63,10 +62,12 @@ public class DailyQuizSchedulerService {
     /**
      * Tägliche Aufgabe, die automatisch um 0:00 Uhr ausgeführt wird.
      * <p>
-     * Diese Methode generiert 10 Quizfragen über eine API-Abfrage und speichert sie als JSON-Datei.
-     * Im Fehlerfall wird ein entsprechender Logeintrag erzeugt.
+     * Diese Methode generiert 10 Quizfragen über eine API-Abfrage und speichert sie.
+     * Im Fehlerfall wird ein Logeintrag erzeugt.
+     * </p>
      * <p>
      * Cron-Ausdruck: {@code 0 0 0 * * *} (täglich um 0:00 Uhr)
+     * </p>
      */
     @Scheduled(cron = "0 0 0 * * *")
     public void generateDailyQuiz() {
@@ -82,8 +83,8 @@ public class DailyQuizSchedulerService {
             JSONArray fragen = null;
             boolean valid = false;
             QuizCategory[] categories = java.util.Arrays.stream(QuizCategory.values())
-    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
-    .toArray(QuizCategory[]::new);
+                    .filter(cat -> cat != QuizCategory.DAILY_QUIZ && cat != QuizCategory.GENERAL_KNOWLEDGE)
+                    .toArray(QuizCategory[]::new);
             QuizCategory randomCategory = categories[(int) (Math.random() * categories.length)];
             while (!valid) {
                 try {
@@ -101,7 +102,7 @@ public class DailyQuizSchedulerService {
             List<User> usersToRemind = userRepository.findByDailyQuizReminderIsTrue();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/logo192.png");
 
             for (User user : usersToRemind) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -115,8 +116,8 @@ public class DailyQuizSchedulerService {
                     userRepository.save(user);
                     variables.put("username", user.getName());
                     variables.put("oldStreak", oldStreak);
-                    emailService.sendEmail(user.getEmail(), "Daily-Streak verloren 😔", "daily-quiz-streak-lost" ,variables);
-                } else{
+                    emailService.sendEmail(user.getEmail(), "Daily-Streak verloren 😔", "daily-quiz-streak-lost", variables);
+                } else {
                     variables.put("username", user.getName());
                     emailService.sendEmail(user.getEmail(), "Tägliche Quiz-Erinnerung ⁉️", "daily-quiz-reminder", variables);
                 }
@@ -127,7 +128,13 @@ public class DailyQuizSchedulerService {
         }
     }
 
-    @Scheduled(cron = "0 0 18 * * ?") // Täglich um 18 Uhr
+    /**
+     * Tägliche Erinnerung an Benutzer um 18 Uhr, falls die Daily-Streak in Gefahr ist.
+     * <p>
+     * Cron-Ausdruck: {@code 0 0 18 * * ?} (täglich um 18 Uhr)
+     * </p>
+     */
+    @Scheduled(cron = "0 0 18 * * ?")
     public void dailyQuizStreakReminder() {
         for (User user : userRepository.findByDailyQuizReminderIsTrue()) {
             LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -136,15 +143,14 @@ public class DailyQuizSchedulerService {
             boolean missedUntilNow = lastPlayed == null || lastPlayed.isBefore(LocalDate.now());
             if (user.getDailyStreak() > 0 && missedUntilNow) {
                 Map<String, Object> variables = new HashMap<>();
-                variables.put("logoUrl", frontendUrl+"/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
                 variables.put("username", user.getName());
-                variables.put("quizUrl", frontendUrl+"/daily-quiz");
+                variables.put("quizUrl", frontendUrl + "/daily-quiz");
                 variables.put("streak", user.getDailyStreak());
-                variables.put("logoUrl", frontendUrl+"/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/logo192.png");
                 emailService.sendEmail(user.getEmail(), "Deine Streak ist in Gefahr! ⏳", "daily-quiz-streak-reminder", variables);
             }
         }
     }
-
 }
 

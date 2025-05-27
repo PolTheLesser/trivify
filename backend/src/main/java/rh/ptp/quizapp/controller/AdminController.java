@@ -18,6 +18,9 @@ import java.util.List;
 
 import static rh.ptp.quizapp.mapper.UserMapper.*;
 
+/**
+ * REST-Controller für administrative Funktionen wie Benutzer- und Quizverwaltung.
+ */
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -32,12 +35,18 @@ public class AdminController {
     @Autowired
     private CleanupRepositoryService cleanupRepositoryService;
 
+    /**
+     * Gibt eine Liste aller Admin-Quizzes inklusive Bewertungen zurück.
+     */
     @GetMapping("/quizzes")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Quiz>> getQuizzesAdmin() {
         return ResponseEntity.ok(quizService.findAllWithRatings());
     }
 
+    /**
+     * Gibt eine Liste aller registrierten Admin-Benutzer im System zurück.
+     */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserDTO>> getUsersAdmin() {
@@ -48,19 +57,27 @@ public class AdminController {
         return ResponseEntity.ok(userDTOs);
     }
 
+    /**
+     * Gibt alle verfügbaren Benutzerrollen zurück.
+     */
     @GetMapping("/users/roles")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<String>> getUserRolesAdmin() {
         return ResponseEntity.ok(UserRole.getUserRoles());
     }
 
+    /**
+     * Gibt alle möglichen Admin-Benutzerstatus zurück.
+     */
     @GetMapping("/users/states")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<String>> getUserStatesAdmin() {
         return ResponseEntity.ok(UserStatus.getUserStates());
     }
 
-
+    /**
+     * Erstellt einen neuen Admin-Benutzer anhand der übergebenen Benutzerdaten.
+     */
     @PostMapping("/users/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDTO> createUserAdmin(@RequestBody UserDTO userToCreateDTO) {
@@ -69,6 +86,11 @@ public class AdminController {
         return ResponseEntity.ok(UserDTO.fromUser(createdUser));
     }
 
+    /**
+     * Aktualisiert einen bestehenden Admin-Benutzer mit neuen Daten.
+     *
+     * @param id Benutzer-ID
+     */
     @PutMapping("/users/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDTO> updateUserAdmin(@PathVariable Long id, @RequestBody UserDTO userToUpdateDTO) {
@@ -77,7 +99,11 @@ public class AdminController {
         return ResponseEntity.ok(UserDTO.fromUser(updatedUser));
     }
 
-
+    /**
+     * Löscht einen Admin-Benutzer inklusive Vorbereitung durch das Cleanup-Service.
+     *
+     * @param id Benutzer-ID
+     */
     @DeleteMapping("/users/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUserAdmin(@PathVariable Long id) {

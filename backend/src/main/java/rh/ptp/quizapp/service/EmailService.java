@@ -20,19 +20,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service zur Verwaltung und zum Versand von E-Mails.
+ * <p>
+ * Verwendet Thymeleaf zur Template-Verarbeitung und JavaMailSender zum Versand.
+ * Prüft vor dem Versand den Benutzerstatus, um unerwünschte E-Mails zu vermeiden.
+ * </p>
+ */
 @Service
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+
     @Value("${spring.mail.username}")
     private final String mailFrom;
 
+    /**
+     * Konstruktor mit Dependency Injection.
+     *
+     * @param mailSender     JavaMailSender für den E-Mail-Versand
+     * @param templateEngine Thymeleaf TemplateEngine zur Verarbeitung von Templates
+     * @param secretsConfig  Konfiguration zur sicheren Beschaffung von geheimen Werten
+     * @param userRepository Repository zur Abfrage von Benutzerdaten
+     */
     @Autowired
-    public EmailService(JavaMailSender mailSender, 
-                       TemplateEngine templateEngine,
-                       SecretsConfig secretsConfig,
+    public EmailService(JavaMailSender mailSender,
+                        TemplateEngine templateEngine,
+                        SecretsConfig secretsConfig,
                         UserRepository userRepository) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
@@ -40,6 +56,19 @@ public class EmailService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Sendet eine E-Mail mit dem angegebenen Betreff und Template an den Empfänger.
+     * <p>
+     * Das Template wird mit den bereitgestellten Variablen gerendert.
+     * Vor dem Versand wird geprüft, ob der Benutzerstatus den Versand erlaubt.
+     * </p>
+     *
+     * @param to           Empfänger-E-Mail-Adresse
+     * @param subject      Betreff der E-Mail
+     * @param templateName Name des Thymeleaf-Templates
+     * @param variables    Variablen zur Template-Verarbeitung
+     * @throws RuntimeException bei Fehlern im Versandprozess
+     */
     public void sendEmail(String to, String subject, String templateName, Map<String, Object> variables) {
         try {
             if (!userRepository.findByEmail(to)

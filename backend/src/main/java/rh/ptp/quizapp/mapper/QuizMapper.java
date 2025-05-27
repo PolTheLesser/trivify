@@ -4,7 +4,17 @@ import rh.ptp.quizapp.dto.QuizDTO;
 import rh.ptp.quizapp.model.Quiz;
 import rh.ptp.quizapp.model.User;
 
+/**
+ * Diese Klasse enthält statische Methoden zur Konvertierung zwischen {@link Quiz} und {@link QuizDTO}.
+ */
 public class QuizMapper {
+
+    /**
+     * Konvertiert ein {@link Quiz} Entity in ein {@link QuizDTO}.
+     *
+     * @param quiz Das Quiz-Entity
+     * @return Das zugehörige QuizDTO oder {@code null}, wenn das Eingabeobjekt {@code null} ist
+     */
     public static QuizDTO toDto(Quiz quiz) {
         if (quiz == null) {
             return null;
@@ -19,6 +29,13 @@ public class QuizMapper {
         return dto;
     }
 
+    /**
+     * Konvertiert ein {@link QuizDTO} in ein {@link Quiz} Entity.
+     * Wenn ein CreatorId gesetzt ist, wird ein neues {@link User} Objekt mit der ID erstellt.
+     *
+     * @param dto Das QuizDTO
+     * @return Das zugehörige Quiz-Entity oder {@code null}, wenn das Eingabeobjekt {@code null} ist
+     */
     public static Quiz toEntity(QuizDTO dto) {
         if (dto == null) {
             return null;
