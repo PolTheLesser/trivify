@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository für den Zugriff auf {@link rh.ptp.quizapp.model.AuthenticationToken} Entitäten.
+ * Bietet Methoden zum Finden, Löschen und Abfragen von Tokens nach Benutzer oder Ablaufdatum.
+ */
 public interface AuthenticationTokenRepository extends JpaRepository<AuthenticationToken, Long> {
     Optional<AuthenticationToken> findByToken(String token);
 

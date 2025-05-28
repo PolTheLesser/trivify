@@ -65,6 +65,7 @@ jobs:
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_OUTPUT
           echo "AI_URL=${{ vars.AI_URL }}" >> $GITHUB_OUTPUT
           echo "AI_API_KEY=${{ secrets.AI_API_KEY }}" >> $GITHUB_OUTPUT
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_OUTPUT
 
         env:
           DB_URL: ${{ vars.DB_URL }}
@@ -79,6 +80,7 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           AI_URL: ${{ vars.AI_URL }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
       - name: Build Backend
         run: |

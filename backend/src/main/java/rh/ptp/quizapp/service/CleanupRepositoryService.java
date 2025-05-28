@@ -17,6 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service zur Bereinigung und Löschung von Benutzerdaten und Tokens.
+ * <p>
+ * Führt geplante Aufgaben wie das Löschen alter Tokens und das Abschließen von Löschanfragen durch.
+ * </p>
+ */
 @Service
 public class CleanupRepositoryService {
 
@@ -33,11 +39,14 @@ public class CleanupRepositoryService {
 
     @Autowired
     private EmailService emailService;
+
     @Value("${frontend.url}")
     private String frontendUrl;
 
     /**
-     * 0) Delete all quiz results of this user
+     * Löscht alle Quiz-Ergebnisse eines Benutzers.
+     *
+     * @param userId ID des Benutzers
      */
     @Transactional
     public void deleteAllQuizResultsByUser(long userId) {
@@ -47,7 +56,9 @@ public class CleanupRepositoryService {
     }
 
     /**
-     * 1) Delete all ratings for quizzes this user created
+     * Löscht alle Bewertungen für die vom Benutzer erstellten Quizzes.
+     *
+     * @param userId ID des Benutzers
      */
     @Transactional
     public void deleteAllQuizRatingsByUser(long userId) {
@@ -62,7 +73,9 @@ public class CleanupRepositoryService {
     }
 
     /**
-     * 2) Set all created Quizzes to admin
+     * Setzt den Ersteller aller vom Benutzer erstellten Quizzes auf den Admin-Benutzer (ID = 1).
+     *
+     * @param userId ID des Benutzers
      */
     @Transactional
     public void setAllCreatedQuizzesToAdmin(long userId) {
@@ -74,18 +87,31 @@ public class CleanupRepositoryService {
                 .executeUpdate();
     }
 
+    /**
+     * Bereitet die Löschung eines Benutzers vor, indem abhängige Datensätze bereinigt werden.
+     *
+     * @param userId ID des Benutzers
+     */
     @Transactional
     public void prepareDelete(long userId) {
-        // 1. Lösche alle abhängigen Datensätze
         deleteAllQuizResultsByUser(userId);
         deleteAllQuizRatingsByUser(userId);
         setAllCreatedQuizzesToAdmin(userId);
     }
 
-    @Scheduled(cron = "0 0 * * * *") // jede Stunde
+    /**
+     * Führt geplante Aufgaben zum Abschluss von Löschanfragen aus.
+     * <ul>
+     *   <li>Warnung an Benutzer mit Löschanfragen älter als 6 Tage.</li>
+     *   <li>Endgültige Löschung von Benutzerdaten für Löschanfragen älter als 7 Tage.</li>
+     * </ul>
+     * <p>
+     * Ausgeführt jede Stunde (Cron: "0 0 * * * *").
+     * </p>
+     */
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void completeDeletionRequests() {
-        // 1) Warn all deletion requests older than 6 days
         LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
         List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_DELETE));
 
@@ -98,7 +124,6 @@ public class CleanupRepositoryService {
             emailService.sendEmail(request.getEmail(), "Erinnerung: Account-Löschung", "account-delete-warning", variables);
         }
 
-        // 2) Delete all deletion requests older than 7 days
         LocalDateTime expiryTime = LocalDateTime.now().minusDays(7);
         requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
         for (User request : requests) {
@@ -113,10 +138,18 @@ public class CleanupRepositoryService {
         userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }
 
-    @Scheduled(cron = "0 * * * * *") // jede Minute
+    /**
+     * Löscht alte Authentifizierungstoken, die älter als 1 Stunde sind.
+     * <p>
+     * Löscht auch Benutzer mit Status PENDING_VERIFICATION, wenn deren Token abgelaufen sind.
+     * </p>
+     * <p>
+     * Ausgeführt jede Minute (Cron: "0 * * * * *").
+     * </p>
+     */
+    @Scheduled(cron = "0 * * * * *")
     @Transactional
     public void deleteOldTokens() {
-        // Delete all tokens older than 1 hour
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(1);
         List<User> users = authenticationTokenRepository.findQuizUserByExpiryDateBefore(expiryTime);
         authenticationTokenRepository.deleteAllByExpiryDateBefore(expiryTime);

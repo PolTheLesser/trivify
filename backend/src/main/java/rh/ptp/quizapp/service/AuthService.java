@@ -23,6 +23,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Service für Authentifizierung und Registrierung von Benutzern.
+ * Beinhaltet Registrierung, Login, E-Mail-Verifikation sowie Tokenmanagement.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,9 +37,20 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuthenticationTokenRepository authenticationTokenRepository;
     private final EmailService emailService;
+
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    /**
+     * Registriert einen neuen Benutzer.
+     * Wenn Benutzername bereits existiert, wird eine Exception geworfen.
+     * Falls E-Mail bereits existiert, wird ein Passwort-Zurücksetzen-Token generiert und E-Mail verschickt.
+     * Sendet Verifizierungs-E-Mail an neu registrierten Benutzer.
+     *
+     * @param request RegisterRequest mit Benutzerdaten
+     * @return Angelegter Benutzer mit verschlüsseltem Passwort und PENDING_VERIFICATION Status
+     * @throws RuntimeException bei existierendem Benutzernamen
+     */
     public User register(RegisterRequest request) {
         if (userRepository.existsByName(request.getName())) {
             throw new RuntimeException("Benutzername ist bereits vergeben");
@@ -64,6 +79,14 @@ public class AuthService {
         return pendingUser;
     }
 
+    /**
+     * Erstellt einen neuen Verifikations- oder Passwort-Zurücksetzen-Token für einen Benutzer.
+     * Löscht ggf. vorhandene Token vorher.
+     * Sendet Verifizierungs-E-Mail wenn der Nutzer den Status PENDING_VERIFICATION hat.
+     *
+     * @param user Benutzer, für den der Token erstellt wird
+     * @return Erstellter AuthenticationToken
+     */
     AuthenticationToken createAuthenticationToken(User user) {
         AuthenticationToken existingToken = authenticationTokenRepository.findByQuizUser(user);
         logger.info("Existing token: " + existingToken);
@@ -77,20 +100,28 @@ public class AuthService {
             variables.put("logoUrl", frontendUrl+"/logo192.png");
             variables.put("username", user.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken.getToken());
-            variables.put("dataUrl", frontendUrl + "/datenschutz");
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
         }
         return authenticationTokenRepository.save(newToken);
     }
 
+    /**
+     * Authentifiziert einen Benutzer anhand der Login-Daten.
+     * Prüft Benutzerstatus und wirft Ausnahmen bei gesperrtem oder nicht verifiziertem Benutzer.
+     * Generiert und gibt ein JWT Token zurück.
+     *
+     * @param request LoginRequest mit E-Mail und Passwort
+     * @return AuthResponse mit JWT Token und UserDTO
+     * @throws RuntimeException bei fehlerhafter Anmeldung oder Statusproblemen
+     */
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
             User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
 
             if (user.getUserStatus()==UserStatus.PENDING_VERIFICATION) {
                 throw new RuntimeException("E-Mail-Adresse nicht verifiziert");
@@ -116,6 +147,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * Verifiziert die E-Mail-Adresse eines Benutzers anhand eines Verifikations-Tokens.
+     * Setzt den Benutzerstatus auf ACTIVE und löscht den Token nach erfolgreicher Verifikation.
+     *
+     * @param token Verifikations-Token aus dem E-Mail-Link
+     * @return Verifizierter Benutzer mit Status ACTIVE
+     * @throws RuntimeException bei ungültigem oder abgelaufenem Token
+     */
     public User verifyEmail(String token) {
         AuthenticationToken authenticationToken = authenticationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Verifizierungslink"));
@@ -132,9 +171,16 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * Liefert den aktuell angemeldeten Benutzer anhand eines JWT Tokens.
+     *
+     * @param token JWT Token aus dem Authorization Header (mit "Bearer " Präfix)
+     * @return Benutzerobjekt des eingeloggten Benutzers
+     * @throws RuntimeException wenn Benutzer nicht gefunden wird
+     */
     public User getCurrentUser(String token) {
         String email = jwtService.extractUsername(token.substring(7));
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
     }
-} 
+}
