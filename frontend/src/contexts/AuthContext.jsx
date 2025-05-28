@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await axios.get(process.env.REACT_APP_API_URL + '/auth/me');
+          const response = await axios.get('/auth/me');
           setUser(response.data);
         } catch (error) {
           localStorage.removeItem('token');
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   // Login Funktion
   const login = async (email, password) => {
     try {
-      const response = await axios.post(process.env.REACT_APP_API_URL + '/auth/login', { email, password });
+      const response = await axios.post('/auth/login', { email, password });
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   // Registrierung
   const register = async (userData) => {
     try {
-      const response = await axios.post(process.env.REACT_APP_API_URL + '/auth/register', {
+      const response = await axios.post('/auth/register', {
         ...userData,
         dailyQuizReminder: Boolean(userData.dailyQuizReminder),
       });
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   // Passwort vergessen
   const forgotPassword = async (email) => {
     try {
-      await axios.post(process.env.REACT_APP_API_URL + '/users/reset-password-request', { email });
+      await axios.post('/users/reset-password-request', { email });
     } catch (error) {
       throw error.response?.data || { message: 'Ein Fehler ist aufgetreten' };
     }
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   // Passwort zurücksetzen
   const resetPassword = async (token, password) => {
     try {
-      await axios.post(process.env.REACT_APP_API_URL + `/users/reset-password/${token}`, { newPassword: password });
+      await axios.post(`/users/reset-password/${token}`, { newPassword: password });
     } catch (error) {
       throw error.response?.data || { message: 'Ein Fehler ist aufgetreten' };
     }

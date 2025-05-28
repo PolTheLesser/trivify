@@ -71,11 +71,11 @@ const AdminUserPanel = () => {
 
     useEffect(() => {
         if (user?.role === 'ROLE_ADMIN') {
-            axios.get(`${process.env.REACT_APP_API_URL}/admin/users/roles`)
+            axios.get(`/admin/users/roles`)
                 .then(res => setUserRoles(res.data))
                 .catch(() => setSnackbar({open: true, message: 'Fehler beim Laden der Rollen.', severity: 'error'}));
 
-            axios.get(`${process.env.REACT_APP_API_URL}/admin/users/states`)
+            axios.get(`/admin/users/states`)
                 .then(res => setUserStatuses(res.data))
                 .catch(() => setSnackbar({open: true, message: 'Fehler beim Laden der Stati.', severity: 'error'}));
         }
@@ -88,7 +88,7 @@ const AdminUserPanel = () => {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/users`);
+            const res = await axios.get(`/admin/users`);
             setUsers(res.data);
             setError('');
         } catch {
@@ -129,7 +129,7 @@ const AdminUserPanel = () => {
     const saveUser = async () => {
         setEditLoading(true);
         try {
-            await axios.put(`${process.env.REACT_APP_API_URL}/admin/users/update/${editUser.id}`, editUser);
+            await axios.put(`/admin/users/update/${editUser.id}`, editUser);
             await fetchUsers();
             setSnackbar({open: true, message: 'Benutzer erfolgreich gespeichert.', severity: 'success'});
             closeEditDialog();
@@ -151,7 +151,7 @@ const AdminUserPanel = () => {
     const deleteUser = async () => {
         setDeleteLoading(true);
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/admin/users/delete/${toDeleteUser.id}`);
+            await axios.delete(`/admin/users/delete/${toDeleteUser.id}`);
             await fetchUsers();
             setSnackbar({open: true, message: 'Benutzer erfolgreich gelöscht.', severity: 'success'});
             closeDeleteDialog();
@@ -171,7 +171,7 @@ const AdminUserPanel = () => {
 
         setCreateLoading(true);
         try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/admin/users/create`, newUser);
+            await axios.post(`/admin/users/create`, newUser);
             setSnackbar({open: true, message: 'Benutzer erstellt.', severity: 'success'});
             setCreateDialogOpen(false);
             await fetchUsers();

@@ -48,7 +48,7 @@ const PlayQuiz = () => {
 
     const fetchQuiz = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_URL + `/${id}`);
+            const response = await axios.get(`/${id}`);
             setQuiz(response.data);
         } catch (err) {
             setError(err.response?.data?.message || 'Quiz konnte nicht geladen werden');
@@ -76,7 +76,7 @@ const PlayQuiz = () => {
 
             try {
                 const res = await axios.post(
-                    process.env.REACT_APP_API_URL + `/${quiz.id}/submit`,
+                    `/${quiz.id}/submit`,
                     {questionId: question.id, answer: userAnswer}
                 );
 
@@ -108,7 +108,7 @@ const PlayQuiz = () => {
 
         try {
             await axios.post(
-                process.env.REACT_APP_API_URL + `/${quiz.id}/submit`,
+                `/${quiz.id}/submit`,
                 {questionId: question.id, answer: selectedAnswer}
             );
 
@@ -121,7 +121,7 @@ const PlayQuiz = () => {
 
                 if (user) {
                     try {
-                        await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
+                        await axios.post('/quiz-results', {
                             userId,
                             quizId,
                             score: newScore,
@@ -204,7 +204,7 @@ const PlayQuiz = () => {
         if (stars < 1) return;
         setSubmitting(true);
         try {
-            await axios.post(process.env.REACT_APP_API_URL + `/quizzes/${quiz.id}/rate`, {rating: stars});
+            await axios.post(`/quizzes/${quiz.id}/rate`, {rating: stars});
             // Optional: nach dem Raten zurück zur Liste
             navigate('/quizzes', {state: {justRated: true}});
         } catch (err) {

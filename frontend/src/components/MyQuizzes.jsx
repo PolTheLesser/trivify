@@ -81,8 +81,8 @@ const MeineQuizze = () => {
                 ? (showAll ? 'quizzes' : 'admin/quizzes')
                 : 'quizzes';
             const [quizRes, favRes] = await Promise.all([
-                axios.get(`${process.env.REACT_APP_API_URL}/${endpoint}`),
-                axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
+                axios.get(`/${endpoint}`),
+                axios.get(`/users/favorites`)
             ]);
             const favoriteIds = new Set(favRes.data || []);
 
@@ -106,7 +106,7 @@ const MeineQuizze = () => {
     const toggleFavorite = async quizId => {
         try {
             const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/users/quizzes/${quizId}/favorite`
+                `/users/quizzes/${quizId}/favorite`
             );
             setQuizzes(prev => prev.map(q => q.id === quizId ? {...q, isFavorite: res.data.favorited} : q));
         } catch (err) {
@@ -118,8 +118,8 @@ const MeineQuizze = () => {
         const fetchCategoryLabels = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)
+                    axios.get(`/categories/values`),
+                    axios.get(`/categories`)
                 ]);
 
                 const values = valsRes.data;
@@ -194,7 +194,7 @@ const MeineQuizze = () => {
     // Tatsächliches Löschen
     const handleDelete = async () => {
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/${toDeleteId}`);
+            await axios.delete(`/${toDeleteId}`);
             const updated = quizzes.filter(q => q.id !== toDeleteId);
             setQuizzes(updated);
             setDialogOpen(false);

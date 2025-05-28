@@ -59,12 +59,12 @@ const Welcome = () => {
             setLoading(true);
             try {
                 const {data: currentStreak} = await axios.get(
-                    `${process.env.REACT_APP_API_URL}/users/streak`
+                    `/users/streak`
                 );
                 setStreak(currentStreak);
 
                 const {data: history} = await axios.get(
-                    `${process.env.REACT_APP_API_URL}/users/quiz-history`
+                    `/users/quiz-history`
                 );
 
                 const map = history.reduce((acc, quiz) => {
@@ -89,7 +89,7 @@ const Welcome = () => {
     const startRandomQuiz = async () => {
         try {
             const quizRes = await axios.get(
-                `${process.env.REACT_APP_API_URL}/quizzes`
+                `/quizzes`
             );
             const data = quizRes.data;
             if (!data.length) return;

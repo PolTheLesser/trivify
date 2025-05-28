@@ -19,7 +19,7 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        await axios.post(process.env.REACT_APP_API_URL +`/auth/verify-email/${token}`);
+        await axios.post(`/auth/verify-email/${token}`);
         setStatus('success');
         setTimeout(() => {
           navigate('/login', {
