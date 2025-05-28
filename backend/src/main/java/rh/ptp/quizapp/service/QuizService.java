@@ -234,7 +234,7 @@ public class QuizService {
                     dto.setId(q.getId());
                     dto.setQuestion(q.getQuestion());
                     dto.setAnswers(q.getAnswers());
-                    dto.setCorrectAnswer(null);
+                    dto.setCorrectAnswer(q.getCorrectAnswer());
                     dto.setDifficulty(q.getDifficulty());
                     dto.setSource(q.getSource());
                     dto.setQuestionType(q.getQuestionType());
