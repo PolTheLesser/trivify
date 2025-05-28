@@ -231,7 +231,7 @@ public class QuizService {
                 JSONObject questionObj = questions.getJSONObject(i);
                 QuizQuestion question = new QuizQuestion();
                 question.setQuestion(questionObj.getString("Frage"));
-                question.setQuestionType(QuestionType.valueOf(questionObj.getString("Fragetyp")));
+                question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
                 JSONArray answers = questionObj.getJSONArray("Antworten");
                 List<String> answerList = new ArrayList<>();
                 for (int j = 0; j < answers.length(); j++) {

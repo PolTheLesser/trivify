@@ -2,6 +2,7 @@ package rh.ptp.quizapp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserRole;
 import rh.ptp.quizapp.model.UserStatus;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByName(String name);
+    List<User> findAllByRole(UserRole role);
     boolean existsByEmail(String email);
     List<User> findByDailyQuizReminderIsTrue();
     boolean existsByName(String name);
