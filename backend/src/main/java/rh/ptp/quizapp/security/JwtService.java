@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @org.springframework.beans.factory.annotation.Value("${jwt.secret.key}")
-    private static String SECRET_KEY;
+    private String SECRET_KEY;
     /**
      * Standardmäßige Gültigkeitsdauer eines JWT-Tokens in Millisekunden.
      * Standardmäßig auf 24 Stunden gesetzt.
