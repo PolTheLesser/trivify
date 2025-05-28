@@ -203,16 +203,20 @@ public class QuizController {
      * @return Das Ergebnis als {@link QuizResultDTO}.
      */
     @PostMapping("/{quizId}/submit")
-    public ResponseEntity<QuizResultDTO> submitAnswer(@PathVariable Long quizId, @RequestBody AnswerDTO answerDto) {
-        logger.info("QuizID: {} - Empfange Antwort für FrageID: {}", quizId, answerDto.getQuestionId());
-        try {
-            QuizResultDTO result = quizService.checkAnswer(answerDto.getQuestionId(), answerDto.getAnswer());
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            logger.error("Fehler beim Überprüfen der Antwort: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+public ResponseEntity<?> submitAnswer(@PathVariable Long quizId,
+                                      @RequestBody AnswerDTO answerDto) {
+    try {
+        QuizResultDTO result = quizService.checkAnswer(answerDto.getQuestionId(),
+                                                      answerDto.getAnswer());
+        return ResponseEntity.ok(result);
+    } catch (Exception e) {
+        logger.error("Fehler beim Überprüfen der Antwort:", e);
+        // return the exception message in JSON so front-end can show it
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
     }
+}
 
     /**
      * Ermöglicht einem Benutzer, ein Quiz zu bewerten, sofern er nicht der Ersteller ist.
