@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 /**
  * Service-Klasse zur Verwaltung von Quiz-bezogenen Operationen,
  * inklusive Erstellen, Bearbeiten, Löschen, Bewerten und Abrufen von Quizzes.
@@ -121,9 +122,10 @@ public class QuizService {
 
     /**
      * Aktualisiert ein bestehendes Quiz.
-     * @param quizId Die ID des zu aktualisierenden Quizzes.
+     *
+     * @param quizId  Die ID des zu aktualisierenden Quizzes.
      * @param quizDTO Neue Daten.
-     * @param userId ID des Bearbeitenden.
+     * @param userId  ID des Bearbeitenden.
      * @return Das aktualisierte Quiz.
      */
     public Quiz updateQuiz(Long quizId, QuizDTO quizDTO, Long userId) {
@@ -161,10 +163,10 @@ public class QuizService {
 
     /**
      * Löscht ein Quiz samt aller zugehörigen Einträge (Bewertungen, Favoriten, Ergebnisse).
+     *
      * @param quizId Die ID des zu löschenden Quizzes.
      * @param userId Die ID des anfordernden Benutzers.
      */
-    @Tran
     @Transactional
     public void deleteQuiz(Long quizId, Long userId) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -182,6 +184,7 @@ public class QuizService {
 
     /**
      * Gibt alle vom Benutzer erstellten Quizzes zurück.
+     *
      * @param userId Die Benutzer-ID.
      * @return Liste der Quizzes.
      */
@@ -191,6 +194,7 @@ public class QuizService {
 
     /**
      * Holt das tägliche Quiz als DTO.
+     *
      * @return Ein QuizDTO für das tägliche Quiz.
      */
     public QuizDTO getDailyQuiz() {
@@ -237,8 +241,9 @@ public class QuizService {
 
     /**
      * Erstellt oder ersetzt das tägliche Quiz.
+     *
      * @param questions JSON-Fragenarray.
-     * @param category Kategorie des täglichen Quizzes.
+     * @param category  Kategorie des täglichen Quizzes.
      */
     public void updateDailyQuiz(JSONArray questions, QuizCategory category) {
         try {
@@ -296,6 +301,7 @@ public class QuizService {
 
     /**
      * Prüft, ob ein Benutzer das heutige tägliche Quiz bereits absolviert hat.
+     *
      * @param userId Benutzer-ID.
      * @return true, wenn bereits gespielt, sonst false.
      */
@@ -306,6 +312,7 @@ public class QuizService {
 
     /**
      * Findet eine Frage anhand ihrer ID.
+     *
      * @param questionId ID der Frage.
      * @return Die Quiz-Frage.
      */
@@ -316,9 +323,11 @@ public class QuizService {
     }
 
     /**
-     * Findet eine Frage anhand ihrer ID.
-     * @param questionId ID der Frage.
-     * @return Die Quiz-Frage.
+     * Überprüft eine Antwort auf eine Quizfrage.
+     *
+     * @param userAnswer    Antwort des Benutzers.
+     * @param correctAnswer Richtige Antwort.
+     * @return true, wenn die Antwort korrekt ist, sonst false.
      */
     public boolean checkAnswer(String userAnswer, String correctAnswer) {
         if (userAnswer == null || correctAnswer == null) {
@@ -329,6 +338,7 @@ public class QuizService {
 
     /**
      * Bewertet eine Antwort auf eine bestimmte Frage.
+     *
      * @param questionId ID der Frage.
      * @param userAnswer Antwort des Benutzers.
      * @return Ein Ergebnis-Datentransferobjekt.
@@ -353,6 +363,7 @@ public class QuizService {
 
     /**
      * Bewertet ein Quiz.
+     *
      * @param quizId ID des Quizzes.
      * @param userId ID des Benutzers.
      * @param rating Bewertung (z. B. 1–5).
@@ -385,7 +396,8 @@ public class QuizService {
 
     /**
      * Markiert oder entfernt ein Quiz aus den Favoriten des Benutzers.
-     * @param quizId ID des Quizzes.
+     *
+     * @param quizId      ID des Quizzes.
      * @param userDetails Benutzer-Details.
      * @return true, wenn neu hinzugefügt, false, wenn entfernt.
      */
@@ -409,10 +421,10 @@ public class QuizService {
     }
 
     /**
-     * Markiert oder entfernt ein Quiz aus den Favoriten des Benutzers.
-     * @param quizId ID des Quizzes.
-     * @param userDetails Benutzer-Details.
-     * @return true, wenn neu hinzugefügt, false, wenn entfernt.
+     * Holt die Quiz-Historie eines Benutzers.
+     *
+     * @param userDetails Authentifizierungsdetails des Benutzers.
+     * @return Liste von QuizHistoryDTOs, die die Historie des Benutzers enthalten.
      */
     public List<QuizHistoryDTO> getQuizHistory(UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
@@ -438,6 +450,7 @@ public class QuizService {
 
     /**
      * Holt alle Quizzes und reichert sie mit Bewertungsinformationen an.
+     *
      * @return Liste aller Quizzes mit Bewertung.
      */
     public List<Quiz> findAllWithRatings() {
@@ -455,6 +468,7 @@ public class QuizService {
 
     /**
      * Gibt alle verfügbaren Quiz-Kategorien (als Text) zurück.
+     *
      * @return Liste von Kategorienamen.
      */
     public List<String> getCategoryValues() {
@@ -466,8 +480,9 @@ public class QuizService {
     }
 
     /**
-     * Gibt alle verfügbaren Quiz-Kategorien (als Text) zurück.
-     * @return Liste von Kategorienamen.
+     * Validiert die Eingabedaten für ein QuizDTO.
+     *
+     * @param quizDTO Das zu validierende QuizDTO.
      */
     public void validateQuizDTO(QuizDTO quizDTO) {
         if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
@@ -511,6 +526,7 @@ public class QuizService {
 
     /**
      * Gibt alle verfügbaren Quiz-Kategorien (als Text) zurück.
+     *
      * @return Liste von Kategorienamen.
      */
     private boolean isAdmin(Long userId) {
