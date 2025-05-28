@@ -210,7 +210,7 @@ public class QuizController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Fehler beim Überprüfen der Antwort: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
