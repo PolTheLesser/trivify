@@ -148,7 +148,6 @@
                 <configuration>
                     <nvdApiKey>${nvd.api.key}</nvdApiKey>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <suppressionFiles>backend/build-props/dependency-check-suppress.xml</suppressionFiles>
                 </configuration>
                 <executions>
                     <execution>

@@ -85,8 +85,8 @@ public class AdminService {
 
         if (userUpdated.getDailyStreak() != user.getDailyStreak()) {
             user.setLastDailyQuizPlayed(LocalDateTime.now());
+            user.setDailyStreak(userUpdated.getDailyStreak());
         }
-        user.setDailyStreak(userUpdated.getDailyStreak());
 
         user.setUpdatedAt(LocalDateTime.now());
 

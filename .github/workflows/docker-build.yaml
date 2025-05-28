@@ -20,6 +20,8 @@ jobs:
           SHA=$(git rev-parse --short HEAD)
           if [ "$BRANCH" = "main" ]; then
             TAG=latest
+          elif [ "$BRANCH" = "hosting" ]; then
+            TAG=stable
           elif [ "$BRANCH" = "dev" ]; then
             TAG=beta
           else
@@ -57,18 +59,26 @@ jobs:
           echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
           echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
           echo "MAIL_PASS=${{ secrets.MAIL_PASS }}" >> $GITHUB_OUTPUT
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_OUTPUT
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_OUTPUT
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_OUTPUT
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "AI_URL=${{ vars.AI_URL }}" >> $GITHUB_OUTPUT
+          echo "AI_API_KEY=${{ secrets.AI_API_KEY }}" >> $GITHUB_OUTPUT
 
         env:
           DB_URL: ${{ vars.DB_URL }}
           SERVER_URL: ${{ vars.SERVER_URL }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASS: ${{ secrets.MAIL_PASS }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          AI_URL: ${{ vars.AI_URL }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
 
       - name: Build Backend
         run: |

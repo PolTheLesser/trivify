@@ -53,7 +53,7 @@ public class QuizController {
 
         for (Quiz quiz : quizze) {
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
-                quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
+                quiz.getQuestions().get(i).setCorrectAnswer(null);
             }
             quiz.getCreator().setEmail(null);
             quiz.getCreator().setPassword(null);
@@ -76,7 +76,7 @@ public class QuizController {
                 getDailyQuiz();
             }
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
-                quiz.getQuestions().get(i).setCorrectAnswer("Nicht cheaten ;)");
+                quiz.getQuestions().get(i).setCorrectAnswer(null);
             }
             quiz.getCreator().setEmail(null);
             quiz.getCreator().setPassword(null);
