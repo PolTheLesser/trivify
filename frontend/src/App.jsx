@@ -20,8 +20,6 @@ import DailyQuiz from "./components/DailyQuiz";
 import CreateQuiz from "./components/CreateQuiz";
 import EditQuiz from "./components/EditQuiz";
 import Settings from "./components/Settings";
-import Datenschutz from "./components/Datenschutz";
-import Impressum from "./components/Impressum";
 import MyQuizzes from "./components/MyQuizzes";
 import { AuthProvider } from './contexts/AuthContext';
 
