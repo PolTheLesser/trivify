@@ -63,7 +63,7 @@ public class QuizController {
     }
 
     /**
-     * Gibt ein einzelnes Quiz anhand der ID zurück. Bei täglichen Quizzes wird der Zugriff am selben Tag unterdrückt.
+     * Gibt ein einzelnes Quiz anhand der ID zurück. Beim heutigen täglichen Quiz wird die {@link #getDailyQuiz()}-Methode aufgerufen.
      *
      * @param quizId Die ID des Quizzes.
      * @return Das entsprechende {@link Quiz}-Objekt oder 404.
