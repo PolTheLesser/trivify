@@ -58,7 +58,7 @@ public class User implements UserDetails {
     /**
      * Rolle des Benutzers (z.B. Benutzer, Admin).
      */
-    @Column(nullable = false, name = "role", columnDefinition = "user_role")
+    @Column(nullable = false, name = "role")
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.ROLE_USER;
 

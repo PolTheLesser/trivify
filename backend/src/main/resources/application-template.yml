@@ -14,8 +14,6 @@ spring:
       hibernate:
         format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}

@@ -165,16 +165,19 @@ spec:
         app: trivify-frontend
     spec:
       initContainers:
-        - name: wait-for-backend
-          image: busybox
+        - name: wait-for-db
+          image: postgres:latest
           command:
             - sh
             - -c
             - |
-              until wget -qO- http://trivify-backend:9090/actuator/health | grep -q "UP"; do
-                echo "Waiting for backend..."
+              until pg_isready -h trivify-db -p 5432 -U quizuser; do
+                echo "Waiting for PostgreSQL to become ready..."
                 sleep 2
               done
+          env:
+            - name: PGPASSWORD
+              value: "quizpass"
       containers:
         - name: frontend
           image: lesommer2019/trivify-frontend:stable
