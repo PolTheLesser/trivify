@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import rh.ptp.quizapp.model.QuizCategory;
 
 import java.util.ArrayList;
@@ -16,8 +14,6 @@ import java.util.List;
  * Enthält Informationen wie Titel, Beschreibung, Fragen, Kategorien und Ersteller.
  */
 @Data
-@Setter
-@Getter
 public class QuizDTO {
 
     /**

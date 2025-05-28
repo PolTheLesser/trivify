@@ -60,8 +60,10 @@ public class QuizService {
     private String adminpassword;
 
     /**
-     * Service-Klasse zur Verwaltung von Quiz-bezogenen Operationen,
-     * inklusive Erstellen, Bearbeiten, Löschen, Bewerten und Abrufen von Quizzes.
+     * Holt ein Quiz anhand seiner ID.
+     *
+     * @param quizId Die ID des Quizzes.
+     * @return Das Quiz-Objekt.
      */
     public Quiz getQuizById(Long quizId) {
         return quizRepository.findById(quizId)
@@ -69,8 +71,11 @@ public class QuizService {
     }
 
     /**
-     * Service-Klasse zur Verwaltung von Quiz-bezogenen Operationen,
-     * inklusive Erstellen, Bearbeiten, Löschen, Bewerten und Abrufen von Quizzes.
+     * Erstellt ein neues Quiz basierend auf den übergebenen Daten.
+     *
+     * @param quizDTO Die Daten für das neue Quiz.
+     * @param userId  ID des Erstellers.
+     * @return Das erstellte Quiz-Objekt.
      */
     public Quiz createQuiz(QuizDTO quizDTO, Long userId) {
         User creator = userRepository.findById(userId)
@@ -362,12 +367,12 @@ public class QuizService {
     }
 
     /**
-     * Bewertet ein Quiz.
+     * Bewertet ein Quiz durch den Benutzer.
      *
      * @param quizId ID des Quizzes.
-     * @param userId ID des Benutzers.
-     * @param rating Bewertung (z. B. 1–5).
-     * @return Die übermittelte Bewertung.
+     * @param userId ID des Benutzers, der bewertet.
+     * @param rating Bewertung (1-5).
+     * @return Die Bewertung des Quizzes.
      */
     public Integer rateQuiz(Long quizId, Long userId, int rating) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -449,9 +454,9 @@ public class QuizService {
     }
 
     /**
-     * Holt alle Quizzes und reichert sie mit Bewertungsinformationen an.
+     * Holt alle Quizzes mit ihren Bewertungen.
      *
-     * @return Liste aller Quizzes mit Bewertung.
+     * @return Liste von Quizzes mit Durchschnittsbewertung und Anzahl der Bewertungen.
      */
     public List<Quiz> findAllWithRatings() {
         List<Quiz> quizzes = quizRepository.findAll();
@@ -525,9 +530,10 @@ public class QuizService {
     }
 
     /**
-     * Gibt alle verfügbaren Quiz-Kategorien (als Text) zurück.
+     * Überprüft, ob der Benutzer ein Administrator ist.
      *
-     * @return Liste von Kategorienamen.
+     * @param userId ID des Benutzers.
+     * @return true, wenn der Benutzer ein Administrator ist, sonst false.
      */
     private boolean isAdmin(Long userId) {
         return userRepository.findById(userId)

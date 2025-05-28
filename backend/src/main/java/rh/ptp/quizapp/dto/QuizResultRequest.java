@@ -1,14 +1,12 @@
 package rh.ptp.quizapp.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * Datenübertragungsobjekt für eine Anfrage zum Speichern eines Quiz-Ergebnisses.
  * Wird verwendet, wenn ein Benutzer ein Quiz abgeschlossen hat.
  */
-@Getter
-@Setter
+@Data
 public class QuizResultRequest {
 
     /**

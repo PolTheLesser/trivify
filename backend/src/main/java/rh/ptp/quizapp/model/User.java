@@ -134,11 +134,11 @@ public class User implements UserDetails {
     }
 
     /**
-     * Gibt an, ob das Konto gesperrt ist (immer true).
+     * Gibt an, ob das Konto gesperrt ist
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !(userStatus == UserStatus.BLOCKED);
     }
 
     /**

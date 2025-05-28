@@ -17,6 +17,7 @@ import rh.ptp.quizapp.repository.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -40,16 +41,17 @@ public class UserService {
 
     /**
      * Sendet eine Passwort-Zurücksetzen-Mail an den Benutzer.
+     *
      * @param email E-Mail-Adresse des Benutzers.
      */
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-        
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+
         authService.createAuthenticationToken(user);
         String token = authenticationTokenRepository.findTokenByQuizUser(user);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl+"/logo192.png");
+        variables.put("logoUrl", frontendUrl + "/logo192.png");
         variables.put("username", user.getName());
         variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
 
@@ -58,7 +60,8 @@ public class UserService {
 
     /**
      * Setzt das Passwort mit einem gültigen Token zurück.
-     * @param token Reset-Token.
+     *
+     * @param token       Reset-Token.
      * @param newPassword Neues Passwort.
      */
     public void resetPassword(String token, String newPassword) {
@@ -72,7 +75,8 @@ public class UserService {
 
     /**
      * Aktualisiert, ob ein Benutzer Erinnerungen für das tägliche Quiz erhalten möchte.
-     * @param userId ID des Benutzers.
+     *
+     * @param userId   ID des Benutzers.
      * @param reminder true = aktiv, false = deaktiviert.
      */
     public void updateDailyQuizReminder(Long userId, boolean reminder) {
@@ -85,6 +89,7 @@ public class UserService {
 
     /**
      * Holt einen Benutzer anhand der E-Mail.
+     *
      * @param email E-Mail-Adresse.
      * @return Benutzer-Entity.
      */
@@ -94,9 +99,11 @@ public class UserService {
     }
 
     /**
-     * Holt einen Benutzer anhand der E-Mail.
-     * @param email E-Mail-Adresse.
-     * @return Benutzer-Entity.
+     * Aktualisiert das Profil eines Benutzers.
+     *
+     * @param email   E-Mail des Benutzers.
+     * @param userDTO Neue Benutzerdaten.
+     * @return Aktualisierter Benutzer.
      */
     public User updateProfile(String email, UserDTO userDTO) {
         User user = userRepository.findByEmail(email)
@@ -111,10 +118,11 @@ public class UserService {
     }
 
     /**
-     * Aktualisiert die Benutzerdaten im Profil.
-     * @param email E-Mail des Benutzers.
-     * @param userDTO Neue Daten.
-     * @return Aktualisierter Benutzer.
+     * Aktualisiert das Passwort eines Benutzers.
+     *
+     * @param email           E-Mail-Adresse des Benutzers.
+     * @param currentPassword Aktuelles Passwort des Benutzers.
+     * @param newPassword     Neues Passwort des Benutzers.
      */
     public void updatePassword(String email, String currentPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
@@ -130,10 +138,10 @@ public class UserService {
     }
 
     /**
-     * Aktualisiert das Passwort eines Benutzers.
-     * @param email E-Mail-Adresse.
-     * @param currentPassword Aktuelles Passwort.
-     * @param newPassword Neues Passwort.
+     * Erhöht die tägliche Quiz-Serie für einen Benutzer um eins, wenn er das tägliche Quiz noch nicht gespielt hat.
+     *
+     * @param email E-Mail-Adresse des Benutzers.
+     * @return Neue Streak-Länge.
      */
     public int incrementDailyQuizStreak(String email) {
         LocalDate today = LocalDate.now();
@@ -141,7 +149,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
         log.info("Incrementing daily quiz streak for user: {}", user.getEmail());
         boolean alreadyPlayedToday = quizResultRepository
-                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(),QuizCategory.DAILY_QUIZ, today.atStartOfDay());
+                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(), QuizCategory.DAILY_QUIZ, today.atStartOfDay());
         user.setLastDailyQuizPlayed(LocalDateTime.now());
 
         if (alreadyPlayedToday) {
@@ -155,9 +163,12 @@ public class UserService {
     }
 
     /**
-     * Erhöht die tägliche Quiz-Serie für einen Benutzer um eins.
-     * @param email Benutzer-E-Mail.
-     * @return Neue Streak-Länge.
+     * Holt einen Benutzer aus den UserDetails.
+     *
+     * @param userDetails UserDetails-Objekt.
+     * @return Benutzer-Entity.
+     * @throws IllegalArgumentException  wenn userDetails null ist.
+     * @throws UsernameNotFoundException wenn der Benutzer nicht gefunden wird.
      */
     public User getUserFromUserDetails(UserDetails userDetails) {
         if (userDetails == null) {

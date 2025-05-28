@@ -5,8 +5,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * Represents a user's favorite quiz.
- * Each entry links a user to a quiz they have marked as favorite.
+ * Repräsentiert ein vom Benutzer als Favorit markiertes Quiz.
+ * Jeder Eintrag verknüpft einen Benutzer mit einem Quiz, das er als Favorit markiert hat.
  */
 @Data
 @Entity
@@ -14,34 +14,34 @@ import java.time.LocalDateTime;
 public class QuizFavorite {
 
     /**
-     * Unique identifier for the favorite entry.
+     * Eindeutige Kennung für den Favoriten-Eintrag.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * The user who marked the quiz as favorite.
+     * Der Benutzer, der das Quiz als Favorit markiert hat.
      */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     /**
-     * The quiz that was marked as favorite.
+     * Das Quiz, das als Favorit markiert wurde.
      */
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
     /**
-     * Timestamp when the favorite was created.
+     * Zeitstempel, wann der Favorit erstellt wurde.
      */
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     /**
-     * Sets the creation timestamp before persisting.
+     * Setzt den Erstellungs-Zeitstempel vor dem Persistieren.
      */
     @PrePersist
     protected void onCreate() {

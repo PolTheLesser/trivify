@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import rh.ptp.quizapp.model.User;
@@ -20,8 +21,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-    private static final long JWT_EXPIRATION = 1000 * 60 * 60 * 24; // 24 Stunden
+    @org.springframework.beans.factory.annotation.Value("${jwt.secret.key}")
+    private static String SECRET_KEY;
+    /**
+     * Standardmäßige Gültigkeitsdauer eines JWT-Tokens in Millisekunden.
+     * Standardmäßig auf 24 Stunden gesetzt.
+     */
+    private static final long JWT_EXPIRATION = 1000 * 60 * 60 * 24;
 
     /**
      * Extrahiert den Benutzernamen (Subject) aus einem JWT-Token.
@@ -36,9 +42,9 @@ public class JwtService {
     /**
      * Extrahiert einen beliebigen Claim aus dem Token mithilfe eines Claims-Resolvers.
      *
-     * @param token JWT-Token
+     * @param token          JWT-Token
      * @param claimsResolver Funktion zur Verarbeitung der Claims
-     * @param <T> Typ des Rückgabewerts
+     * @param <T>            Typ des Rückgabewerts
      * @return Extrahierter Wert
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -76,7 +82,7 @@ public class JwtService {
     /**
      * Überprüft, ob ein JWT-Token gültig ist.
      *
-     * @param token JWT-Token
+     * @param token       JWT-Token
      * @param userDetails Benutzerdetails
      * @return true, wenn Token gültig ist
      */
@@ -136,13 +142,13 @@ public class JwtService {
      * @return JWT-Token
      */
     public String generatePasswordResetToken(User user) {
-        return generateToken(user, 3600000); // Token ist 1 Stunde gültig
+        return generateToken(user, 3600000);
     }
 
     /**
      * Erstellt ein JWT-Token mit benutzerdefinierter Gültigkeitsdauer.
      *
-     * @param user Benutzer
+     * @param user           Benutzer
      * @param expirationTime Gültigkeit in Millisekunden
      * @return JWT-Token
      */
@@ -153,8 +159,8 @@ public class JwtService {
     /**
      * Erstellt ein JWT-Token mit benutzerdefinierter Gültigkeit und zusätzlichen Claims.
      *
-     * @param extraClaims Zusätzliche Claims
-     * @param user Benutzer
+     * @param extraClaims    Zusätzliche Claims
+     * @param user           Benutzer
      * @param expirationTime Gültigkeit in Millisekunden
      * @return JWT-Token
      */

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a question within a quiz, including its text,
- * possible answers, correct answer, and metadata.
+ * Repräsentiert eine Frage innerhalb eines Quizzes, einschließlich Fragetext,
+ * möglicher Antworten, der richtigen Antwort und weiterer Metadaten.
  */
 @Entity
 @Data
@@ -18,20 +18,20 @@ import java.util.List;
 public class QuizQuestion {
 
     /**
-     * Unique identifier for the quiz question.
+     * Eindeutige Kennung der Quizfrage.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * The text of the question.
+     * Der Text der Frage.
      */
     @Column(nullable = false, length = 1000)
     private String question;
 
     /**
-     * A list of possible answers for the question.
+     * Eine Liste möglicher Antworten zur Frage.
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "question_answers", joinColumns = @JoinColumn(name = "question_id"))
@@ -39,24 +39,24 @@ public class QuizQuestion {
     private List<String> answers;
 
     /**
-     * The correct answer from the list of possible answers.
+     * Die richtige Antwort aus der Liste der möglichen Antworten.
      */
     @Column(nullable = false)
     private String correctAnswer;
 
     /**
-     * Difficulty level of the question (e.g., 1–5).
+     * Schwierigkeitsgrad der Frage (z. B. 1–5).
      */
     @Column(nullable = false)
     private int difficulty;
 
     /**
-     * Optional source or reference for the question content.
+     * Optionale Quelle oder Referenz für den Inhalt der Frage.
      */
     private String source;
 
     /**
-     * The quiz this question belongs to.
+     * Das Quiz, zu dem diese Frage gehört.
      */
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,16 +65,16 @@ public class QuizQuestion {
     private Quiz quiz;
 
     /**
-     * The type of the question (e.g., MULTIPLE_CHOICE).
+     * Der Fragetyp (z. B. MULTIPLE_CHOICE).
      */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private QuestionType questionType = QuestionType.MULTIPLE_CHOICE;
 
     /**
-     * Ensures the answer list is initialized and not null.
+     * Stellt sicher, dass die Antwortliste initialisiert ist und nicht null zurückgibt.
      *
-     * @return the list of possible answers
+     * @return die Liste der möglichen Antworten
      */
     public List<String> getAnswers() {
         if (answers == null) {

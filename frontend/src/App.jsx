@@ -53,8 +53,6 @@ const App = () => {
                         <Route path="/quizzes/edit/:id" element={<PrivateRoute><EditQuiz/></PrivateRoute>}/>
                         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>}/>
                         <Route path="/adminpanel" element={<PrivateRoute><AdminPanel/></PrivateRoute>}/>
-                        <Route path="/impressum" element={<Impressum/>}/>
-                        <Route path="/datenschutz" element={<Datenschutz/>}/>
                         {/* Catch-all: if you have a token, go to /welcome; otherwise go to / */}
                         <Route
                             path="*"
