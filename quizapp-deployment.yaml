@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: quizapp
+  name: trivify
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pgdata
-  namespace: quizapp
+  namespace: trivify
 spec:
   accessModes:
     - ReadWriteOnce
@@ -18,17 +18,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-db
-  namespace: quizapp
+  name: trivify-db
+  namespace: trivify
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: quizapp-db
+      app: trivify-db
   template:
     metadata:
       labels:
-        app: quizapp-db
+        app: trivify-db
     spec:
       containers:
         - name: postgres
@@ -60,11 +60,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-db
-  namespace: quizapp
+  name: trivify-db
+  namespace: trivify
 spec:
   selector:
-    app: quizapp-db
+    app: trivify-db
   ports:
     - port: 5432
       targetPort: 5432
@@ -72,8 +72,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-backend
-  namespace: quizapp
+  name: trivify-backend
+  namespace: trivify
 spec:
   replicas: 1
   strategy:
@@ -83,11 +83,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: quizapp-backend
+      app: trivify-backend
   template:
     metadata:
       labels:
-        app: quizapp-backend
+        app: trivify-backend
     spec:
       initContainers:
         - name: wait-for-db
@@ -96,7 +96,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z quizapp-db 5432; do
+              until nc -z trivify-db 5432; do
                 echo "Waiting for PostgreSQL..."
                 sleep 2
               done
@@ -111,7 +111,7 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: "-Duser.timezone=Europe/Berlin"
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://quizapp-db:5432/quizapp"
+              value: "jdbc:postgresql://trivify-db:5432/quizapp"
             - name: SPRING_DATASOURCE_USERNAME
               value: "quizuser"
             - name: SPRING_DATASOURCE_PASSWORD
@@ -130,11 +130,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-backend
-  namespace: quizapp
+  name: trivify-backend
+  namespace: trivify
 spec:
   selector:
-    app: quizapp-backend
+    app: trivify-backend
   ports:
     - port: 9090
       targetPort: 9090
@@ -142,8 +142,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-frontend
-  namespace: quizapp
+  name: trivify-frontend
+  namespace: trivify
 spec:
   replicas: 1
   strategy:
@@ -153,11 +153,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: quizapp-frontend
+      app: trivify-frontend
   template:
     metadata:
       labels:
-        app: quizapp-frontend
+        app: trivify-frontend
     spec:
       initContainers:
         - name: wait-for-backend
@@ -166,7 +166,7 @@ spec:
             - sh
             - -c
             - |
-              until wget -qO- http://quizapp-backend:9090/actuator/health | grep -q "UP"; do
+              until wget -qO- http://trivify-backend:9090/actuator/health | grep -q "UP"; do
                 echo "Waiting for backend..."
                 sleep 2
               done
@@ -188,13 +188,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-frontend
-  namespace: quizapp
+  name: trivify-frontend
+  namespace: trivify
 spec:
-  selector:
-    app: quizapp-frontend
-  type: NodePort
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080
