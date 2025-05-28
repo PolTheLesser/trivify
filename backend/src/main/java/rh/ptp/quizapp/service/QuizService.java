@@ -1,5 +1,6 @@
 package rh.ptp.quizapp.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -325,7 +326,7 @@ public class QuizService {
      */
     public QuizQuestion findQuestionById(Long questionId) {
         log.debug("Suche Frage mit ID: {}", questionId);
-        return quizQuestionRepo.findById(id)
+        return quizQuestionRepository.findById(questionId)
                .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
     }
 
