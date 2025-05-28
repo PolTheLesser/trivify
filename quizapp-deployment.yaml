@@ -36,11 +36,11 @@ spec:
           imagePullPolicy: Always
           env:
             - name: POSTGRES_DB
-              value: "trivify"
+              value: "quizapp"
             - name: POSTGRES_USER
-              value: "trivifyuser"
+              value: "quizuser"
             - name: POSTGRES_PASSWORD
-              value: "trivifypass"
+              value: "quizpass"
             - name: PGTZ
               value: "Europe/Berlin"
             - name: PGDATA
@@ -49,7 +49,7 @@ spec:
             - containerPort: 5432
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "trivifyuser", "-d", "trivify"]
+              command: ["pg_isready", "-U", "quizuser", "-d", "quizapp"]
             initialDelaySeconds: 10
             periodSeconds: 10
           volumeMounts:
@@ -115,11 +115,11 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: "-Duser.timezone=Europe/Berlin"
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://trivify-db:5432/trivify"
+              value: "jdbc:postgresql://trivify-db:5432/quizapp"
             - name: SPRING_DATASOURCE_USERNAME
-              value: "trivifyuser"
+              value: "quizuser"
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "trivifypass"
+              value: "quizpass"
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SPRING_JPA_DATABASE_PLATFORM
