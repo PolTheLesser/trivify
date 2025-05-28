@@ -192,7 +192,7 @@ public class QuizService {
                     QuizQuestionDTO dto = new QuizQuestionDTO();
                     dto.setId(q.getId());
                     dto.setQuestion(q.getQuestion());
-                    dto.setAnswers(q.getAnswers());
+                    dto.setAnswers(null);
                     dto.setDifficulty(q.getDifficulty());
                     dto.setSource(q.getSource());
                     return dto;
