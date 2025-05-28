@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller für Benutzerfunktionen wie Registrierung, Profilverwaltung und Favoriten.
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -35,6 +38,12 @@ public class UserController {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    /**
+     * Versendet einen Link zum Zurücksetzen des Passworts.
+     *
+     * @param request E-Mail des Benutzers.
+     * @return Erfolgsmeldung oder Fehler.
+     */
     @PostMapping("/reset-password-request")
     public ResponseEntity<?> resetPasswordRequest(@RequestBody PasswordResetRequest request) {
         try {
@@ -45,12 +54,25 @@ public class UserController {
         }
     }
 
+    /**
+     * Löst das Zurücksetzen des Passworts aus.
+     *
+     * @param email E-Mail-Adresse.
+     * @return OK-Antwort.
+     */
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@RequestParam String email) {
         userService.forgotPassword(email);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Setzt ein neues Passwort anhand eines Reset-Tokens.
+     *
+     * @param token   Reset-Token.
+     * @param request Neues Passwort.
+     * @return Erfolgsmeldung oder Fehler.
+     */
     @PostMapping("/reset-password/{token}")
     public ResponseEntity<?> resetPassword(
             @PathVariable String token,
@@ -63,18 +85,37 @@ public class UserController {
         }
     }
 
-
+    /**
+     * Aktiviert oder deaktiviert tägliche Quiz-Erinnerungen.
+     *
+     * @param userId   Benutzer-ID.
+     * @param reminder Erinnerungsstatus.
+     * @return OK-Antwort.
+     */
     @PutMapping("/{userId}/daily-quiz-reminder")
     public ResponseEntity<Void> updateDailyQuizReminder(@PathVariable Long userId, @RequestParam boolean reminder) {
         userService.updateDailyQuizReminder(userId, reminder);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Gibt das Profil des aktuell angemeldeten Benutzers zurück.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Benutzerprofil.
+     */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(userService.getUserByEmail(userDetails.getUsername()));
     }
 
+    /**
+     * Aktualisiert das Profil des Benutzers.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @param userDTO     Neue Profildaten.
+     * @return Aktualisiertes Profil oder Fehler.
+     */
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UserDTO userDTO) {
         try {
@@ -85,10 +126,18 @@ public class UserController {
         }
     }
 
+    /**
+     * Ändert das Passwort des Benutzers.
+     *
+     * @param userDetails     Authentifizierte Benutzerdaten.
+     * @param currentPassword Aktuelles Passwort.
+     * @param newPassword     Neues Passwort.
+     * @return Erfolg oder Fehler.
+     */
     @PutMapping("/profile/password")
-    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails, 
-                                          @RequestParam String currentPassword,
-                                          @RequestParam String newPassword) {
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestParam String currentPassword,
+                                            @RequestParam String newPassword) {
         try {
             userService.updatePassword(userDetails.getUsername(), currentPassword, newPassword);
             return ResponseEntity.ok().body(new MessageResponse("Passwort erfolgreich aktualisiert"));
@@ -97,6 +146,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Markiert den Benutzeraccount zur Löschung und sendet eine Info-Mail.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Erfolgsmeldung oder Fehler.
+     */
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteProfile(@AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -104,16 +159,22 @@ public class UserController {
             user.setUserStatus(UserStatus.PENDING_DELETE);
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/logo192.png");
-            variables.put("username",  user.getName());
+            variables.put("username", user.getName());
             variables.put("loginUrl", frontendUrl + "/login");
             emailService.sendEmail(user.getEmail(), "Konto zur Löschung vorgemerkt", "account-delete-info", variables);
             userRepository.save(user);
             return ResponseEntity.ok().body(new MessageResponse("Account zur Löschung vorgemerkt"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Fehler beim Löschen des Accounts: "+e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Fehler beim Löschen des Accounts: " + e.getMessage()));
         }
     }
 
+    /**
+     * Gibt alle favorisierten Quiz-IDs des Benutzers zurück.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Liste von Quiz-IDs.
+     */
     @GetMapping("/favorites")
     public ResponseEntity<List<Long>> getFavoriteQuizIds(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
@@ -124,6 +185,13 @@ public class UserController {
         return ResponseEntity.ok(favoriteQuizIds);
     }
 
+    /**
+     * Setzt oder entfernt ein Quiz als Favorit.
+     *
+     * @param quizId      Die ID des Quizzes.
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Ob das Quiz nun favorisiert ist.
+     */
     @PostMapping("/quizzes/{quizId}/favorite")
     public ResponseEntity<Map<String, Boolean>> toggleFavorite(
             @PathVariable Long quizId,
@@ -132,18 +200,36 @@ public class UserController {
         return ResponseEntity.ok(Map.of("favorited", isFavorited));
     }
 
+    /**
+     * Gibt den täglichen Streak des Benutzers zurück.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Anzahl aufeinanderfolgender Tage mit erledigtem Daily Quiz.
+     */
     @GetMapping("/streak")
     public int getUserStreak(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
         return user.getDailyStreak();
     }
 
+    /**
+     * Gibt die Quiz-Historie des Benutzers zurück.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Liste der abgeschlossenen Quizzes.
+     */
     @GetMapping("/quiz-history")
     public ResponseEntity<List<QuizHistoryDTO>> getQuizHistory(@AuthenticationPrincipal UserDetails userDetails) {
         List<QuizHistoryDTO> history = quizService.getQuizHistory(userDetails);
         return ResponseEntity.ok(history);
     }
 
+    /**
+     * Markiert das tägliche Quiz als abgeschlossen und erhöht den Streak.
+     *
+     * @param userDetails Authentifizierte Benutzerdaten.
+     * @return Neuer Streak-Wert.
+     */
     @PostMapping("/daily-quiz/completed")
     public int completeDailyQuiz(@AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -152,4 +238,4 @@ public class UserController {
             return 0;
         }
     }
-} 
+}

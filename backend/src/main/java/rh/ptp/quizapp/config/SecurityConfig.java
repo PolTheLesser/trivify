@@ -26,18 +26,31 @@ import rh.ptp.quizapp.service.CustomUserDetailsService;
 
 import java.util.Arrays;
 
+/**
+ * Konfigurationsklasse für die Sicherheit der Anwendung.
+ * Stellt CORS, Authentifizierung, Autorisierung und JWT-Filter bereit.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
+
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    /** URL des Frontends, für CORS-Freigaben. */
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    /**
+     * Konfiguriert die HTTP-Sicherheitsfilterkette inklusive CORS, CSRF, Autorisierungsregeln und JWT.
+     *
+     * @param http die {@link HttpSecurity}-Instanz
+     * @return die konfigurierte {@link SecurityFilterChain}
+     * @throws Exception bei Konfigurationsfehlern
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -73,6 +86,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Erstellt die CORS-Konfiguration für eingehende HTTP-Anfragen.
+     *
+     * @return eine konfigurierte {@link CorsConfigurationSource}
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -88,6 +106,11 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * Erstellt und konfiguriert den Authentifizierungsanbieter mit benutzerdefiniertem UserDetailsService.
+     *
+     * @return ein konfigurierter {@link AuthenticationProvider}
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -96,13 +119,25 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Erstellt den Authentifizierungsmanager zur Verwaltung von Login-Vorgängen.
+     *
+     * @param config die {@link AuthenticationConfiguration}
+     * @return ein {@link AuthenticationManager}
+     * @throws Exception bei Fehlern in der Konfiguration
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Erstellt einen BCryptPasswordEncoder zur sicheren Passwort-Hashing.
+     *
+     * @return ein {@link PasswordEncoder} mit BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-} 
+}

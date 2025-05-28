@@ -124,8 +124,8 @@ const QuizList = () => {
         const fetchCategoryLabels = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)
+                    axios.get(`/categories/values`),
+                    axios.get(`/categories`)
                 ]);
 
                 const values = valsRes.data;
@@ -151,7 +151,7 @@ const QuizList = () => {
     useEffect(() => {
         if (!user) return;
         axios
-            .get(`${process.env.REACT_APP_API_URL}/users/quiz-history`)
+            .get(`/users/quiz-history`)
             .then(res => setPlayedQuizIds(new Set(res.data.map(h => h.quizId))))
             .catch(() => console.error('Quiz history load error'));
     }, [user]);
@@ -162,10 +162,10 @@ const QuizList = () => {
             try {
                 const [quizRes, favRes] = user
                     ? await Promise.all([
-                        axios.get(`${process.env.REACT_APP_API_URL}/quizzes`),
-                        axios.get(`${process.env.REACT_APP_API_URL}/users/favorites`)
+                        axios.get(`/quizzes`),
+                        axios.get(`/users/favorites`)
                     ])
-                    : [await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`), {data: []}];
+                    : [await axios.get(`/quizzes`), {data: []}];
 
                 const favoriteIds = new Set(favRes.data || []);
                 const data = quizRes.data.map(q => ({
@@ -239,7 +239,7 @@ const QuizList = () => {
     const toggleFavorite = async quizId => {
         try {
             const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/users/quizzes/${quizId}/favorite`
+                `/users/quizzes/${quizId}/favorite`
             );
             setQuizzes(prev =>
                 prev.map(q => (q.id === quizId ? {...q, isFavorite: res.data.favorited} : q))

@@ -8,20 +8,33 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Konfigurationsklasse zur Einrichtung des JavaMailSender mit SMTP-Eigenschaften.
+ */
 @Configuration
 public class MailConfig {
+
+    /** Benutzername für die SMTP-Authentifizierung. */
     @Value("${spring.mail.username}")
     private String username;
 
+    /** Passwort für die SMTP-Authentifizierung. */
     @Value("${spring.mail.password}")
     private String userpwd;
 
+    /** Hostname des SMTP-Servers. */
     @Value("${spring.mail.host}")
     private String host;
 
+    /** Port des SMTP-Servers. */
     @Value("${spring.mail.port}")
     private int port;
 
+    /**
+     * Erstellt und konfiguriert eine JavaMailSender-Bean für den Mailversand.
+     *
+     * @return eine konfigurierte Instanz von {@link JavaMailSender}
+     */
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

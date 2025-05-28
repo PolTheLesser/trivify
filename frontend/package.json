@@ -57,6 +57,6 @@
     "allowedHosts": [
       "0.0.0.0"
     ],
-    "proxy": "http://quizapp-backend:9090"
+    "proxy": "http://trivify-backend:9090"
   }
 }

@@ -1,30 +1,17 @@
 package rh.ptp.quizapp.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Datenübertragungsobjekt für eine gegebene Antwort auf eine Frage.
+ * Enthält die ID der Frage und die Antwort des Benutzers.
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AnswerDTO {
     private Long questionId;
     private String answer;
-
-    public AnswerDTO() {
-    }
-
-    public AnswerDTO(Long questionId, String answer) {
-        this.questionId = questionId;
-        this.answer = answer;
-    }
-
-    public Long getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(Long questionId) {
-        this.questionId = questionId;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
 }

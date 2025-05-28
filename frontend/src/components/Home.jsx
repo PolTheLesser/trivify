@@ -19,7 +19,7 @@ const Welcome = () => {
 
     const startRandomQuiz = async () => {
         try {
-            const quizRes = await axios.get(`${process.env.REACT_APP_API_URL}/quizzes`);
+            const quizRes = await axios.get(`/quizzes`);
             const data = quizRes.data.map(q => ({
                 ...q,
                 isDaily: !!q.dailyQuiz,

@@ -20,8 +20,6 @@ import DailyQuiz from "./components/DailyQuiz";
 import CreateQuiz from "./components/CreateQuiz";
 import EditQuiz from "./components/EditQuiz";
 import Settings from "./components/Settings";
-import Datenschutz from "./components/Datenschutz";
-import Impressum from "./components/Impressum";
 import MyQuizzes from "./components/MyQuizzes";
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -53,8 +51,6 @@ const App = () => {
                         <Route path="/quizzes/edit/:id" element={<PrivateRoute><EditQuiz/></PrivateRoute>}/>
                         <Route path="/settings" element={<PrivateRoute><Settings/></PrivateRoute>}/>
                         <Route path="/adminpanel" element={<PrivateRoute><AdminPanel/></PrivateRoute>}/>
-                        <Route path="/impressum" element={<Impressum/>}/>
-                        <Route path="/datenschutz" element={<Datenschutz/>}/>
                         {/* Catch-all: if you have a token, go to /welcome; otherwise go to / */}
                         <Route
                             path="*"

@@ -9,7 +9,10 @@ import rh.ptp.quizapp.model.QuizRating;
 
 import java.util.Optional;
 
-
+/**
+ * Repository für den Zugriff auf {@link rh.ptp.quizapp.model.QuizRating}.
+ * Enthält Methoden zur Berechnung von Durchschnittsbewertungen, Zählungen und zur Bewertungspflege.
+ */
 public interface QuizRatingRepository extends JpaRepository<QuizRating, Long> {
     // Für Aggregation: Durchschnitt und Anzahl
     @Query("SELECT AVG(qr.rating) FROM QuizRating qr WHERE qr.quiz.id = :quizId")

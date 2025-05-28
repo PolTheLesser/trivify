@@ -17,8 +17,12 @@ import rh.ptp.quizapp.repository.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Service zur Verwaltung von Benutzeroperationen wie Registrierung, Passwortänderung und Profilaktualisierung.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,20 +39,31 @@ public class UserService {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    /**
+     * Sendet eine Passwort-Zurücksetzen-Mail an den Benutzer.
+     *
+     * @param email E-Mail-Adresse des Benutzers.
+     */
     public void forgotPassword(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-        
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+
         authService.createAuthenticationToken(user);
         String token = authenticationTokenRepository.findTokenByQuizUser(user);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl+"/logo192.png");
+        variables.put("logoUrl", frontendUrl + "/logo192.png");
         variables.put("username", user.getName());
         variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
 
         emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
     }
 
+    /**
+     * Setzt das Passwort mit einem gültigen Token zurück.
+     *
+     * @param token       Reset-Token.
+     * @param newPassword Neues Passwort.
+     */
     public void resetPassword(String token, String newPassword) {
         User user = authenticationTokenRepository.findQuizUserByToken(token)
                 .orElseThrow(() -> new RuntimeException("Ungültiger oder abgelaufener Token"));
@@ -58,7 +73,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-
+    /**
+     * Aktualisiert, ob ein Benutzer Erinnerungen für das tägliche Quiz erhalten möchte.
+     *
+     * @param userId   ID des Benutzers.
+     * @param reminder true = aktiv, false = deaktiviert.
+     */
     public void updateDailyQuizReminder(Long userId, boolean reminder) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
@@ -67,11 +87,24 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Holt einen Benutzer anhand der E-Mail.
+     *
+     * @param email E-Mail-Adresse.
+     * @return Benutzer-Entity.
+     */
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
     }
 
+    /**
+     * Aktualisiert das Profil eines Benutzers.
+     *
+     * @param email   E-Mail des Benutzers.
+     * @param userDTO Neue Benutzerdaten.
+     * @return Aktualisierter Benutzer.
+     */
     public User updateProfile(String email, UserDTO userDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
@@ -84,6 +117,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Aktualisiert das Passwort eines Benutzers.
+     *
+     * @param email           E-Mail-Adresse des Benutzers.
+     * @param currentPassword Aktuelles Passwort des Benutzers.
+     * @param newPassword     Neues Passwort des Benutzers.
+     */
     public void updatePassword(String email, String currentPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
@@ -97,13 +137,19 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Erhöht die tägliche Quiz-Serie für einen Benutzer um eins, wenn er das tägliche Quiz noch nicht gespielt hat.
+     *
+     * @param email E-Mail-Adresse des Benutzers.
+     * @return Neue Streak-Länge.
+     */
     public int incrementDailyQuizStreak(String email) {
         LocalDate today = LocalDate.now();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
         log.info("Incrementing daily quiz streak for user: {}", user.getEmail());
         boolean alreadyPlayedToday = quizResultRepository
-                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(),QuizCategory.DAILY_QUIZ, today.atStartOfDay());
+                .existsByUserIdAndQuizCategoriesAndPlayedAtAfter(user.getId(), QuizCategory.DAILY_QUIZ, today.atStartOfDay());
         user.setLastDailyQuizPlayed(LocalDateTime.now());
 
         if (alreadyPlayedToday) {
@@ -116,6 +162,14 @@ public class UserService {
         return user.getDailyStreak();
     }
 
+    /**
+     * Holt einen Benutzer aus den UserDetails.
+     *
+     * @param userDetails UserDetails-Objekt.
+     * @return Benutzer-Entity.
+     * @throws IllegalArgumentException  wenn userDetails null ist.
+     * @throws UsernameNotFoundException wenn der Benutzer nicht gefunden wird.
+     */
     public User getUserFromUserDetails(UserDetails userDetails) {
         if (userDetails == null) {
             throw new IllegalArgumentException("UserDetails cannot be null");

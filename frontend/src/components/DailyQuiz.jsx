@@ -39,7 +39,7 @@ const DailyQuiz = () => {
     useEffect(() => {
         const fetchDailyQuiz = async () => {
             try {
-                const response = await axios.get(process.env.REACT_APP_API_URL + '/daily');
+                const response = await axios.get('/daily');
                 const data = response.data;
 
                 console.log('Geladene Quiz-Daten:', data);
@@ -73,7 +73,7 @@ const DailyQuiz = () => {
 
             try {
                 const res = await axios.post(
-                    process.env.REACT_APP_API_URL + '/' + quiz.id + '/submit',
+                    '/' + quiz.id + '/submit',
                     {questionId: question.id, answer: userAnswer}
                 );
                 if (res.data.correct) correctCount += 1;
@@ -94,7 +94,7 @@ const DailyQuiz = () => {
 
         try {
             const response = await axios.post(
-                process.env.REACT_APP_API_URL + '/' + quizid + '/submit',
+                '/' + quizid + '/submit',
                 {questionId: currentQuestion.id, answer: selectedAnswer}
             );
 
@@ -126,8 +126,8 @@ const DailyQuiz = () => {
                 const maxPossibleScore = quiz?.questions?.length;
 
                 if (user) {
-                    await axios.post(process.env.REACT_APP_API_URL + '/users/daily-quiz/completed');
-                    await axios.post(process.env.REACT_APP_API_URL + '/quiz-results', {
+                    await axios.post('/users/daily-quiz/completed');
+                    await axios.post('/quiz-results', {
                         userId,
                         quizId,
                         score: newScore, // ✅ korrekt gespeicherter Score

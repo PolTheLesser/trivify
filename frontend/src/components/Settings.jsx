@@ -32,7 +32,7 @@ const Settings = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/users/profile`);
+        const { data } = await axios.get(`/users/profile`);
         setProfile(data);
       } catch (err) {
         setError(err.response?.data?.message || 'Fehler beim Laden des Profils');
@@ -45,7 +45,7 @@ const Settings = () => {
   const handleProfileUpdate = async e => {
     e.preventDefault();
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/users/profile`, profile);
+      await axios.put(`/users/profile`, profile);
       setSuccess('Profil erfolgreich aktualisiert. Bitte melde dich neu an.');
     } catch (err) {
       setError(err.response?.data?.message || 'Fehler beim Aktualisieren des Profils');
@@ -60,7 +60,7 @@ const Settings = () => {
     }
     try {
       await axios.put(
-          `${process.env.REACT_APP_API_URL}/users/profile/password`,
+          `/users/profile/password`,
           null,
           { params: { currentPassword: password.currentPassword, newPassword: password.newPassword } }
       );
@@ -75,7 +75,7 @@ const Settings = () => {
     const newValue = e.target.checked;
     try {
       await axios.put(
-          `${process.env.REACT_APP_API_URL}/users/${user.id}/daily-quiz-reminder`,
+          `/users/${user.id}/daily-quiz-reminder`,
           null,
           { params: { reminder: newValue } }
       );
@@ -88,7 +88,7 @@ const Settings = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/users/profile`);
+      await axios.delete(`/users/profile`);
       logout();
       navigate('/login');
     } catch (err) {

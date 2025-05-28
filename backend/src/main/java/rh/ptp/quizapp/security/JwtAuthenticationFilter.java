@@ -17,6 +17,9 @@ import rh.ptp.quizapp.service.CustomUserDetailsService;
 
 import java.io.IOException;
 
+/**
+ * Filter zur JWT-Authentifizierung, der bei jedem Request geprüft wird.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -25,14 +28,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
 
+    /**
+     * Gibt an, ob der Filter bei bestimmten Pfaden nicht ausgeführt werden soll.
+     *
+     * @param request HTTP-Request
+     * @return true, wenn der Filter übersprungen werden soll
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth/") || 
-               path.equals("/api/quizzes/daily") || 
-               path.matches("/api/quizzes/\\d+/submit");
+        return path.startsWith("/api/auth/") ||
+                path.equals("/api/quizzes/daily") ||
+                path.matches("/api/quizzes/\\d+/submit");
     }
 
+    /**
+     * Führt die Filterlogik aus, um JWT-Tokens zu validieren und Authentifizierungsinformationen im Kontext zu speichern.
+     *
+     * @param request HTTP-Request
+     * @param response HTTP-Response
+     * @param filterChain Filterkette
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -53,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                
+
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -75,4 +93,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-} 
+}

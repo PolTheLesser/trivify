@@ -3,7 +3,17 @@ package rh.ptp.quizapp.mapper;
 import rh.ptp.quizapp.dto.UserDTO;
 import rh.ptp.quizapp.model.User;
 
+/**
+ * Diese Klasse stellt Methoden zur Umwandlung zwischen {@link User} und {@link UserDTO} bereit.
+ */
 public class UserMapper {
+
+    /**
+     * Konvertiert ein {@link User} Entity in ein {@link UserDTO}.
+     *
+     * @param user Das User-Entity
+     * @return Das zugehörige UserDTO oder {@code null}, wenn das Eingabeobjekt {@code null} ist
+     */
     public static UserDTO userToUserDTO(User user) {
         if (user == null) {
             return null;
@@ -20,6 +30,13 @@ public class UserMapper {
         userDTO.setCreatedAt(user.getCreatedAt());
         return userDTO;
     }
+
+    /**
+     * Konvertiert ein {@link UserDTO} in ein {@link User} Entity.
+     *
+     * @param userDTO Das UserDTO
+     * @return Das zugehörige User-Entity oder {@code null}, wenn das Eingabeobjekt {@code null} ist
+     */
     public static User userDTOToUser(UserDTO userDTO) {
         if (userDTO == null) {
             return null;

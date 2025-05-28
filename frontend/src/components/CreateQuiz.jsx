@@ -141,7 +141,6 @@ const CreateQuiz = () => {
 
         try {
             await axios.post(
-                process.env.REACT_APP_API_URL,
                 {title, description, categories: selectedEnums, questions},
                 {params: {userId}}
             );
@@ -191,8 +190,8 @@ const CreateQuiz = () => {
     useEffect(() => {
         const fetchTags = async () => {
             try {
-                const valuesRes = await axios.get(`${process.env.REACT_APP_API_URL}/categories/values`);
-                const dataRes = await axios.get(`${process.env.REACT_APP_API_URL}/categories`);
+                const valuesRes = await axios.get(`/categories/values`);
+                const dataRes = await axios.get(`/categories`);
                 const values = valuesRes.data.slice(1);
                 const cats = dataRes.data.slice(1);
                 setAllValues(values);

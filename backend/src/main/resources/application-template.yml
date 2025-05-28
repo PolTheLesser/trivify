@@ -9,10 +9,11 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -43,7 +44,8 @@ admin:
 app:
   jwt-secret: ${JWT_SECRET}
   jwt-expiration-in-ms: 86400000
-frontend.url: ${SERVER_URL}:80
+frontend.url: http://trivify.de
+jwt.secret.key: ${JWT_SECRET_KEY}
 
 management:
   endpoints:

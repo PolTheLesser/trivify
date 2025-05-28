@@ -73,7 +73,7 @@ const EditQuiz = () => {
 
     const loadQuizFromServer = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/toEdit/${id}`);
+            const res = await axios.get(`/toEdit/${id}`);
             const data = res.data;
             const tagsFromEnums = data.categories.map((cat) => {
                 const idx = allCategories.indexOf(cat);
@@ -105,8 +105,8 @@ const EditQuiz = () => {
         const fetchTags = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories/values`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/categories`)
+                    axios.get(`/categories/values`),
+                    axios.get(`/categories`)
                 ]);
                 const values = valsRes.data.slice(1);
                 const cats = catsRes.data.slice(1);
@@ -193,7 +193,7 @@ const EditQuiz = () => {
         }
         try {
             const selectedEnums = newTagsToEnums(tags);
-            await axios.put(`${process.env.REACT_APP_API_URL}/${id}`, {
+            await axios.put(`/${id}`, {
                 title,
                 description,
                 questions,

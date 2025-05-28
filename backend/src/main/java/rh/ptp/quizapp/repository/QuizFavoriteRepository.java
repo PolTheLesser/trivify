@@ -10,6 +10,10 @@ import rh.ptp.quizapp.model.QuizFavorite;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository zur Verwaltung von {@link rh.ptp.quizapp.model.QuizFavorite} Einträgen.
+ * Erlaubt die Suche, Löschung und Auflistung favorisierter Quizzes pro Benutzer.
+ */
 @Repository
 public interface QuizFavoriteRepository extends JpaRepository<QuizFavorite, Long> {
     Optional<QuizFavorite> findByUserIdAndQuizId(Long userId, Long quizId);

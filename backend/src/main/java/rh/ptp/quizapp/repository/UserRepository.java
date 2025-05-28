@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository zur Verwaltung von {@link rh.ptp.quizapp.model.User} Entitäten.
+ * Bietet Suchfunktionen nach E-Mail, Name oder Status sowie Möglichkeiten zur Löschung und Statusprüfung.
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByName(String name);

@@ -17,6 +17,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service zur Verwaltung von Quiz-Ergebnissen.
+ * <p>
+ * Bietet Methoden zum Speichern von Ergebnissen, Abrufen von Ergebnissen
+ * für Nutzer und Quiz sowie zum Berechnen von Top-Scores und Rankings.
+ * </p>
+ */
 @Service
 public class QuizResultService {
 
@@ -31,6 +38,16 @@ public class QuizResultService {
 
     private final Logger log = LoggerFactory.getLogger(QuizResultService.class);
 
+    /**
+     * Speichert ein Quiz-Ergebnis für einen Benutzer und ein Quiz.
+     *
+     * @param userId           ID des Benutzers
+     * @param quizId           ID des Quiz
+     * @param score            erreichte Punktzahl
+     * @param maxPossibleScore maximale Punktzahl des Quiz
+     * @return gespeichertes QuizResult-Objekt
+     * @throws RuntimeException wenn Benutzer oder Quiz nicht gefunden werden
+     */
     public QuizResult saveResult(Long userId, Long quizId, int score, int maxPossibleScore) {
         log.info("️ Speichere QuizResult für userId=" + userId + ", quizId=" + quizId);
 
@@ -54,16 +71,31 @@ public class QuizResultService {
         return saved;
     }
 
-
+    /**
+     * Gibt alle Quiz-Ergebnisse eines bestimmten Benutzers zurück.
+     *
+     * @param userId ID des Benutzers
+     * @return Liste der Quiz-Ergebnisse
+     */
     public List<QuizResult> getUserResults(Long userId) {
         return quizResultRepository.findByUserId(userId);
     }
 
+    /**
+     * Gibt alle Ergebnisse für ein bestimmtes Quiz zurück.
+     *
+     * @param quizId ID des Quiz
+     * @return Liste der Quiz-Ergebnisse
+     */
     public List<QuizResult> getQuizResults(Long quizId) {
         return quizResultRepository.findByQuizId(quizId);
     }
 
-
+    /**
+     * Liefert die Top 10 Scores aller Benutzer zurück.
+     *
+     * @return Liste von ScoreDTO mit Benutzername, Score und Platzierung (-1 als Platzhalter)
+     */
     public List<ScoreDTO> getTopScores() {
         List<Object[]> rawResults = quizResultRepository.findTopUserScores(PageRequest.of(0, 10));
 
@@ -74,12 +106,17 @@ public class QuizResultService {
                     String username = userRepository.findById(userId)
                             .map(User::getName)
                             .orElse("Unbekannt");
-                    return new ScoreDTO(username, score, -1); // -1 weil Platz egal hier
+                    return new ScoreDTO(username, score, -1); // Platz wird hier nicht beachtet
                 })
                 .toList();
     }
 
-
+    /**
+     * Liefert den Score und das Ranking eines Benutzers zurück.
+     *
+     * @param userId ID des Benutzers
+     * @return ScoreDTO mit Benutzername, Score und Rang, oder Platz -1 wenn nicht gefunden
+     */
     public ScoreDTO getUserScoreAndRank(Long userId) {
         List<Object[]> ordered = quizResultRepository.findAllUserScoresOrdered();
         int rank = 1;
@@ -98,4 +135,4 @@ public class QuizResultService {
 
         return new ScoreDTO("Unbekannt", 0, -1);
     }
-} 
+}
