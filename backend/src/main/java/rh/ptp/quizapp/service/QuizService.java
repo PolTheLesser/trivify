@@ -39,7 +39,7 @@ public class QuizService {
     private QuizResultRepository quizResultRepository;
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private QuizQuestionRepository quizQuestionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -325,8 +325,8 @@ public class QuizService {
      */
     public QuizQuestion findQuestionById(Long questionId) {
         log.debug("Suche Frage mit ID: {}", questionId);
-        QuizQuestion frage = questionRepository.findByIdCustom(questionId);
-        return frage;
+        return quizQuestionRepo.findById(id)
+               .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
     }
 
     /**
