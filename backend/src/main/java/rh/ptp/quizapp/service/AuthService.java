@@ -100,7 +100,6 @@ public class AuthService {
             variables.put("logoUrl", frontendUrl+"/logo192.png");
             variables.put("username", user.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken.getToken());
-            variables.put("dataUrl", frontendUrl + "/datenschutz");
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
         }
         return authenticationTokenRepository.save(newToken);
