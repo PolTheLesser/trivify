@@ -33,20 +33,23 @@ spec:
       containers:
         - name: postgres
           image: postgres:latest
+          imagePullPolicy: Always
           env:
             - name: POSTGRES_DB
-              value: "quizapp"
+              value: "trivify"
             - name: POSTGRES_USER
-              value: "quizuser"
+              value: "trivifyuser"
             - name: POSTGRES_PASSWORD
-              value: "quizpass"
+              value: "trivifypass"
             - name: PGTZ
               value: "Europe/Berlin"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
           ports:
             - containerPort: 5432
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "quizuser", "-d", "quizapp"]
+              command: ["pg_isready", "-U", "trivifyuser", "-d", "trivify"]
             initialDelaySeconds: 10
             periodSeconds: 10
           volumeMounts:
@@ -76,14 +79,14 @@ metadata:
   namespace: trivify
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: trivify-backend
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: trivify-backend
   template:
     metadata:
       labels:
@@ -102,7 +105,8 @@ spec:
               done
       containers:
         - name: backend
-          image: lesommer2019/trivify-backend:latest
+          image: lesommer2019/trivify-backend:stable
+          imagePullPolicy: Always
           ports:
             - containerPort: 9090
           env:
@@ -111,11 +115,11 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: "-Duser.timezone=Europe/Berlin"
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://trivify-db:5432/quizapp"
+              value: "jdbc:postgresql://trivify-db:5432/trivify"
             - name: SPRING_DATASOURCE_USERNAME
-              value: "quizuser"
+              value: "trivifyuser"
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "quizpass"
+              value: "trivifypass"
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SPRING_JPA_DATABASE_PLATFORM
@@ -135,6 +139,7 @@ metadata:
 spec:
   selector:
     app: trivify-backend
+  type: LoadBalancer
   ports:
     - port: 9090
       targetPort: 9090
@@ -146,14 +151,14 @@ metadata:
   namespace: trivify
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: trivify-frontend
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: trivify-frontend
   template:
     metadata:
       labels:
@@ -172,7 +177,8 @@ spec:
               done
       containers:
         - name: frontend
-          image: lesommer2019/trivify-frontend:latest
+          image: lesommer2019/trivify-frontend:stable
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -191,6 +197,8 @@ metadata:
   name: trivify-frontend
   namespace: trivify
 spec:
+  selector:
+    app: trivify-frontend
   type: LoadBalancer
   ports:
     - port: 80
