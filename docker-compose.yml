@@ -1,10 +1,10 @@
 version: "3.9"
 services:
-  quizapp-db:
+  trivify-db:
     image: postgres:latest
     pull_policy: always
     restart: always
-    container_name: quizapp-db
+    container_name: trivify-db
     environment:
       POSTGRES_DB: quizapp
       POSTGRES_USER: quizuser
@@ -21,16 +21,16 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  quizapp-backend:
+  trivify-backend:
     image: lesommer2019/trivify-backend:stable
     pull_policy: always
-    container_name: quizapp-backend
+    container_name: trivify-backend
     ports:
       - "9090:9090"
     environment:
       - TZ=Europe/Berlin
       - JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Berlin
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://quizapp-db:5432/quizapp
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://trivify-db:5432/quizapp
       - SPRING_DATASOURCE_USERNAME=quizuser
       - SPRING_DATASOURCE_PASSWORD=quizpass
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
@@ -42,19 +42,19 @@ services:
       retries: 25
       start_period: 20s
     depends_on:
-      quizapp-db:
+      trivify-db:
         condition: service_healthy
 
-  quizapp-frontend:
+  trivify-frontend:
     image: lesommer2019/trivify-frontend:stable
     pull_policy: always
-    container_name: quizapp-frontend
+    container_name: trivify-frontend
     ports:
       - "80:80"
     environment:
       - TZ=Europe/Berlin
     depends_on:
-      quizapp-backend:
+      trivify-backend:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:

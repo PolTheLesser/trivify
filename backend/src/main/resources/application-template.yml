@@ -43,7 +43,7 @@ admin:
 app:
   jwt-secret: ${JWT_SECRET}
   jwt-expiration-in-ms: 86400000
-frontend.url: ${SERVER_URL}:80
+frontend.url: http://trivify.de
 jwt.secret.key: ${JWT_SECRET_KEY}
 
 management:

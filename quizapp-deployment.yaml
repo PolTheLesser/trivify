@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: quizapp
+  name: trivify
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pgdata
-  namespace: quizapp
+  namespace: trivify
 spec:
   accessModes:
     - ReadWriteOnce
@@ -18,35 +18,38 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-db
-  namespace: quizapp
+  name: trivify-db
+  namespace: trivify
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: quizapp-db
+      app: trivify-db
   template:
     metadata:
       labels:
-        app: quizapp-db
+        app: trivify-db
     spec:
       containers:
         - name: postgres
           image: postgres:latest
+          imagePullPolicy: Always
           env:
             - name: POSTGRES_DB
-              value: "quizapp"
+              value: "trivify"
             - name: POSTGRES_USER
-              value: "quizuser"
+              value: "trivifyuser"
             - name: POSTGRES_PASSWORD
-              value: "quizpass"
+              value: "trivifypass"
             - name: PGTZ
               value: "Europe/Berlin"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
           ports:
             - containerPort: 5432
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "quizuser", "-d", "quizapp"]
+              command: ["pg_isready", "-U", "trivifyuser", "-d", "trivify"]
             initialDelaySeconds: 10
             periodSeconds: 10
           volumeMounts:
@@ -60,11 +63,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-db
-  namespace: quizapp
+  name: trivify-db
+  namespace: trivify
 spec:
   selector:
-    app: quizapp-db
+    app: trivify-db
   ports:
     - port: 5432
       targetPort: 5432
@@ -72,22 +75,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-backend
-  namespace: quizapp
+  name: trivify-backend
+  namespace: trivify
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: trivify-backend
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: quizapp-backend
   template:
     metadata:
       labels:
-        app: quizapp-backend
+        app: trivify-backend
     spec:
       initContainers:
         - name: wait-for-db
@@ -96,13 +99,14 @@ spec:
             - sh
             - -c
             - |
-              until nc -z quizapp-db 5432; do
+              until nc -z trivify-db 5432; do
                 echo "Waiting for PostgreSQL..."
                 sleep 2
               done
       containers:
         - name: backend
-          image: lesommer2019/trivify-backend:latest
+          image: lesommer2019/trivify-backend:stable
+          imagePullPolicy: Always
           ports:
             - containerPort: 9090
           env:
@@ -111,11 +115,11 @@ spec:
             - name: JAVA_TOOL_OPTIONS
               value: "-Duser.timezone=Europe/Berlin"
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://quizapp-db:5432/quizapp"
+              value: "jdbc:postgresql://trivify-db:5432/trivify"
             - name: SPRING_DATASOURCE_USERNAME
-              value: "quizuser"
+              value: "trivifyuser"
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "quizpass"
+              value: "trivifypass"
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SPRING_JPA_DATABASE_PLATFORM
@@ -130,11 +134,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-backend
-  namespace: quizapp
+  name: trivify-backend
+  namespace: trivify
 spec:
   selector:
-    app: quizapp-backend
+    app: trivify-backend
+  type: LoadBalancer
   ports:
     - port: 9090
       targetPort: 9090
@@ -142,22 +147,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quizapp-frontend
-  namespace: quizapp
+  name: trivify-frontend
+  namespace: trivify
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: trivify-frontend
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: quizapp-frontend
   template:
     metadata:
       labels:
-        app: quizapp-frontend
+        app: trivify-frontend
     spec:
       initContainers:
         - name: wait-for-backend
@@ -166,13 +171,14 @@ spec:
             - sh
             - -c
             - |
-              until wget -qO- http://quizapp-backend:9090/actuator/health | grep -q "UP"; do
+              until wget -qO- http://trivify-backend:9090/actuator/health | grep -q "UP"; do
                 echo "Waiting for backend..."
                 sleep 2
               done
       containers:
         - name: frontend
-          image: lesommer2019/trivify-frontend:latest
+          image: lesommer2019/trivify-frontend:stable
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -188,13 +194,36 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: quizapp-frontend
-  namespace: quizapp
+  name: trivify-frontend
+  namespace: trivify
 spec:
   selector:
-    app: quizapp-frontend
-  type: NodePort
+    app: trivify-frontend
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: trivify-rolling-restart
+  namespace: trivify
+spec:
+  schedule: "0 2 * * *"  # every day at 02:00 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: restart-deployments
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl rollout restart deployment/trivify-backend -n trivify
+                  kubectl rollout restart deployment/trivify-frontend -n trivify
+                  kubectl rollout restart deployment/trivify-db -n trivify
+          restartPolicy: OnFailure
+
