@@ -36,7 +36,7 @@ public class AdminController {
     private CleanupRepositoryService cleanupRepositoryService;
 
     /**
-     * Gibt eine Liste aller Admin-Quizzes inklusive Bewertungen zurück.
+     * Gibt eine Liste aller Quizzes inklusive Bewertungen zurück.
      */
     @GetMapping("/quizzes")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -45,7 +45,7 @@ public class AdminController {
     }
 
     /**
-     * Gibt eine Liste aller registrierten Admin-Benutzer im System zurück.
+     * Gibt eine Liste aller registrierten Benutzer im System zurück.
      */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -67,7 +67,7 @@ public class AdminController {
     }
 
     /**
-     * Gibt alle möglichen Admin-Benutzerstatus zurück.
+     * Gibt alle möglichen User-States zurück.
      */
     @GetMapping("/users/states")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -76,7 +76,7 @@ public class AdminController {
     }
 
     /**
-     * Erstellt einen neuen Admin-Benutzer anhand der übergebenen Benutzerdaten.
+     * Erstellt einen neuen Benutzer anhand der übergebenen Benutzerdaten.
      */
     @PostMapping("/users/create")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -87,7 +87,7 @@ public class AdminController {
     }
 
     /**
-     * Aktualisiert einen bestehenden Admin-Benutzer mit neuen Daten.
+     * Aktualisiert einen bestehenden Benutzer mit neuen Daten.
      *
      * @param id Benutzer-ID
      */
@@ -100,7 +100,7 @@ public class AdminController {
     }
 
     /**
-     * Löscht einen Admin-Benutzer inklusive Vorbereitung durch das Cleanup-Service.
+     * Löscht einen Benutzer inklusive Vorbereitung durch das Cleanup-Service.
      *
      * @param id Benutzer-ID
      */
