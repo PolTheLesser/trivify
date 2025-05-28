@@ -1,0 +1,6 @@
+<changeSet id="create-user-role-enum" author="Robin">
+    <comment>Create user_role enum type</comment>
+    <sql>
+        CREATE TYPE user_role AS ENUM ('ROLE_USER', 'ROLE_ADMIN');
+    </sql>
+</changeSet>
