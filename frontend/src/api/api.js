@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL from env or default
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = "/api";
 axios.defaults.withCredentials = true;
 
 // Auth token interceptor
