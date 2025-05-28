@@ -24,7 +24,8 @@ import java.util.Map;
 /**
  * Service zur automatischen Erstellung und Speicherung eines täglichen Quiz.
  * <p>
- * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt
+ * Die Methode {@link #generateDailyQuiz()} wird einmal täglich um 0:00 Uhr ausgeführt.
+ * </p>
  */
 @Slf4j
 @Service
@@ -40,11 +41,9 @@ public class DailyQuizSchedulerService {
     private final QuizRepository quizRepository;
     private final QuizService quizService;
 
-    /**
-     * Pfad zur Daily-Quiz-Datei.
-     */
     @Autowired
     private EmailService emailService;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -63,10 +62,12 @@ public class DailyQuizSchedulerService {
     /**
      * Tägliche Aufgabe, die automatisch um 0:00 Uhr ausgeführt wird.
      * <p>
-     * Diese Methode generiert 10 Quizfragen über eine API-Abfrage und speichert sie als JSON-Datei.
-     * Im Fehlerfall wird ein entsprechender Logeintrag erzeugt.
+     * Diese Methode generiert 10 Quizfragen über eine API-Abfrage und speichert sie.
+     * Im Fehlerfall wird ein Logeintrag erzeugt.
+     * </p>
      * <p>
      * Cron-Ausdruck: {@code 0 0 0 * * *} (täglich um 0:00 Uhr)
+     * </p>
      */
     @Scheduled(cron = "0 0 0 * * *")
     public void generateDailyQuiz() {
@@ -93,6 +94,7 @@ public class DailyQuizSchedulerService {
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
             variables.put("logoUrl", frontendUrl + "/logo192.png");
+          
             for (User user : users) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
                         ? user.getLastDailyQuizPlayed().toLocalDate()
@@ -117,7 +119,13 @@ public class DailyQuizSchedulerService {
         }
     }
 
-    @Scheduled(cron = "0 0 18 * * ?") // Täglich um 18 Uhr
+    /**
+     * Tägliche Erinnerung an Benutzer um 18 Uhr, falls die Daily-Streak in Gefahr ist.
+     * <p>
+     * Cron-Ausdruck: {@code 0 0 18 * * ?} (täglich um 18 Uhr)
+     * </p>
+     */
+    @Scheduled(cron = "0 0 18 * * ?")
     public void dailyQuizStreakReminder() {
         for (User user : userRepository.findByDailyQuizReminderIsTrue()) {
             LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -135,6 +143,5 @@ public class DailyQuizSchedulerService {
             }
         }
     }
-
 }
 

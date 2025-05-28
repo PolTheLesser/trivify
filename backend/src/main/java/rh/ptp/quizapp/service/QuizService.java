@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Service-Klasse zur Verwaltung von Quiz-bezogenen Operationen,
+ * inklusive Erstellen, Bearbeiten, Löschen, Bewerten und Abrufen von Quizzes.
+ */
 @Service
 public class QuizService {
     private Logger log = LoggerFactory.getLogger(QuizService.class);
@@ -55,11 +59,24 @@ public class QuizService {
     @Value("${admin.password}")
     private String adminpassword;
 
+    /**
+     * Holt ein Quiz anhand seiner ID.
+     *
+     * @param quizId Die ID des Quizzes.
+     * @return Das Quiz-Objekt.
+     */
     public Quiz getQuizById(Long quizId) {
         return quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
     }
 
+    /**
+     * Erstellt ein neues Quiz basierend auf den übergebenen Daten.
+     *
+     * @param quizDTO Die Daten für das neue Quiz.
+     * @param userId  ID des Erstellers.
+     * @return Das erstellte Quiz-Objekt.
+     */
     public Quiz createQuiz(QuizDTO quizDTO, Long userId) {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
@@ -108,6 +125,14 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    /**
+     * Aktualisiert ein bestehendes Quiz.
+     *
+     * @param quizId  Die ID des zu aktualisierenden Quizzes.
+     * @param quizDTO Neue Daten.
+     * @param userId  ID des Bearbeitenden.
+     * @return Das aktualisierte Quiz.
+     */
     public Quiz updateQuiz(Long quizId, QuizDTO quizDTO, Long userId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
@@ -141,6 +166,12 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    /**
+     * Löscht ein Quiz samt aller zugehörigen Einträge (Bewertungen, Favoriten, Ergebnisse).
+     *
+     * @param quizId Die ID des zu löschenden Quizzes.
+     * @param userId Die ID des anfordernden Benutzers.
+     */
     @Transactional
     public void deleteQuiz(Long quizId, Long userId) {
         Quiz quiz = quizRepository.findById(quizId)
@@ -156,11 +187,21 @@ public class QuizService {
         quizRepository.delete(quiz);
     }
 
-
+    /**
+     * Gibt alle vom Benutzer erstellten Quizzes zurück.
+     *
+     * @param userId Die Benutzer-ID.
+     * @return Liste der Quizzes.
+     */
     public List<Quiz> getUserQuizzes(Long userId) {
         return quizRepository.findByCreatorId(userId);
     }
 
+    /**
+     * Holt das tägliche Quiz als DTO.
+     *
+     * @return Ein QuizDTO für das tägliche Quiz.
+     */
     public QuizDTO getDailyQuiz() {
         LocalDate today = LocalDate.now();
         List<Quiz> dailyQuizzes = quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, today);
@@ -203,6 +244,12 @@ public class QuizService {
         return quizDTO;
     }
 
+    /**
+     * Erstellt oder ersetzt das tägliche Quiz.
+     *
+     * @param questions JSON-Fragenarray.
+     * @param category  Kategorie des täglichen Quizzes.
+     */
     public void updateDailyQuiz(JSONArray questions, QuizCategory category) {
         try {
             Quiz dailyQuiz = new Quiz();
@@ -257,18 +304,36 @@ public class QuizService {
         }
     }
 
-
+    /**
+     * Prüft, ob ein Benutzer das heutige tägliche Quiz bereits absolviert hat.
+     *
+     * @param userId Benutzer-ID.
+     * @return true, wenn bereits gespielt, sonst false.
+     */
     public boolean hasCompletedDailyQuiz(Long userId) {
         LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         return quizResultRepository.existsByUserIdAndQuizCategoriesAndPlayedAtAfter(userId, QuizCategory.DAILY_QUIZ, today);
     }
 
+    /**
+     * Findet eine Frage anhand ihrer ID.
+     *
+     * @param questionId ID der Frage.
+     * @return Die Quiz-Frage.
+     */
     public QuizQuestion findQuestionById(Long questionId) {
         log.debug("Suche Frage mit ID: {}", questionId);
         QuizQuestion frage = questionRepository.findByIdCustom(questionId);
         return frage;
     }
 
+    /**
+     * Überprüft eine Antwort auf eine Quizfrage.
+     *
+     * @param userAnswer    Antwort des Benutzers.
+     * @param correctAnswer Richtige Antwort.
+     * @return true, wenn die Antwort korrekt ist, sonst false.
+     */
     public boolean checkAnswer(String userAnswer, String correctAnswer) {
         if (userAnswer == null || correctAnswer == null) {
             return false;
@@ -276,6 +341,13 @@ public class QuizService {
         return userAnswer.trim().equalsIgnoreCase(correctAnswer.trim());
     }
 
+    /**
+     * Bewertet eine Antwort auf eine bestimmte Frage.
+     *
+     * @param questionId ID der Frage.
+     * @param userAnswer Antwort des Benutzers.
+     * @return Ein Ergebnis-Datentransferobjekt.
+     */
     public QuizResultDTO checkAnswer(Long questionId, String userAnswer) {
         QuizQuestion question = findQuestionById(questionId);
         if (question == null) {
@@ -294,6 +366,14 @@ public class QuizService {
         return result;
     }
 
+    /**
+     * Bewertet ein Quiz durch den Benutzer.
+     *
+     * @param quizId ID des Quizzes.
+     * @param userId ID des Benutzers, der bewertet.
+     * @param rating Bewertung (1-5).
+     * @return Die Bewertung des Quizzes.
+     */
     public Integer rateQuiz(Long quizId, Long userId, int rating) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
@@ -319,7 +399,13 @@ public class QuizService {
         return rating;
     }
 
-
+    /**
+     * Markiert oder entfernt ein Quiz aus den Favoriten des Benutzers.
+     *
+     * @param quizId      ID des Quizzes.
+     * @param userDetails Benutzer-Details.
+     * @return true, wenn neu hinzugefügt, false, wenn entfernt.
+     */
     public boolean toggleFavorite(Long quizId, UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
         Quiz quiz = getQuizById(quizId);
@@ -339,6 +425,12 @@ public class QuizService {
         }
     }
 
+    /**
+     * Holt die Quiz-Historie eines Benutzers.
+     *
+     * @param userDetails Authentifizierungsdetails des Benutzers.
+     * @return Liste von QuizHistoryDTOs, die die Historie des Benutzers enthalten.
+     */
     public List<QuizHistoryDTO> getQuizHistory(UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
 
@@ -362,7 +454,9 @@ public class QuizService {
     }
 
     /**
-     * Für GET /quizzes: hol alle Quizzes als QuizDTO mit Rating-Aggregaten
+     * Holt alle Quizzes mit ihren Bewertungen.
+     *
+     * @return Liste von Quizzes mit Durchschnittsbewertung und Anzahl der Bewertungen.
      */
     public List<Quiz> findAllWithRatings() {
         List<Quiz> quizzes = quizRepository.findAll();
@@ -377,6 +471,11 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gibt alle verfügbaren Quiz-Kategorien (als Text) zurück.
+     *
+     * @return Liste von Kategorienamen.
+     */
     public List<String> getCategoryValues() {
         List<String> values = new ArrayList<>();
         for (QuizCategory category : QuizCategory.values()) {
@@ -385,6 +484,11 @@ public class QuizService {
         return values;
     }
 
+    /**
+     * Validiert die Eingabedaten für ein QuizDTO.
+     *
+     * @param quizDTO Das zu validierende QuizDTO.
+     */
     public void validateQuizDTO(QuizDTO quizDTO) {
         if (quizDTO.getTitle() == null || quizDTO.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Titel darf nicht leer sein");
@@ -425,6 +529,12 @@ public class QuizService {
         }
     }
 
+    /**
+     * Überprüft, ob der Benutzer ein Administrator ist.
+     *
+     * @param userId ID des Benutzers.
+     * @return true, wenn der Benutzer ein Administrator ist, sonst false.
+     */
     private boolean isAdmin(Long userId) {
         return userRepository.findById(userId)
                 .map(u -> u.getRole() == UserRole.ROLE_ADMIN)

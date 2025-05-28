@@ -1,5 +1,11 @@
 package rh.ptp.quizapp.model;
 
+/**
+ * Das Enum {@code QuizCategory} definiert Kategorien,
+ * die für Quizfragen verwendet werden können. Jede Kategorie besitzt
+ * einen Namen, der zur Anzeige in der
+ * Benutzeroberfläche genutzt wird.
+ */
 public enum QuizCategory {
     DAILY_QUIZ("Tägliches Quiz"),
     GENERAL_KNOWLEDGE("Allgemeinwissen"),

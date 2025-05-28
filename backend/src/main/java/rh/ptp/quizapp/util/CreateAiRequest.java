@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import rh.ptp.quizapp.model.QuizCategory;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserRole;
 import rh.ptp.quizapp.repository.UserRepository;
@@ -24,8 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Dienstklasse zur Erstellung von KI-gestützten Quizfragen über eine externe API.
+ * Sie versucht, bis zu fünfmal ein valides JSON-Array mit Quizfragen abzurufen.
+ * Im Fehlerfall wird eine E-Mail an Administratoren gesendet.
+ */
 @Component
 public class CreateAiRequest {
+
     @Autowired
     private EmailService emailService;
 
@@ -46,6 +51,14 @@ public class CreateAiRequest {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Fordert von der KI-API ein Quiz im JSON-Format an. Es wird ein Retry-Mechanismus mit bis zu 5 Versuchen implementiert.
+     * Im Fehlerfall wird eine E-Mail an alle Administratoren gesendet.
+     *
+     * @param category Die gewünschte Quiz-Kategorie (z.B. "Allgemeinwissen").
+     * @return Ein JSONArray mit generierten Quizfragen.
+     * @throws RuntimeException Wenn nach 5 Versuchen kein valides Ergebnis empfangen werden konnte.
+     */
     public JSONArray fetchQuizFromAPI(String category) {
         int invalidRetrys = 0;
         String errorMessage = "";
@@ -106,6 +119,16 @@ public class CreateAiRequest {
         throw new RuntimeException("Fehler beim Abrufen des Quiz von der API nach 5 Versuchen");
     }
 
+    /**
+     * Führt den eigentlichen HTTP-Request an die KI-API aus und verarbeitet die Antwort.
+     *
+     * @param httpClient Der HTTP-Client zum Senden der Anfrage.
+     * @param prompt     Der Text, der als Eingabeaufforderung an die KI gesendet wird.
+     * @return Ein JSONArray mit den Quizfragen im erwarteten Format.
+     * @throws IOException              Falls beim Netzwerkzugriff ein Fehler auftritt.
+     * @throws InterruptedException     Falls die Anfrage unterbrochen wird.
+     * @throws RuntimeException         Falls die API-Antwort kein valides JSON enthält.
+     */
     public JSONArray fetchQuizFromAPI(HttpClient httpClient, String prompt) throws IOException, InterruptedException {
         JSONObject requestBody = new JSONObject()
                 .put("contents", new JSONArray()
@@ -127,17 +150,16 @@ public class CreateAiRequest {
         logger.info("Antwort von der API: {}", responseBody);
 
         JSONObject responseJson = new JSONObject(responseBody);
-
         JSONArray candidates = responseJson.getJSONArray("candidates");
         JSONObject contentObj = candidates.getJSONObject(0).getJSONObject("content");
         JSONArray parts = contentObj.getJSONArray("parts");
         String content = parts.getJSONObject(0).getString("text");
 
         // Bereinigung der Antwort
-        content = content.replaceAll("(?s)```json|```", "")     // Entferne Markdown
-                .replace("\\n", "")                    // Entferne \n
-                .replace("\\\"", "\"")                // Entescape "
-                .replaceAll("\\\\", "")               // Entferne alle \
+        content = content.replaceAll("(?s)```json|```", "")
+                .replace("\\n", "")
+                .replace("\\\"", "\"")
+                .replaceAll("\\\\", "")
                 .trim();
 
         if (!content.startsWith("[")) {
