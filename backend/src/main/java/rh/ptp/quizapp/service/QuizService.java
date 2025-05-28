@@ -237,6 +237,7 @@ public class QuizService {
                     dto.setCorrectAnswer(null);
                     dto.setDifficulty(q.getDifficulty());
                     dto.setSource(q.getSource());
+                    dto.setQuestionType(q.getQuestionType());
                     return dto;
                 })
                 .collect(Collectors.toList());
