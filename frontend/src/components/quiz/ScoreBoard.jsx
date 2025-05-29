@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchTopScores, fetchUserScore } from '../services/scoreService';
+import { fetchTopScores, fetchUserScore } from '../../services/scoreService';
 
 const ScoreBoard = ({ userId }) => {
     const [topScores, setTopScores] = useState([]);

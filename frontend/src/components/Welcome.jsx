@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import './WelcomeCalendar.css';
+import './layout/WelcomeCalendar.css';
 import {format} from 'date-fns';
 import {
     CircularProgress,
@@ -18,7 +18,7 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CasinoIcon from '@mui/icons-material/Casino';
 import {useAuth} from '../contexts/AuthContext';
-import ScoreBoard from './ScoreBoard';
+import ScoreBoard from './quiz/ScoreBoard';
 import axios from '../api/api';
 
 // Styled version of react-calendar with theme-based text color and overrides for weekends and neighboring months

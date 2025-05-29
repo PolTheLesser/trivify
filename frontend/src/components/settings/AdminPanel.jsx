@@ -23,9 +23,9 @@ import {
     CircularProgress,
     Alert,
 } from '@mui/material';
-import axios from '../api/api';
-import {useAuth} from '../contexts/AuthContext';
-import {CustomSelect, CustomSwitch, PasswordField} from "../CustomElements";
+import axios from '../../api/api';
+import {useAuth} from '../../contexts/AuthContext';
+import {CustomSelect, CustomSwitch, PasswordField} from "../../CustomElements";
 
 const ROWS_PER_PAGE = 9;
 

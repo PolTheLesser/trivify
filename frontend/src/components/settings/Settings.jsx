@@ -15,8 +15,8 @@ import {
   Typography
 } from '@mui/material';
 import axios from 'axios';
-import {useAuth} from '../contexts/AuthContext';
-import {PasswordField, CustomSwitch, CustomFormControlLabel } from "../CustomElements";
+import {useAuth} from '../../contexts/AuthContext';
+import {PasswordField, CustomSwitch, CustomFormControlLabel } from "../../CustomElements";
 
 const Settings = () => {
   const { user, logout } = useAuth();

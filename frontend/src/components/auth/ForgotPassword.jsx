@@ -10,7 +10,7 @@ import {
   Box,
   Alert,
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');

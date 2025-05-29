@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationErrors(org.springframework.web.bind.MethodArgumentNotValidException ex) {
-        String errorMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage(); // Nur erste Fehlermeldung
+        String errorMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ResponseEntity.badRequest().body(errorBody(errorMsg));
     }
 

@@ -25,7 +25,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-import {CustomAutocomplete, CustomSelect} from "../CustomElements";
+import {CustomAutocomplete, CustomSelect} from "../../CustomElements";
 
 const EditQuiz = () => {
     const {id} = useParams();

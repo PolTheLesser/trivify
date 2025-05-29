@@ -10,8 +10,8 @@ import {
     Box,
     Alert,
 } from '@mui/material';
-import {useAuth} from '../contexts/AuthContext';
-import {PasswordField} from '../CustomElements';
+import {useAuth} from '../../contexts/AuthContext';
+import {PasswordField} from '../../CustomElements';
 
 const Login = () => {
     const [email, setEmail] = useState('');

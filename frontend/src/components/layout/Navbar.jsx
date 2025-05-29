@@ -16,8 +16,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import SearchIcon from '@mui/icons-material/Search';
-import { useAuth } from '../contexts/AuthContext';
-import { ThemeContext } from '../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { ThemeContext } from '../../contexts/ThemeContext';
 
 const Navbar = () => {
     // Hooks ganz oben aufrufen, nicht konditional

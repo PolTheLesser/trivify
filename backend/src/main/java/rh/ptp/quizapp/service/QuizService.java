@@ -146,7 +146,6 @@ public class QuizService {
         quiz.setDescription(quizDTO.getDescription());
         quiz.setCategories(quizDTO.getCategories());
         quiz.setPublic(quizDTO.isPublic());
-        // Füge neue Fragen hinzu
         List<QuizQuestion> questions = quizDTO.getQuestions().stream()
                 .map(q -> {
                     QuizQuestion question = new QuizQuestion();
@@ -216,7 +215,6 @@ public class QuizService {
             throw new RuntimeException("Keine Fragen im täglichen Quiz gefunden");
         }
 
-        // Debug-Logging
         log.info("Daily Quiz gefunden: ID={}, Fragen={}, Datum={}", dailyQuiz.getId(), dailyQuiz.getQuestions().size(), dailyQuiz.getDate());
 
         QuizDTO quizDTO = new QuizDTO();
@@ -228,14 +226,13 @@ public class QuizService {
         quizDTO.setCreatorId(dailyQuiz.getCreator().getId());
         quizDTO.setCreatorUsername(dailyQuiz.getCreator().getName());
 
-        // Konvertiere die Fragen in DTOs
         List<QuizQuestionDTO> questionDTOs = dailyQuiz.getQuestions().stream()
                 .map(q -> {
                     QuizQuestionDTO dto = new QuizQuestionDTO();
                     dto.setId(q.getId());
                     dto.setQuestion(q.getQuestion());
                     dto.setAnswers(q.getAnswers());
-                    dto.setCorrectAnswer(""); // Setze die korrekte Antwort nicht, um sie nicht anzuzeigen
+                    dto.setCorrectAnswer("");
                     dto.setDifficulty(q.getDifficulty());
                     dto.setSource(q.getSource());
                     dto.setQuestionType(q.getQuestionType());
@@ -437,10 +434,8 @@ public class QuizService {
     public List<QuizHistoryDTO> getQuizHistory(UserDetails userDetails) {
         User user = userService.getUserFromUserDetails(userDetails);
 
-        // Hole alle QuizResults für den User
         List<QuizResult> quizResults = quizResultRepository.findByUserId(user.getId());
 
-        // Konvertiere die QuizResults in DTOs
         return quizResults.stream()
                 .map(result -> {
                     QuizHistoryDTO dto = new QuizHistoryDTO();
@@ -450,7 +445,6 @@ public class QuizService {
                     dto.setScore(result.getScore());
                     dto.setMaxPossibleScore(result.getMaxPossibleScore());
                     dto.setPlayedAt(result.getPlayedAt());
-                    // Optional: Füge weitere Felder hinzu, die Sie in der Historie anzeigen möchten
                     return dto;
                 })
                 .collect(Collectors.toList());

@@ -14,7 +14,6 @@ import java.util.Optional;
  * Enthält Methoden zur Berechnung von Durchschnittsbewertungen, Zählungen und zur Bewertungspflege.
  */
 public interface QuizRatingRepository extends JpaRepository<QuizRating, Long> {
-    // Für Aggregation: Durchschnitt und Anzahl
     @Query("SELECT AVG(qr.rating) FROM QuizRating qr WHERE qr.quiz.id = :quizId")
     Double findAverageByQuizId(@Param("quizId") Long quizId);
 

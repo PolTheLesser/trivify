@@ -23,9 +23,9 @@ import {
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {useAuth} from '../contexts/AuthContext';
-import axios from '../api/api';
-import {CustomSelect, CustomFormControlLabel} from "../CustomElements";
+import {useAuth} from '../../contexts/AuthContext';
+import axios from '../../api/api';
+import {CustomSelect, CustomFormControlLabel} from "../../CustomElements";
 
 const QuizList = () => {
     const {user} = useAuth();

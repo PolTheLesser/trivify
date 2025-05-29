@@ -11,8 +11,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {useAuth} from '../contexts/AuthContext';
-import {PasswordField, CustomFormControlLabel, CustomSwitch } from "../CustomElements";
+import {useAuth} from '../../contexts/AuthContext';
+import {PasswordField, CustomFormControlLabel, CustomSwitch } from "../../CustomElements";
 
 const Register = () => {
   const [formData, setFormData] = useState({

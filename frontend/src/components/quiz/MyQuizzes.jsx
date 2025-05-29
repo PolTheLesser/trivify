@@ -30,9 +30,9 @@ import {
 import {useNavigate} from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {useAuth} from '../contexts/AuthContext';
-import axios from '../api/api';
-import {CustomFormControlLabel, CustomSelect} from "../CustomElements";
+import {useAuth} from '../../contexts/AuthContext';
+import axios from '../../api/api';
+import {CustomFormControlLabel, CustomSelect} from "../../CustomElements";
 
 const MeineQuizze = () => {
     const {user} = useAuth();

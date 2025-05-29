@@ -12,9 +12,9 @@ import {
     RadioGroup,
     Typography
 } from '@mui/material';
-import axios from '../api/api';
-import {useAuth} from '../contexts/AuthContext';
-import {CustomFormControlLabel} from '../CustomElements'
+import axios from '../../api/api';
+import {useAuth} from '../../contexts/AuthContext';
+import {CustomFormControlLabel} from '../../CustomElements'
 
 const DailyQuiz = () => {
     const navigate = useNavigate();

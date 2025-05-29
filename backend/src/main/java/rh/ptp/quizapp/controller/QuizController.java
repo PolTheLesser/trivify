@@ -53,7 +53,7 @@ public class QuizController {
 
         for (Quiz quiz : quizze) {
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
-                quiz.getQuestions().get(i).setCorrectAnswer(""); // Setzt die korrekte Antwort auf null, um sie nicht anzuzeigen
+                quiz.getQuestions().get(i).setCorrectAnswer("");
             }
             quiz.getCreator().setEmail(null);
             quiz.getCreator().setPassword(null);
@@ -76,7 +76,7 @@ public class QuizController {
                 getDailyQuiz();
             }
             for (int i = 0; i < quiz.getQuestions().size(); i++) {
-                quiz.getQuestions().get(i).setCorrectAnswer(""); // Setzt die korrekte Antwort auf null, um sie nicht anzuzeigen
+                quiz.getQuestions().get(i).setCorrectAnswer("");
             }
             quiz.getCreator().setEmail(null);
             quiz.getCreator().setPassword(null);
@@ -211,7 +211,6 @@ public ResponseEntity<?> submitAnswer(@PathVariable Long quizId,
         return ResponseEntity.ok(result);
     } catch (Exception e) {
         logger.error("Fehler beim Überprüfen der Antwort:", e);
-        // return the exception message in JSON so front-end can show it
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", e.getMessage()));

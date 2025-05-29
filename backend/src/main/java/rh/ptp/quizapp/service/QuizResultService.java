@@ -106,7 +106,7 @@ public class QuizResultService {
                     String username = userRepository.findById(userId)
                             .map(User::getName)
                             .orElse("Unbekannt");
-                    return new ScoreDTO(username, score, -1); // Platz wird hier nicht beachtet
+                    return new ScoreDTO(username, score, -1);
                 })
                 .toList();
     }
