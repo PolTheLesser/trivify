@@ -139,7 +139,7 @@ metadata:
 spec:
   selector:
     app: trivify-backend
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 9090
       targetPort: 9090
@@ -202,7 +202,7 @@ metadata:
 spec:
   selector:
     app: trivify-frontend
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 80
       targetPort: 80
