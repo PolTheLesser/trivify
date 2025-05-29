@@ -102,6 +102,14 @@ public class QuizController {
             return ResponseEntity.notFound().build();
         }
 
+        List<QuizCategory> categories = quiz.getCategories();
+        for(QuizCategory category : categories) {
+            if (category.equals(QuizCategory.DAILY_QUIZ)) {
+                categories.remove(QuizCategory.DAILY_QUIZ);
+            }
+        }
+        quiz.setCategories(categories);
+
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Benutzer nicht gefunden"));
         boolean isAdmin = user.getRole() == UserRole.ROLE_ADMIN;

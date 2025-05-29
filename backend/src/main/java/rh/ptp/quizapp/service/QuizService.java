@@ -144,7 +144,11 @@ public class QuizService {
 
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
-        quiz.setCategories(quizDTO.getCategories());
+        List<QuizCategory> newCategories = quizDTO.getCategories();
+        if (quiz.getCategories().contains(QuizCategory.DAILY_QUIZ)){
+            newCategories.add(QuizCategory.DAILY_QUIZ);
+        }
+        quiz.setCategories(newCategories);
         quiz.setPublic(quizDTO.isPublic());
         List<QuizQuestion> questions = quizDTO.getQuestions().stream()
                 .map(q -> {
