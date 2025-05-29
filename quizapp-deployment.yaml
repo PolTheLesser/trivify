@@ -265,16 +265,20 @@ spec:
     - host: trivify.de
       http:
         paths:
-          - path: /
+          - path: /actuator
             pathType: Prefix
             backend:
               service:
-                name: trivify-frontend
+                name: trivify-backend
                 port:
-                  number: 80
-    - host: www.trivify.de
-      http:
-        paths:
+                  number: 9090
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: trivify-backend
+                port:
+                  number: 9090
           - path: /
             pathType: Prefix
             backend:
