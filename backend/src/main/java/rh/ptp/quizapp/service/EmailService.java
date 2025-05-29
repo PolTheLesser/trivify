@@ -37,6 +37,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private final String mailFrom;
 
+    @Value("${spring.mail.answer-to}")
+    private final String answerTo;
+
     /**
      * Konstruktor mit Dependency Injection.
      *
@@ -53,6 +56,7 @@ public class EmailService {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
         this.mailFrom = secretsConfig.getMailUsername();
+        this.answerTo = secretsConfig.getMailAnswerTo();
         this.userRepository = userRepository;
     }
 
@@ -70,6 +74,7 @@ public class EmailService {
      * @throws RuntimeException bei Fehlern im Versandprozess
      */
     public void sendEmail(String to, String subject, String templateName, Map<String, Object> variables) {
+        variables.put("supportEmail", answerTo);
         try {
             if (!userRepository.findByEmail(to)
                     .map(user -> user.getUserStatus() != UserStatus.PENDING_VERIFICATION && user.getUserStatus() != UserStatus.BLOCKED)
@@ -90,6 +95,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(new InternetAddress(mailFrom, "Trivify"));
+            helper.setReplyTo(new InternetAddress(answerTo, "Trivify-Support"));
             helper.setTo(to);
             helper.setSubject(subject);
 

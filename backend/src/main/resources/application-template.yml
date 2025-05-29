@@ -20,6 +20,7 @@ spring:
     username: ${MAIL_USER}
     password: ${MAIL_PASS}
     from: ${MAIL_USER}
+    answer-to: ${MAIL_ANSWER_TO}
     properties:
       mail:
         smtp:

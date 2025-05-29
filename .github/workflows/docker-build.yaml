@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Frontend
         run: |
-          docker build --build-arg REACT_APP_MAIL=${{ secrets.MAIL_USER }} \
+          docker build --build-arg REACT_APP_MAIL=${{ secrets.MAIL_ANSWER_TO }} \
             --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
@@ -57,6 +57,7 @@ jobs:
           echo "SERVER_URL=${{ vars.SERVER_URL }}" >> $GITHUB_OUTPUT
           echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_OUTPUT
           echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
+          echo "MAIL_ANSWER_TO=${{ secrets.MAIL_ANSWER_TO }}" >> $GITHUB_OUTPUT
           echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
           echo "MAIL_PASS=${{ secrets.MAIL_PASS }}" >> $GITHUB_OUTPUT
           echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_OUTPUT
@@ -72,6 +73,7 @@ jobs:
           SERVER_URL: ${{ vars.SERVER_URL }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
+          MAIL_ANSWER_TO: ${{ secrets.MAIL_ANSWER_TO }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}

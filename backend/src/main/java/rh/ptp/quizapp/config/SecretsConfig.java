@@ -22,6 +22,9 @@ public class SecretsConfig {
     /** Benutzername für das Mail-System. */
     private String mailUsername;
 
+    /** E-Mail-Adresse, an die Antworten gesendet werden. */
+    private String mailAnswerTo;
+
     /** Passwort für das Mail-System. */
     private String mailPassword;
 
