@@ -140,7 +140,7 @@ const CreateQuiz = () => {
         }
 
         try {
-            await axios.post(
+            await axios.post('',
                 {title, description, categories: selectedEnums, questions},
                 {params: {userId}}
             );

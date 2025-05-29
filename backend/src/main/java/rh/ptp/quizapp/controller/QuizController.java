@@ -102,13 +102,13 @@ public class QuizController {
             return ResponseEntity.notFound().build();
         }
 
-        List<QuizCategory> categories = quiz.getCategories();
-        for(QuizCategory category : categories) {
-            if (category.equals(QuizCategory.DAILY_QUIZ)) {
-                categories.remove(QuizCategory.DAILY_QUIZ);
-            }
-        }
-        quiz.setCategories(categories);
+        List<QuizCategory> filtered = quiz.getCategories()
+                .stream()
+                .filter(cat -> !cat.equals(QuizCategory.DAILY_QUIZ))
+                .toList();
+
+        quiz.setCategories(filtered);
+
 
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Benutzer nicht gefunden"));
