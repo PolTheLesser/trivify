@@ -94,3 +94,20 @@ jobs:
 
       - name: Push Backend
         run: docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up kubectl
+        uses: azure/aks-set-context@v3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+
+      - name: Apply Kubernetes Manifests
+        if: github.ref_name == 'hosting'
+        run: |
+          kubectl apply -f ./deployment.yaml -n trivify
