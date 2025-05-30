@@ -31,16 +31,14 @@ const AppContent = () => {
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
     useEffect(() => {
-        const updateOnlineStatus = () => {
-            setIsOffline(!navigator.onLine);
-        };
+        const updateOnlineStatus = async () => {
+            if (!navigator.onLine) {
+                setIsOffline(true);
+                return;
+            }
 
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
-        // Confirm actual connectivity in case navigator.onLine is unreliable
-        const verifyConnection = async () => {
             try {
+                // Versuche echten Server-Check
                 await fetch("/", { method: "HEAD", cache: "no-store" });
                 setIsOffline(false);
             } catch {
@@ -48,11 +46,16 @@ const AppContent = () => {
             }
         };
 
-        verifyConnection();
+        // Initial prüfen
+        updateOnlineStatus();
+
+        // Events abonnieren
+        window.addEventListener("online", updateOnlineStatus);
+        window.addEventListener("offline", () => setIsOffline(true));
 
         return () => {
-            window.removeEventListener('online', updateOnlineStatus);
-            window.removeEventListener('offline', updateOnlineStatus);
+            window.removeEventListener("online", updateOnlineStatus);
+            window.removeEventListener("offline", () => setIsOffline(true));
         };
     }, []);
 
