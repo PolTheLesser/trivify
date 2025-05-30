@@ -75,7 +75,7 @@ const MeineQuizze = () => {
         } finally {
             setLoading(false);
         }
-    }, [showAll, user]);
+    }, [showAll, user?.role, user?.id]);
 
     useEffect(() => {
         fetchData();
