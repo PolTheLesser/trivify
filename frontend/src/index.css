@@ -8,6 +8,12 @@ body.dark {
   background-color: #121212;
   color: #e0e0e0;
 }
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
 /* override any other element backgrounds if needed */
 
 html, body {

@@ -1,37 +1,41 @@
-import React, { useEffect, useState } from 'react';
+// components/layout/OfflineBanner.js
+import React from 'react';
 
 const OfflineBanner = () => {
-    const [isOffline, setIsOffline] = useState(!navigator.onLine);
-
-    useEffect(() => {
-        const handleOnline = () => setIsOffline(false);
-        const handleOffline = () => setIsOffline(true);
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
-        };
-    }, []);
-
-    if (!isOffline) return null;
-
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            backgroundColor: '#f44336',
-            color: '#fff',
-            textAlign: 'center',
-            padding: '0.75em',
-            zIndex: 2000,
-        }}>
-            Keine Internetverbindung. Bitte überprüfe deine Verbindung.
-        </div>
+        <>
+            {/* Interaction blocker over content only */}
+            <div
+                style={{
+                    position: 'fixed',
+                    top: '64px', // adjust if navbar is different
+                    left: 0,
+                    width: '100vw',
+                    height: 'calc(100vh - 64px - 3rem)', // exclude navbar and footer
+                    zIndex: 998,
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    pointerEvents: 'auto',
+                }}
+            />
+
+            {/* Top banner */}
+            <div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    backgroundColor: '#f57c00', // amber/orange tone
+                    color: 'white',
+                    textAlign: 'center',
+                    padding: '1em',
+                    zIndex: 999,
+                    fontWeight: 'bold',
+                }}
+            >
+                📡 Keine Internetverbindung. Bitte überprüfe deine Verbindung.
+            </div>
+        </>
     );
 };
 

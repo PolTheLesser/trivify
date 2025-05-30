@@ -26,8 +26,21 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ServerStatusProvider, useServerStatus } from './contexts/ServerStatusContext';
 import ServerDownBanner from './components/layout/ServerDownBanner';
 import { attachServerInterceptor } from './api/axios';
+import OfflineBanner from "./components/layout/OfflineBanner";
 
 const AppContent = () => {
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
+    useEffect(() => {
+        const goOnline = () => setIsOffline(false);
+        const goOffline = () => setIsOffline(true);
+
+        window.addEventListener('online', goOnline);
+        window.addEventListener('offline', goOffline);
+        return () => {
+            window.removeEventListener('online', goOnline);
+            window.removeEventListener('offline', goOffline);
+        };
+    }, []);
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(() => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }), [darkMode]);
 
@@ -43,7 +56,11 @@ const AppContent = () => {
             <Router>
                 <Navbar />
                 {serverDown && <ServerDownBanner />}
-                <main style={{ flex: 1, paddingBottom: '3rem' }}>
+                {isOffline && <OfflineBanner />}
+                <main
+                    style={{ flex: 1, paddingBottom: '3rem' }}
+                    className={serverDown || isOffline ? 'blurred' : ''}
+                >
                     <Routes>
                         <Route path="/" element={
                             localStorage.getItem("token") ? <Navigate to="/welcome" replace /> : <Home />
