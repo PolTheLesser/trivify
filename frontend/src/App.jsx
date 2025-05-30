@@ -31,13 +31,14 @@ const AppContent = () => {
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
     useEffect(() => {
-        const handleOnline = () => setIsOffline(false);
-        const handleOffline = () => setIsOffline(true);
+        const updateOnlineStatus = () => {
+            setIsOffline(!navigator.onLine);
+        };
 
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
 
-        // Confirm connection isn't faked
+        // Confirm actual connectivity in case navigator.onLine is unreliable
         const verifyConnection = async () => {
             try {
                 await fetch("/", { method: "HEAD", cache: "no-store" });
@@ -50,13 +51,16 @@ const AppContent = () => {
         verifyConnection();
 
         return () => {
-            window.removeEventListener('online', handleOnline);
-            window.removeEventListener('offline', handleOffline);
+            window.removeEventListener('online', updateOnlineStatus);
+            window.removeEventListener('offline', updateOnlineStatus);
         };
     }, []);
 
     const { darkMode } = useContext(ThemeContext);
-    const muiTheme = useMemo(() => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }), [darkMode]);
+    const muiTheme = useMemo(
+        () => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }),
+        [darkMode]
+    );
 
     const { serverDown, setServerDown } = useServerStatus();
 
@@ -72,6 +76,7 @@ const AppContent = () => {
                     <Navbar />
                     {serverDown && <ServerDownBanner />}
                     {isOffline && <OfflineBanner />}
+
                     <main
                         style={{ flex: 1, paddingBottom: '3rem' }}
                         className={(serverDown || isOffline) ? 'blurred' : ''}
@@ -101,6 +106,7 @@ const AppContent = () => {
                             } />
                         </Routes>
                     </main>
+
                     <div style={{ height: "3rem" }}></div>
                     <Footer />
                 </div>
