@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
 import rh.ptp.quizapp.model.User;
+import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AuthService;
 import rh.ptp.quizapp.service.CleanupRepositoryService;
@@ -43,12 +44,16 @@ public class AuthController {
             authService.register(request);
             return ResponseEntity.ok().body(new MessageResponse("Bitte überprüfen Sie Ihre E-Mail-Adresse, um Ihre Registrierung abzuschließen."));
         } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        } catch (Exception e) {
             User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-            cleanupRepositoryService.prepareDelete(user.getId());
-            userRepository.delete(userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
-            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+            if (user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
+                cleanupRepositoryService.prepareDelete(user.getId());
+                userRepository.delete(userRepository.findByEmail(request.getEmail())
+                        .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."));
         }
     }
 
