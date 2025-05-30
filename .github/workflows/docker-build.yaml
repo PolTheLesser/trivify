@@ -84,6 +84,12 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
+      - name: Cache OWASP NVD Data
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check/data
+          key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+
       - name: Build Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
