@@ -38,7 +38,6 @@ const AppContent = () => {
             }
 
             try {
-                // Versuche echten Server-Check
                 await fetch("/", { method: "HEAD", cache: "no-store" });
                 setIsOffline(false);
             } catch {
@@ -46,18 +45,18 @@ const AppContent = () => {
             }
         };
 
-        // Initial prüfen
-        updateOnlineStatus();
-
-        // Events abonnieren
         window.addEventListener("online", updateOnlineStatus);
         window.addEventListener("offline", () => setIsOffline(true));
+
+        // Direkt prüfen beim Start
+        updateOnlineStatus();
 
         return () => {
             window.removeEventListener("online", updateOnlineStatus);
             window.removeEventListener("offline", () => setIsOffline(true));
         };
     }, []);
+
 
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(
