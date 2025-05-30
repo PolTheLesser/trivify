@@ -26,6 +26,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     /**
      * Registriert einen neuen Benutzer und sendet eine E-Mail zur Verifizierung.
@@ -39,6 +40,8 @@ public class AuthController {
             authService.register(request);
             return ResponseEntity.ok().body(new MessageResponse("Bitte überprüfen Sie Ihre E-Mail-Adresse, um Ihre Registrierung abzuschließen."));
         } catch (RuntimeException e) {
+            userRepository.delete(userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
     }
