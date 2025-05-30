@@ -6,7 +6,6 @@ const Footer = () => {
     return (
         <footer
             style={{
-                position: 'fixed',
                 bottom: 0,
                 left: 0,
                 backgroundColor: alpha(theme.palette.background.default, 0.8), // 80% opacity
