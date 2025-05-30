@@ -22,25 +22,39 @@ import EditQuiz from "./components/quiz/EditQuiz";
 import Settings from "./components/settings/Settings";
 import MyQuizzes from "./components/quiz/MyQuizzes";
 import { AuthProvider } from './contexts/AuthContext';
-
 import { ServerStatusProvider, useServerStatus } from './contexts/ServerStatusContext';
-import ServerDownBanner from './components/layout/ServerDownBanner';
 import { attachServerInterceptor } from './api/axios';
+import ServerDownBanner from "./components/layout/ServerDownBanner";
 import OfflineBanner from "./components/layout/OfflineBanner";
 
 const AppContent = () => {
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
-    useEffect(() => {
-        const goOnline = () => setIsOffline(false);
-        const goOffline = () => setIsOffline(true);
 
-        window.addEventListener('online', goOnline);
-        window.addEventListener('offline', goOffline);
+    useEffect(() => {
+        const handleOnline = () => setIsOffline(false);
+        const handleOffline = () => setIsOffline(true);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Confirm connection isn't faked
+        const verifyConnection = async () => {
+            try {
+                await fetch("/", { method: "HEAD", cache: "no-store" });
+                setIsOffline(false);
+            } catch {
+                setIsOffline(true);
+            }
+        };
+
+        verifyConnection();
+
         return () => {
-            window.removeEventListener('online', goOnline);
-            window.removeEventListener('offline', goOffline);
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
         };
     }, []);
+
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(() => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }), [darkMode]);
 
@@ -54,40 +68,42 @@ const AppContent = () => {
         <MuiThemeProvider theme={muiTheme}>
             <CssBaseline />
             <Router>
-                <Navbar />
-                {serverDown && <ServerDownBanner />}
-                {isOffline && <OfflineBanner />}
-                <main
-                    style={{ flex: 1, paddingBottom: '3rem' }}
-                    className={serverDown || isOffline ? 'blurred' : ''}
-                >
-                    <Routes>
-                        <Route path="/" element={
-                            localStorage.getItem("token") ? <Navigate to="/welcome" replace /> : <Home />
-                        } />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/forgot-password" element={<ForgotPassword />} />
-                        <Route path="/reset-password/:token" element={<ResetPassword />} />
-                        <Route path="/verify-email/:token" element={<VerifyEmail />} />
-                        <Route path="/welcome" element={<PrivateRoute><Welcome /></PrivateRoute>} />
-                        <Route path="/quizzes" element={<QuizList />} />
-                        <Route path="/quizzes/:id" element={<PlayQuiz />} />
-                        <Route path="/daily-quiz" element={<DailyQuiz />} />
-                        <Route path="/quizzes/my-quizzes" element={<MyQuizzes />} />
-                        <Route path="/quizzes/create" element={<PrivateRoute><CreateQuiz /></PrivateRoute>} />
-                        <Route path="/quizzes/edit/:id" element={<PrivateRoute><EditQuiz /></PrivateRoute>} />
-                        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-                        <Route path="/adminpanel" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
-                        <Route path="*" element={
-                            localStorage.getItem("token")
-                                ? <Navigate to="/welcome" replace />
-                                : <Navigate to="/" replace />
-                        } />
-                    </Routes>
-                </main>
-                <div style={{ height: "3rem" }}></div>
-                <Footer />
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                    <Navbar />
+                    {serverDown && <ServerDownBanner />}
+                    {isOffline && <OfflineBanner />}
+                    <main
+                        style={{ flex: 1, paddingBottom: '3rem' }}
+                        className={(serverDown || isOffline) ? 'blurred' : ''}
+                    >
+                        <Routes>
+                            <Route path="/" element={
+                                localStorage.getItem("token") ? <Navigate to="/welcome" replace /> : <Home />
+                            } />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/forgot-password" element={<ForgotPassword />} />
+                            <Route path="/reset-password/:token" element={<ResetPassword />} />
+                            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                            <Route path="/welcome" element={<PrivateRoute><Welcome /></PrivateRoute>} />
+                            <Route path="/quizzes" element={<QuizList />} />
+                            <Route path="/quizzes/:id" element={<PlayQuiz />} />
+                            <Route path="/daily-quiz" element={<DailyQuiz />} />
+                            <Route path="/quizzes/my-quizzes" element={<MyQuizzes />} />
+                            <Route path="/quizzes/create" element={<PrivateRoute><CreateQuiz /></PrivateRoute>} />
+                            <Route path="/quizzes/edit/:id" element={<PrivateRoute><EditQuiz /></PrivateRoute>} />
+                            <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+                            <Route path="/adminpanel" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
+                            <Route path="*" element={
+                                localStorage.getItem("token")
+                                    ? <Navigate to="/welcome" replace />
+                                    : <Navigate to="/" replace />
+                            } />
+                        </Routes>
+                    </main>
+                    <div style={{ height: "3rem" }}></div>
+                    <Footer />
+                </div>
             </Router>
         </MuiThemeProvider>
     );
