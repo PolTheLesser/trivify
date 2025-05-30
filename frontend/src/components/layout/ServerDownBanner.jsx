@@ -33,7 +33,7 @@ const ServerDownBanner = () => {
                     fontWeight: 'bold',
                 }}
             >
-                🥲 Verbindung zum Server fehlgeschlagen. Bitte später erneut versuchen.
+                📡 Verbindung zum Server fehlgeschlagen. Bitte überprüfe deine Verbindung.
             </div>
         </>
     );

@@ -25,39 +25,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ServerStatusProvider, useServerStatus } from './contexts/ServerStatusContext';
 import { attachServerInterceptor } from './api/axios';
 import ServerDownBanner from "./components/layout/ServerDownBanner";
-import OfflineBanner from "./components/layout/OfflineBanner";
 
 const AppContent = () => {
-    const [isOffline, setIsOffline] = useState(!navigator.onLine);
-
-    useEffect(() => {
-        const updateOnlineStatus = async () => {
-            if (!navigator.onLine) {
-                setIsOffline(true);
-                return;
-            }
-
-            try {
-                await fetch("/", { method: "HEAD", cache: "no-store" });
-                setIsOffline(false);
-            } catch {
-                setIsOffline(true);
-            }
-        };
-
-        window.addEventListener("online", updateOnlineStatus);
-        window.addEventListener("offline", () => setIsOffline(true));
-
-        // Direkt prüfen beim Start
-        updateOnlineStatus();
-
-        return () => {
-            window.removeEventListener("online", updateOnlineStatus);
-            window.removeEventListener("offline", () => setIsOffline(true));
-        };
-    }, []);
-
-
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(
         () => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }),
@@ -77,11 +46,9 @@ const AppContent = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                     <Navbar />
                     {serverDown && <ServerDownBanner />}
-                    {isOffline && <OfflineBanner />}
-
                     <main
                         style={{ flex: 1, paddingBottom: '3rem' }}
-                        className={(serverDown || isOffline) ? 'blurred' : ''}
+                        className={(serverDown) ? 'blurred' : ''}
                     >
                         <Routes>
                             <Route path="/" element={

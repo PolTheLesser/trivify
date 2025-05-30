@@ -5,13 +5,13 @@ import {AuthProvider} from "./contexts/AuthContext";
 import {ThemeProvider} from "./contexts/ThemeContext";
 import "./index.css";
 import {register} from './serviceWorkerRegistration';
-import OfflineBanner from './components/layout/OfflineBanner';
+import ServerDownBanner from "./components/layout/ServerDownBanner";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
     <>
-        <OfflineBanner/>
+        <ServerDownBanner/>
         <React.StrictMode>
             <AuthProvider>
                 <ThemeProvider>
