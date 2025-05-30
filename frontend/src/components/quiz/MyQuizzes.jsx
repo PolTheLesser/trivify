@@ -79,7 +79,7 @@ const MeineQuizze = () => {
 
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, showAll, user?.role]);
 
     const toggleFavorite = async quizId => {
         try {
