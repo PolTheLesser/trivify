@@ -1,89 +1,63 @@
-import React, {useEffect, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
-    Alert,
-    Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    Checkbox,
-    Chip,
-    CircularProgress,
-    Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    Grid,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Rating,
-    Slider,
-    TextField,
-    Typography
+    Alert, Box, Button, Card, CardActions, CardContent, Checkbox, Chip, CircularProgress,
+    Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
+    Grid, IconButton, InputLabel, MenuItem, Paper, Rating, Slider, TextField, Typography
 } from '@mui/material';
-import {useNavigate} from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {useAuth} from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/api';
-import {CustomFormControlLabel, CustomSelect} from "../../CustomElements";
+import { CustomFormControlLabel, CustomSelect } from "../../CustomElements";
 
 const MeineQuizze = () => {
-    const {user} = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Initialwerte aus URL holen (string, boolean, number)
+    // Initialwerte aus URL holen
     const getBoolParam = (key) => searchParams.get(key) === 'true';
     const getNumberParam = (key, fallback = 0) => {
         const val = Number(searchParams.get(key));
         return isNaN(val) ? fallback : val;
     };
 
-    // Query state (aus URL initialisiert)
+    // Filter-/Query-Zustände
     const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
     const [onlyFavorites, setOnlyFavorites] = useState(getBoolParam('onlyFavorites'));
     const [onlyRated, setOnlyRated] = useState(getBoolParam('onlyRated'));
     const [minQuestions, setMinQuestions] = useState(getNumberParam('minQuestions', 0));
     const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'desc');
-
-    // Data states
-    const [quizzes, setQuizzes] = useState([]);
-    const [filtered, setFiltered] = useState([]);
-    const [categoryLabels, setCategoryLabels] = useState({});
     const [showAll, setShowAll] = useState(
         user?.role === 'ROLE_ADMIN' && searchParams.get('showAll') === 'true'
     );
 
-    // UI states
+    // Datenzustände
+    const [quizzes, setQuizzes] = useState([]);
+    const [filtered, setFiltered] = useState([]);
+    const [categoryLabels, setCategoryLabels] = useState({});
+
+    // UI-Zustände
     const [loading, setLoading] = useState(true);
-    const [loadingTags, setLoadingTags] = useState(true);
     const [error, setError] = useState('');
 
     // Dialog-State
     const [dialogOpen, setDialogOpen] = useState(false);
     const [toDeleteId, setToDeleteId] = useState(null);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const isAdmin = user?.role === 'ROLE_ADMIN';
             const endpoint = isAdmin
                 ? (showAll ? 'quizzes' : 'admin/quizzes')
                 : 'quizzes';
+
             const [quizRes, favRes] = await Promise.all([
                 axios.get(`/${endpoint}`),
                 axios.get(`/users/favorites`)
             ]);
+
             const favoriteIds = new Set(favRes.data || []);
 
             const ownQuizzes = quizRes.data
@@ -101,14 +75,18 @@ const MeineQuizze = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [showAll, user]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const toggleFavorite = async quizId => {
         try {
-            const res = await axios.post(
-                `/users/quizzes/${quizId}/favorite`
+            const res = await axios.post(`/users/quizzes/${quizId}/favorite`);
+            setQuizzes(prev =>
+                prev.map(q => q.id === quizId ? { ...q, isFavorite: res.data.favorited } : q)
             );
-            setQuizzes(prev => prev.map(q => q.id === quizId ? {...q, isFavorite: res.data.favorited} : q));
         } catch (err) {
             console.error(err);
         }
@@ -133,8 +111,6 @@ const MeineQuizze = () => {
                 setCategoryLabels(labels);
             } catch (err) {
                 console.error('Fehler beim Laden der Kategorienamen', err);
-            } finally {
-                setLoadingTags(false);
             }
         };
 
@@ -183,7 +159,7 @@ const MeineQuizze = () => {
         }
 
         setFiltered(result);
-    }, [searchQuery, minQuestions, sortOrder, quizzes, onlyFavorites, onlyRated, categoryLabels, user]);
+    }, [searchQuery, minQuestions, sortOrder, quizzes, onlyFavorites, onlyRated, categoryLabels]);
 
     // Öffnet den Bestätigungs-Dialog
     const confirmDelete = (quizId) => {
@@ -206,7 +182,6 @@ const MeineQuizze = () => {
         }
     };
 
-    // Filter zurücksetzen
     const resetFilters = () => {
         setSearchQuery('');
         setOnlyFavorites(false);
@@ -218,7 +193,7 @@ const MeineQuizze = () => {
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                <CircularProgress/>
+                <CircularProgress />
             </Box>
         );
     }
@@ -226,13 +201,13 @@ const MeineQuizze = () => {
     if (error) {
         return (
             <Container maxWidth="sm">
-                <Alert severity="error" sx={{mt: 4}}>{error}</Alert>
+                <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>
             </Container>
         );
     }
 
     return (
-        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+        <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
             {/* Filterleiste */}
             <Paper elevation={2}
                    sx={{

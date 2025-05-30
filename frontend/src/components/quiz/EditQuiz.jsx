@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     Alert, Box, Button, Chip, CircularProgress, Container, Dialog,
@@ -28,35 +28,15 @@ const EditQuiz = () => {
     const [success, setSuccess] = useState("");
     const [showResetDialog, setShowResetDialog] = useState(false);
 
-    const LOCAL_KEY = `quiz_backup_${id}`;
-
     useEffect(() => {
-        // Clear possibly corrupted localStorage on ID change
+        const LOCAL_KEY = `quiz_backup_${id}`;
         localStorage.removeItem(LOCAL_KEY);
     }, [id]);
 
     const handleResetClick = () => setShowResetDialog(true);
     const handleResetCancel = () => setShowResetDialog(false);
 
-    const handleResetConfirm = async () => {
-        setShowResetDialog(false);
-        setLoading(true);
-        setError("");
-        setSuccess("");
-        localStorage.removeItem(LOCAL_KEY);
-        await loadQuizFromServer();
-    };
-
-    const handleCancleConfirm = async () => {
-        setShowResetDialog(false);
-        setLoading(true);
-        setError("");
-        setSuccess("");
-        localStorage.removeItem(LOCAL_KEY);
-        navigate("/quizzes/my-quizzes");
-    };
-
-    const loadQuizFromServer = async () => {
+    const loadQuizFromServer = useCallback(async () => {
         try {
             const res = await axios.get(`/toEdit/${id}`);
             const data = res.data;
@@ -70,6 +50,7 @@ const EditQuiz = () => {
             setQuestions(data.questions || []);
             setTags(tagsFromEnums);
 
+            const LOCAL_KEY = `quiz_backup_${id}`;
             localStorage.setItem(LOCAL_KEY, JSON.stringify({
                 title: data.title,
                 description: data.description,
@@ -82,6 +63,26 @@ const EditQuiz = () => {
         } finally {
             setLoading(false);
         }
+    }, [id, allCategories, allValues]);
+
+    const handleResetConfirm = async () => {
+        setShowResetDialog(false);
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        const LOCAL_KEY = `quiz_backup_${id}`;
+        localStorage.removeItem(LOCAL_KEY);
+        await loadQuizFromServer();
+    };
+
+    const handleCancleConfirm = async () => {
+        setShowResetDialog(false);
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        const LOCAL_KEY = `quiz_backup_${id}`;
+        localStorage.removeItem(LOCAL_KEY);
+        navigate("/quizzes/my-quizzes");
     };
 
     useEffect(() => {
@@ -91,10 +92,8 @@ const EditQuiz = () => {
                     axios.get(`/categories/values`),
                     axios.get(`/categories`)
                 ]);
-                const values = valsRes.data.slice(1);
-                const cats = catsRes.data.slice(1);
-                setAllValues(values);
-                setAllCategories(cats);
+                setAllValues(valsRes.data.slice(1));
+                setAllCategories(catsRes.data.slice(1));
             } catch (err) {
                 console.error(err);
                 setError("Kategorien konnten nicht geladen werden");
@@ -107,6 +106,7 @@ const EditQuiz = () => {
 
     useEffect(() => {
         if (allCategories.length > 0 && allValues.length > 0) {
+            const LOCAL_KEY = `quiz_backup_${id}`;
             const saved = localStorage.getItem(LOCAL_KEY);
             if (saved) {
                 try {
@@ -132,7 +132,7 @@ const EditQuiz = () => {
             }
             loadQuizFromServer();
         }
-    }, [id, allCategories, allValues]);
+    }, [id, allCategories, allValues, loadQuizFromServer]);
 
     const handleQuestionChange = (index, field, value) => {
         const newQuestions = [...questions];
@@ -199,6 +199,7 @@ const EditQuiz = () => {
                 questions,
                 categories: selectedEnums
             });
+            const LOCAL_KEY = `quiz_backup_${id}`;
             localStorage.removeItem(LOCAL_KEY);
             setSuccess("Quiz erfolgreich aktualisiert");
             setTimeout(() => navigate("/quizzes/my-quizzes"), 1500);

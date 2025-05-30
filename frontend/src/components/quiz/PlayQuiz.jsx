@@ -40,22 +40,10 @@ const PlayQuiz = () => {
     const [wrongAnswers, setWrongAnswers] = useState([]);
     const [stars, setStars] = useState(0);
     const [submitting, setSubmitting] = useState(false);
-    const [finished, setFinished] = useState(false);
     const userId = user?.id;
     const quizId = quiz?.id;
     const maxPossibleScore = quiz?.questions.length;
     const isDailyQuiz = quiz?.categories.includes("DAILY_QUIZ") || false;
-
-    const fetchQuiz = async () => {
-        try {
-            const response = await axios.get(`/${id}`);
-            setQuiz(response.data);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Quiz konnte nicht geladen werden');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleAnswerSelect = (e) => {
         updateAnswer(currentQuestionIndex, e.target.value);
@@ -117,7 +105,6 @@ const PlayQuiz = () => {
 
             if (currentQuestionIndex === quiz.questions.length - 1) {
                 setShowResults(true);
-                setFinished(true);
 
                 if (user) {
                     try {
@@ -173,8 +160,19 @@ const PlayQuiz = () => {
     };
 
     useEffect(() => {
+        const fetchQuiz = async () => {
+            try {
+                const response = await axios.get(`/${id}`);
+                setQuiz(response.data);
+            } catch (err) {
+                setError(err.response?.data?.message || 'Quiz konnte nicht geladen werden');
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchQuiz();
     }, [id]);
+
 
     if (loading) {
         return (

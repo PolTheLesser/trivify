@@ -30,7 +30,6 @@ import {CustomSelect, CustomFormControlLabel} from "../../CustomElements";
 const QuizList = () => {
     const {user} = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Filter-States initialisieren mit URL-Werten, user-only Filter nur wenn user da ist
@@ -40,7 +39,7 @@ const QuizList = () => {
     const [onlyRated, setOnlyRated] = useState(searchParams.get('onlyRated') === 'true');
     const [minQuestions, setMinQuestions] = useState(Number(searchParams.get('minQuestions')) || 0);
     const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'desc');
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('selectedCategory') || 'all');
+    const [selectedCategory] = useState(searchParams.get('selectedCategory') || 'all');
     const [dailyQuizFilter, setDailyQuizFilter] = useState(searchParams.get('dailyQuizFilter') || 'all');
 
     // Daten States

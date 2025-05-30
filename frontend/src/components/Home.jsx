@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Container,
@@ -10,11 +10,9 @@ import {
 import QuizIcon from '@mui/icons-material/Quiz';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CasinoIcon from '@mui/icons-material/Casino';
-import { useAuth } from '../contexts/AuthContext';
 import axios from '../api/api';
 
 const Welcome = () => {
-    const { user } = useAuth();
     const navigate = useNavigate();
 
     const startRandomQuiz = async () => {
