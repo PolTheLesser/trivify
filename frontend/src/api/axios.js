@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useServerStatus } from '../contexts/ServerStatusContext';
 
 const instance = axios.create({
     baseURL: "/api",

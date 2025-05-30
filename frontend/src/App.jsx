@@ -22,10 +22,6 @@ import EditQuiz from "./components/quiz/EditQuiz";
 import Settings from "./components/settings/Settings";
 import MyQuizzes from "./components/quiz/MyQuizzes";
 import { AuthProvider } from './contexts/AuthContext';
-import { ServerStatusProvider, useServerStatus } from './contexts/ServerStatusContext';
-import { attachServerInterceptor } from './api/axios';
-import ServerDownBanner from "./components/layout/ServerDownBanner";
-
 const AppContent = () => {
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(
@@ -33,22 +29,14 @@ const AppContent = () => {
         [darkMode]
     );
 
-    const { serverDown, setServerDown } = useServerStatus();
-
-    useEffect(() => {
-        attachServerInterceptor(setServerDown);
-    }, [setServerDown]);
-
     return (
         <MuiThemeProvider theme={muiTheme}>
             <CssBaseline />
             <Router>
                 <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                     <Navbar />
-                    {serverDown && <ServerDownBanner />}
                     <main
                         style={{ flex: 1, paddingBottom: '3rem' }}
-                        className={(serverDown) ? 'blurred' : ''}
                     >
                         <Routes>
                             <Route path="/" element={
@@ -86,9 +74,7 @@ const AppContent = () => {
 
 const App = () => (
     <AuthProvider>
-        <ServerStatusProvider>
             <AppContent />
-        </ServerStatusProvider>
     </AuthProvider>
 );
 
