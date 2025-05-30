@@ -5,7 +5,7 @@ import {AuthProvider} from "./contexts/AuthContext";
 import {ThemeProvider} from "./contexts/ThemeContext";
 import "./index.css";
 import {register} from './serviceWorkerRegistration';
-import OfflineBanner from './OfflineBanner';
+import OfflineBanner from './components/layout/OfflineBanner';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
