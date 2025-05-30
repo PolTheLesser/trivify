@@ -150,7 +150,7 @@ const AdminUserPanel = () => {
     const deleteUser = async () => {
         setDeleteLoading(true);
         try {
-            await axios.delete(`/admin/users/delete/${toDeleteUser.id}`);
+            await axios.delete(`/admin/users/delete/${toDeleteUser.email}`);
             await fetchUsers();
             setSnackbar({open: true, message: 'Benutzer erfolgreich gelöscht.', severity: 'success'});
             closeDeleteDialog();

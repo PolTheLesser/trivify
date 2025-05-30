@@ -101,8 +101,9 @@ public class CleanupRepositoryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
         AuthenticationToken token = authenticationTokenRepository.findByQuizUser(user);
-        token.setExpiryDate(LocalDateTime.now().minusDays(1));
-        authenticationTokenRepository.save(token);
+        if (token != null) {
+            authenticationTokenRepository.delete(token);
+        }
         deleteOldTokens();
     }
 
