@@ -75,11 +75,11 @@ const MeineQuizze = () => {
         } finally {
             setLoading(false);
         }
-    }, [showAll, user?.role, user?.id]);
+    }, [showAll, user]);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData, showAll, user?.role]);
+    }, [fetchData]);
 
     const toggleFavorite = async quizId => {
         try {
