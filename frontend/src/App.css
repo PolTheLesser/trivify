@@ -12,6 +12,12 @@ html, body, #root {
   flex-direction: column;
 }
 
+.blurred {
+    filter: blur(5px);
+    pointer-events: none;
+    user-select: none;
+}
+
 main {
   flex: 1;
 }
