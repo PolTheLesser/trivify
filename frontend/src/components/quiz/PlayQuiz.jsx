@@ -40,11 +40,11 @@ const PlayQuiz = () => {
     const [wrongAnswers, setWrongAnswers] = useState([]);
     const [stars, setStars] = useState(0);
     const [submitting, setSubmitting] = useState(false);
-    // Markiert, dass das Quiz vorbei ist
     const [finished, setFinished] = useState(false);
     const userId = user?.id;
     const quizId = quiz?.id;
     const maxPossibleScore = quiz?.questions.length;
+    const isDailyQuiz = quiz?.categories.includes("DAILY_QUIZ") || false;
 
     const fetchQuiz = async () => {
         try {
@@ -103,7 +103,7 @@ const PlayQuiz = () => {
         const selectedAnswer = answers[currentQuestionIndex];
         if (!selectedAnswer) return;
 
-        const updatedAnswers = { ...answers };
+        const updatedAnswers = {...answers};
         const question = quiz.questions[currentQuestionIndex];
 
         try {
@@ -158,18 +158,18 @@ const PlayQuiz = () => {
 
     const updateAnswer = (questionIndex, answer) => {
         setAnswers(prev => {
-            const updated = { ...prev, [questionIndex]: answer };
+            const updated = {...prev, [questionIndex]: answer};
             localStorage.setItem(storageKey, JSON.stringify(updated));
             return updated;
         });
     };
 
     const updateCurrentQuestionIndex = (updater) => {
-      setCurrentQuestionIndex(prevIndex => {
-        const newIndex = typeof updater === 'function' ? updater(prevIndex) : updater;
-        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
-        return newIndex;
-      });
+        setCurrentQuestionIndex(prevIndex => {
+            const newIndex = typeof updater === 'function' ? updater(prevIndex) : updater;
+            localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
+            return newIndex;
+        });
     };
 
     useEffect(() => {
@@ -362,7 +362,15 @@ const PlayQuiz = () => {
                         Abbrechen
                     </Button>
                 </Box>
-            </Paper>
+                {isDailyQuiz && (
+                    <>
+                        <br/>
+                        <Alert severity="warning" sx={{mb: 3}}>
+                            Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                        </Alert>
+                        <br/>
+                    </>
+                )} </Paper>
         </Container>
     );
 };

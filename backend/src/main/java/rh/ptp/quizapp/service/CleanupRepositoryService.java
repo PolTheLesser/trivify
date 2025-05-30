@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rh.ptp.quizapp.model.AuthenticationToken;
 import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.model.UserStatus;
 import rh.ptp.quizapp.repository.AuthenticationTokenRepository;
@@ -97,6 +98,12 @@ public class CleanupRepositoryService {
         deleteAllQuizResultsByUser(userId);
         deleteAllQuizRatingsByUser(userId);
         setAllCreatedQuizzesToAdmin(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        AuthenticationToken token = authenticationTokenRepository.findByQuizUser(user);
+        token.setExpiryDate(LocalDateTime.now().minusDays(1));
+        authenticationTokenRepository.save(token);
+        deleteOldTokens();
     }
 
     /**
