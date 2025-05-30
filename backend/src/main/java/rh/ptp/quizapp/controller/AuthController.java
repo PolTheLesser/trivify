@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rh.ptp.quizapp.dto.*;
+import rh.ptp.quizapp.model.User;
 import rh.ptp.quizapp.repository.UserRepository;
 import rh.ptp.quizapp.service.AuthService;
+import rh.ptp.quizapp.service.CleanupRepositoryService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final CleanupRepositoryService cleanupRepositoryService;
 
     /**
      * Registriert einen neuen Benutzer und sendet eine E-Mail zur Verifizierung.
@@ -40,6 +43,9 @@ public class AuthController {
             authService.register(request);
             return ResponseEntity.ok().body(new MessageResponse("Bitte überprüfen Sie Ihre E-Mail-Adresse, um Ihre Registrierung abzuschließen."));
         } catch (RuntimeException e) {
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+            cleanupRepositoryService.prepareDelete(user.getId());
             userRepository.delete(userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
