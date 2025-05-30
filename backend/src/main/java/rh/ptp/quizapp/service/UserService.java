@@ -51,7 +51,7 @@ public class UserService {
         authService.createAuthenticationToken(user);
         String token = authenticationTokenRepository.findTokenByQuizUser(user);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl + "/logo192.png");
+        variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
         variables.put("username", user.getName());
         variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
 

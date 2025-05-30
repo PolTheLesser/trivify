@@ -124,7 +124,7 @@ public class CleanupRepositoryService {
 
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl + "/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
             variables.put("username", request.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + authenticationTokenRepository.findTokenByQuizUser(request));
             variables.put("loginUrl", frontendUrl + "/login");
@@ -135,7 +135,7 @@ public class CleanupRepositoryService {
         requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl + "/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
             variables.put("username", request.getName());
             variables.put("loginUrl", frontendUrl + "/login");
             variables.put("registerUrl", frontendUrl + "/register");

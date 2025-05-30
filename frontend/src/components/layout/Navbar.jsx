@@ -75,7 +75,7 @@ const Navbar = () => {
                     {/* Logo / Burger auf xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                         <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
-                            <img src="/logo192.png" alt="Trivify" style={{ height: 64, width: 64 }} />
+                            <img src="/icons/logo512.png" alt="Trivify" style={{ height: 64, width: 64 }} />
                         </IconButton>
                     </Box>
 
@@ -91,7 +91,7 @@ const Navbar = () => {
                             mr: 2
                         }}
                     >
-                        <img src="/logo192.png" alt="Trivify" style={{ height: 40 }} />
+                        <img src="/icons/logo512.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
                     {/* Nav Buttons auf md+ */}

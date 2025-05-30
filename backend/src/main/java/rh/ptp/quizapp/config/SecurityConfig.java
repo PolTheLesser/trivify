@@ -65,7 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/quizzes", "/api/quizzes/my-quizzes", "/api/quizzes/daily").permitAll()
                         .requestMatchers("/api/{id}/submit").permitAll()
-                        .requestMatchers("/auth/**", "/error", "/logo192.png", "/favicon.ico", "/logo_bimi_ready.svg").permitAll()
+                        .requestMatchers("/auth/**", "/error").permitAll()
                         .requestMatchers("/api/quizzes/{id}").permitAll()
                         .requestMatchers("/api/quizzes/{id}/submit").permitAll()
                         .requestMatchers("/api/quizzes/{id}/rate").permitAll()

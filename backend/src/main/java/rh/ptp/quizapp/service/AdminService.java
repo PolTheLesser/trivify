@@ -129,7 +129,7 @@ public class AdminService {
     private Map<String, Object> adminEmail(User user, User userUpdated, int action) {
         customEmailSend = false;
         Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl + "/logo192.png");
+        variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
         variables.put("username", userUpdated.getName());
         variables.put("loginUrl", frontendUrl + "/login");
         variables.put("password", userUpdated.getPassword());

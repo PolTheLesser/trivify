@@ -61,7 +61,7 @@ public class AuthService {
             createAuthenticationToken(user);
             String token = authenticationTokenRepository.findTokenByQuizUser(user);
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl+"/icons/logo512.png");
             variables.put("username", user.getName());
             variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
             emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
@@ -97,7 +97,7 @@ public class AuthService {
         AuthenticationToken newToken = new AuthenticationToken(user);
         if(user.getUserStatus() == UserStatus.PENDING_VERIFICATION) {
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl+"/logo192.png");
+            variables.put("logoUrl", frontendUrl+"/icons/logo512.png");
             variables.put("username", user.getName());
             variables.put("verificationUrl", frontendUrl + "/verify-email/" + newToken.getToken());
             emailService.sendEmail(user.getEmail(), "E-Mail-Adresse verifizieren", "verification-email", variables);
@@ -131,7 +131,7 @@ public class AuthService {
                 user.setUserStatus(UserStatus.ACTIVE);
                 userRepository.save(user);
                 Map<String, Object> variables = new HashMap<>();
-                variables.put("logoUrl", frontendUrl + "/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
                 variables.put("username", user.getName());
                 variables.put("quizUrl", frontendUrl + "/daily-quiz");
                 emailService.sendEmail(user.getEmail(), "Account reaktiviert", "account-reactivated", variables);

@@ -105,7 +105,7 @@ public class CreateAiRequest {
 
         List<User> admins = userRepository.findAllByRole(UserRole.ROLE_ADMIN);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("logoUrl", frontendUrl + "/logo192.png");
+        variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
         variables.put("adminName", "Admin");
         variables.put("generationDate", LocalDateTime.now());
         variables.put("errorMessage", errorMessage);

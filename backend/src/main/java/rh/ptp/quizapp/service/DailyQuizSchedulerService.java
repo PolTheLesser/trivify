@@ -93,7 +93,7 @@ public class DailyQuizSchedulerService {
             List<User> users = userRepository.findAll();
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
-            variables.put("logoUrl", frontendUrl + "/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
           
             for (User user : users) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
@@ -134,11 +134,11 @@ public class DailyQuizSchedulerService {
             boolean missedUntilNow = lastPlayed == null || lastPlayed.isBefore(LocalDate.now());
             if (user.getDailyStreak() > 0 && missedUntilNow) {
                 Map<String, Object> variables = new HashMap<>();
-                variables.put("logoUrl", frontendUrl + "/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
                 variables.put("username", user.getName());
                 variables.put("quizUrl", frontendUrl + "/daily-quiz");
                 variables.put("streak", user.getDailyStreak());
-                variables.put("logoUrl", frontendUrl + "/logo192.png");
+                variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
                 emailService.sendEmail(user.getEmail(), "Deine Streak ist in Gefahr! ⏳", "daily-quiz-streak-reminder", variables);
             }
         }

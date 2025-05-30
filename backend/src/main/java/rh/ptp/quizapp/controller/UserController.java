@@ -158,7 +158,7 @@ public class UserController {
             User user = userService.getUserFromUserDetails(userDetails);
             user.setUserStatus(UserStatus.PENDING_DELETE);
             Map<String, Object> variables = new HashMap<>();
-            variables.put("logoUrl", frontendUrl + "/logo192.png");
+            variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
             variables.put("username", user.getName());
             variables.put("loginUrl", frontendUrl + "/login");
             emailService.sendEmail(user.getEmail(), "Konto zur Löschung vorgemerkt", "account-delete-info", variables);
