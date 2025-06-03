@@ -1,6 +1,19 @@
 import React from 'react';
 import {useTheme, alpha} from '@mui/material/styles';
 
+/**
+ * Footer-Komponente
+ *
+ * Diese Komponente rendert einen festen Footer am unteren Rand der Seite mit einer halbtransparenten Hintergrundfarbe,
+ * die sich am aktuellen MUI-Theme orientiert. Im Footer befindet sich ein Kontakt-Link, der eine E-Mail an die
+ * in der Umgebungsvariable definierte Adresse öffnet, sowie ein Copyright-Hinweis.
+ *
+ * Funktionalitäten:
+ * - Fixierte Positionierung am unteren Seitenrand
+ * - Hintergrundfarbe mit Transparenz basierend auf dem aktuellen Theme
+ * - Anzeige eines Kontakt-Mailto-Links mit vordefiniertem Betreff
+ * - Anzeige eines Copyright-Textes
+ */
 const Footer = () => {
     const theme = useTheme();
     return (

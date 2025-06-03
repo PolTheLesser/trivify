@@ -13,6 +13,21 @@ import {
 import {useAuth} from '../contexts/AuthContext';
 import {PasswordField} from '../CustomElements';
 
+/**
+ * Login-Komponente
+ *
+ * Diese Komponente stellt ein Login-Formular zur Verfügung, mit dem Benutzer sich mit ihrer E-Mail-Adresse und ihrem Passwort anmelden können.
+ * Sie zeigt dabei verschiedene Statusmeldungen (Fehler, Warnungen, Erfolg) an, die über die Navigation als State übergeben werden können.
+ * Nach erfolgreicher Anmeldung wird der Nutzer weitergeleitet und seine User-ID im Local Storage gespeichert.
+ *
+ * Funktionalitäten:
+ * - Eingabe von E-Mail und Passwort mit Validierung (Pflichtfelder)
+ * - Anzeige von Fehler-, Warn- und Erfolgsmeldungen, die aus der Navigation übernommen werden können
+ * - Login-Aufruf über den Auth-Kontext (useAuth)
+ * - Speicherung der User-ID nach erfolgreichem Login im Local Storage
+ * - Navigation zur Willkommensseite nach erfolgreichem Login
+ * - Links zu "Passwort vergessen" und "Registrieren"
+ */
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

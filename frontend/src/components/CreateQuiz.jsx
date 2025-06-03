@@ -23,6 +23,26 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import {CustomAutocomplete, CustomSelect} from "../CustomElements";
 
+/**
+ * CreateQuiz-Komponente
+ *
+ * Diese Komponente ermöglicht es dem Benutzer, ein neues Quiz zu erstellen.
+ * Der Benutzer kann Titel, Beschreibung, Kategorien (Tags) und beliebig viele Fragen mit verschiedenen Fragetypen hinzufügen.
+ * Fragen können Multiple Choice, Wahr/Falsch oder Texteingabe sein. Antworten können hinzugefügt oder entfernt werden,
+ * und die korrekte Antwort wird ausgewählt oder eingegeben.
+ * Die Komponente validiert das Formular, speichert Zwischenergebnisse im Local Storage und sendet die Daten an einen API-Endpunkt.
+ * Nach erfolgreicher Erstellung wird der Nutzer zur Übersicht seiner eigenen Quizzes weitergeleitet.
+ *
+ * Funktionalitäten:
+ * - Laden und Speichern von Formulardaten in Local Storage zur Persistenz
+ * - Auswahl und Limitierung von bis zu 3 Kategorien per Autocomplete mit Ladeanzeige
+ * - Dynamisches Hinzufügen, Bearbeiten und Entfernen von Fragen und Antworten
+ * - Unterstützung verschiedener Fragetypen mit unterschiedlicher Antwortlogik
+ * - Validierung der Eingaben vor dem Absenden
+ * - Absenden des Quiz an einen Server via POST-Request mit Fehler- und Erfolgsmeldungen
+ * - Navigation zur Quiz-Übersicht nach erfolgreichem Speichern
+ * - Formular zurücksetzen und lokale Daten löschen
+ */
 const CreateQuiz = () => {
     const navigate = useNavigate();
 

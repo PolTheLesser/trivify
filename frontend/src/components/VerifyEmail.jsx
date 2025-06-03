@@ -10,6 +10,24 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+/**
+ * VerifyEmail-Komponente
+ *
+ * Diese Komponente wird aufgerufen, wenn ein Benutzer den Verifizierungslink
+ * aus der E-Mail anklickt. Sie verarbeitet das Verifizierungstoken aus der URL
+ * und kommuniziert mit dem Backend, um die E-Mail-Adresse zu bestätigen.
+ *
+ * Ablauf:
+ * - Extrahiert das Token aus den URL-Parametern
+ * - Sendet eine POST-Anfrage zur Verifizierung der E-Mail
+ * - Zeigt den aktuellen Status der Verifizierung:
+ *   - Ladeindikator während der Verifizierung
+ *   - Erfolgsmeldung bei erfolgreicher Verifizierung (inkl. Weiterleitung)
+ *   - Fehlermeldung, wenn etwas schiefläuft
+ *
+ * Nach erfolgreicher Verifizierung wird der Benutzer automatisch
+ * zur Login-Seite weitergeleitet, inklusive einer Erfolgsmeldung.
+ */
 const VerifyEmail = () => {
   const [status, setStatus] = useState('verifying');
   const [error, setError] = useState('');

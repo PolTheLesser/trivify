@@ -1,6 +1,18 @@
 import { useEffect, useState } from 'react';
 import { fetchTopScores, fetchUserScore } from '../services/scoreService';
 
+/**
+ * ScoreBoard-Komponente
+ *
+ * Diese Komponente zeigt die Top-Scoreliste sowie den persönlichen Punktestand
+ * eines Benutzers (falls `userId` übergeben wurde).
+ *
+ * Funktionalitäten:
+ * - Lädt und zeigt die Top 10 Spieler mit ihren Punktzahlen an
+ * - Zeigt dem angemeldeten Nutzer (basierend auf `userId`) seinen eigenen Score und Rang an
+ * - Wenn der Nutzer keine Punkte hat, erscheint ein entsprechender Hinweis
+ * - Fußzeile informiert darüber, dass wiederholte oder eigene Quiz-Teilnahmen nicht gewertet werden
+ */
 const ScoreBoard = ({ userId }) => {
     const [topScores, setTopScores] = useState([]);
     const [myScore, setMyScore] = useState(null);

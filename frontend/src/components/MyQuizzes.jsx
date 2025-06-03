@@ -34,6 +34,23 @@ import {useAuth} from '../contexts/AuthContext';
 import axios from '../api/api';
 import {CustomFormControlLabel, CustomSelect} from "../CustomElements";
 
+/**
+ * MeineQuizze-Komponente
+ *
+ * Diese Komponente zeigt eine Übersicht der vom Benutzer erstellten oder verwalteten Quizze an.
+ * Nutzer können ihre Quizze durchsuchen, filtern (z.B. nach Favoriten, bewerteten Quizzen, Mindestanzahl an Fragen), sortieren und neue Quizze erstellen.
+ * Administratoren können zusätzlich alle Quizze sehen und zwischen eigenen und allen Quizzen wechseln.
+ *
+ * Funktionalitäten:
+ * - Laden und Anzeigen der Quiz-Daten inkl. Favoritenstatus und Bewertungen
+ * - Filtern der Quizze nach Suchbegriff, Favoriten, Bewertungen, Mindestanzahl der Fragen und Sortierung
+ * - Synchronisierung der Filter- und Suchparameter mit der URL
+ * - Anzeigen von Kategorienamen als Chips
+ * - Favorisieren und Entfavorisieren von Quizzen per Stern-Icon
+ * - Navigieren zu Detail-, Bearbeitungs- und Erstellungsseiten von Quizzen
+ * - Löschen von Quizzen mit Bestätigungsdialog
+ * - Fehler- und Ladezustände handhaben
+ */
 const MeineQuizze = () => {
     const {user} = useAuth();
     const navigate = useNavigate();

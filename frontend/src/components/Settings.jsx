@@ -18,6 +18,21 @@ import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import {PasswordField, CustomSwitch, CustomFormControlLabel } from "../CustomElements";
 
+/**
+ * Settings-Komponente
+ *
+ * Diese Komponente bietet die Benutzeroberfläche für die Verwaltung des Benutzerprofils.
+ * Sie erlaubt dem angemeldeten Benutzer folgende Aktionen:
+ *
+ * - Anzeigen und Bearbeiten des Profils (Name, E-Mail)
+ * - Aktivieren/Deaktivieren täglicher Quiz-Erinnerungen
+ * - Ändern des Passworts mit Validierung
+ * - Löschen des Benutzerkontos mit Bestätigungsdialog
+ *
+ * Die Komponente lädt beim Initialisieren die Profildaten aus dem Backend.
+ * Erfolgreiche Änderungen werden mit einer Erfolgsnachricht quittiert,
+ * Fehler mit einer Fehlermeldung angezeigt.
+ */
 const Settings = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

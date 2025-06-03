@@ -13,6 +13,20 @@ import CasinoIcon from '@mui/icons-material/Casino';
 import { useAuth } from '../contexts/AuthContext';
 import axios from '../api/api';
 
+/**
+ * Welcome-Komponente
+ *
+ * Diese Komponente dient als Willkommensseite für angemeldete Benutzer und bietet eine Übersicht über verschiedene Quizoptionen.
+ * Sie lädt keine Benutzerdaten aktiv, sondern nutzt den Auth-Kontext, um den angemeldeten Nutzer zu identifizieren.
+ * Über interaktive Kacheln kann der Benutzer ein tägliches Quiz starten, ein zufälliges Quiz auswählen oder die komplette Quizsammlung durchsuchen.
+ *
+ * Funktionalitäten:
+ * - Anzeige einer Begrüßungsnachricht und kurzer Einführung
+ * - Navigation zu „Tägliches Quiz“ per Klick auf entsprechende Kachel
+ * - Auswahl und Start eines zufälligen Quiz, das per API geladen wird
+ * - Navigation zur Quizsammlung
+ * - Benutzerfreundliche Gestaltung mit Hover-Effekten und Icons
+ */
 const Welcome = () => {
     const { user } = useAuth();
     const navigate = useNavigate();

@@ -40,6 +40,23 @@ const StyledCalendar = styled(Calendar)(({theme}) => ({
     },
 }));
 
+/**
+ * Welcome-Komponente
+ *
+ * Diese Komponente stellt die Startseite für eingeloggte Benutzer dar.
+ * Sie dient als interaktives Dashboard und bietet folgende Funktionen:
+ * - Persönliche Begrüßung mit dem Namen des Benutzers
+ * - Kalenderansicht der Quiz-Aktivitäten mit Anzeige des aktuellen Streaks
+ * - Highscore-Anzeige mit Rang und Punktestand des Benutzers
+ * - Schnelleinstieg zu: täglichem Quiz, zufälligem Quiz und zur gesamten Quizsammlung
+ *
+ * Hauptfunktionen:
+ * - Integration von `react-calendar` zur Visualisierung der Quiz-Historie inkl. Popover mit Details
+ * - Responsives Layout durch MUI Grid und Paper-Komponenten
+ * - Nutzung von `useAuth` zur Authentifizierung und Anzeige benutzerspezifischer Daten
+ * - Gestylte Komponenten und MUI-Theming für ein konsistentes Erscheinungsbild
+ * - API-Aufrufe via Axios zum Abrufen von Streak und Quiz-Historie
+ */
 const Welcome = () => {
     const {user} = useAuth();
     const navigate = useNavigate();

@@ -29,6 +29,20 @@ import {CustomSelect, CustomSwitch, PasswordField} from "../CustomElements";
 
 const ROWS_PER_PAGE = 9;
 
+/**
+ * AdminUserPanel-Komponente
+ *
+ * Diese Komponente stellt ein Administrationspanel zur Verwaltung von Benutzern bereit.
+ * Administratoren können Benutzer suchen, filtern, erstellen, bearbeiten und löschen.
+ *
+ * Funktionalitäten:
+ * - Laden und Anzeigen einer paginierten Liste von Benutzern mit Filtermöglichkeiten nach Name, Status und Rolle
+ * - Erstellen neuer Benutzer mit Angabe von Name, Email, Passwort, Rolle, Status und weiteren Einstellungen
+ * - Bearbeiten bestehender Benutzer inklusive Passwortänderung, Rollen- und Statusanpassung sowie weiteren Eigenschaften
+ * - Löschen von Benutzern mit Bestätigungsdialog
+ * - Anzeige von Ladezuständen, Fehlermeldungen und Erfolgshinweisen via Snackbar
+ * - Zugriffsbeschränkung: Nur Benutzer mit Admin-Rolle können das Panel nutzen
+ */
 const AdminUserPanel = () => {
     const {user} = useAuth();
     const [users, setUsers] = useState([]);

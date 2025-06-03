@@ -5,6 +5,12 @@ const AuthContext = createContext(null);
 
 export const useAuth = () => useContext(AuthContext);
 
+/** AuthProvider (mit AuthContext)
+ * Ein globaler Authentifizierungs-Provider auf Basis des React Context API.
+ * Er stellt Authentifizierungszustand und zugehörige Funktionen (Login, Logout, Registrierung usw.)
+ * für die gesamte Anwendung bereit. Wird typischerweise um die App-Komponente gelegt,
+ * um Benutzerstatus zentral zu verwalten.
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

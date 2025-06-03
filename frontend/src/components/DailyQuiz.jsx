@@ -16,6 +16,28 @@ import axios from '../api/api';
 import {useAuth} from '../contexts/AuthContext';
 import {CustomFormControlLabel} from '../CustomElements'
 
+/**
+ * DailyQuiz-Komponente
+ *
+ * Diese Komponente lädt ein tägliches Quiz vom Server und ermöglicht dem Benutzer,
+ * die Fragen nacheinander zu beantworten. Die Antworten werden lokal im
+ * localStorage zwischengespeichert, sodass der Fortschritt erhalten bleibt.
+ * Nach Beendigung des Quiz wird das Ergebnis angezeigt und bei angemeldeten
+ * Benutzern auf dem Server gespeichert.
+ *
+ * Funktionalitäten:
+ * - Laden des täglichen Quiz vom Backend
+ * - Fortschrittsanzeige mit LinearProgress
+ * - Anzeige einer Frage mit mehreren Antwortoptionen (Multiple Choice)
+ * - Speicherung der Antworten und des aktuellen Fragenindex im localStorage
+ * - Überprüfung der Antworten durch Backend-API (Submit)
+ * - Berechnung und Anzeige der Gesamtpunktzahl nach Abschluss
+ * - Anzeige falscher Antworten mit Korrekturen
+ * - Navigation zwischen Fragen (Weiter, Zurück)
+ * - Möglichkeit zum Abbrechen und Zurückkehren zur Quiz-Übersicht
+ * - Fehlerbehandlung und Ladeindikatoren
+ * - Hinweis, dass die Fragen KI-generiert sind und Fehler enthalten können
+ */
 const DailyQuiz = () => {
     const navigate = useNavigate();
     const [quiz, setQuiz] = useState(null);

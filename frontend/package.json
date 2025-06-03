@@ -27,7 +27,9 @@
     "react-scripts": "^5.0.1",
     "react-tooltip": "^5.28.1",
     "vite": "^6.2.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@react-buddy/ide-toolbox": "^2.4.0",
+    "@react-buddy/palette-mui": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

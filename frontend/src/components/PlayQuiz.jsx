@@ -19,6 +19,25 @@ import axios from '../api/api';
 import {useAuth} from '../contexts/AuthContext';
 import {CustomFormControlLabel} from '../CustomElements'
 
+/**
+ * PlayQuiz-Komponente
+ *
+ * Diese Komponente ermöglicht das Spielen eines Quiz mit mehreren Fragen.
+ * Sie lädt das Quiz vom Backend, verwaltet den Fortschritt, speichert Antworten lokal und zeigt am Ende die Ergebnisse an.
+ * Der Nutzer kann Fragen mit Multiple-Choice- oder Textantworten beantworten und seine Antworten speichern, navigieren und das Quiz abschließen.
+ * Nach Abschluss kann das Ergebnis bewertet und an den Server gesendet werden.
+ *
+ * Funktionalitäten:
+ * - Laden eines Quiz per API anhand der URL-Parameter (Quiz-ID)
+ * - Anzeige von Fragen mit Unterstützung für Text- und Multiple-Choice-Antworten
+ * - Speicherung des aktuellen Fortschritts und der Antworten im localStorage zur Wiederherstellung
+ * - Navigation zwischen Fragen (vorwärts und rückwärts)
+ * - Einreichen der Antworten an das Backend zur Bewertung einzelner Fragen
+ * - Anzeige des Endergebnisses mit Punktzahl, falschen Antworten und prozentualer Bewertung
+ * - Speichern des Ergebnisses für angemeldete Nutzer auf dem Server
+ * - Möglichkeit, das Quiz zu bewerten (Sternebewertung) nach Abschluss
+ * - Fehlerbehandlung und Ladezustände während der API-Kommunikation
+ */
 const PlayQuiz = () => {
     const {id} = useParams();
     const {user} = useAuth();
