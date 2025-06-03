@@ -2,6 +2,18 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const ThemeContext = createContext();
 
+/** ThemeProvider (mit ThemeContext)
+ * Ein globaler Theme-Context-Provider zur Verwaltung des Dark-Mode-Zustands in der Anwendung.
+ * Er berücksichtigt sowohl lokale Benutzereinstellungen als auch systemweite Präferenzen und
+ * speichert den Zustand im `localStorage` zur Persistenz zwischen Sitzungen.
+ *
+ * Funktionalitäten:
+ * - Initiale Theme-Erkennung über `localStorage` oder systemweite Farbmodus-Einstellung
+ * - Reagiert dynamisch auf Änderungen der systemweiten Dark-Mode-Präferenz (z. B. durch Betriebssystem oder Browser)
+ * - Aktualisiert die `classList` von `<body>` automatisch mit/ohne `dark`-Klasse
+ * - Speichert den gewählten Modus im `localStorage`
+ * - Stellt `darkMode`-Status und Setter-Funktion `setDarkMode` über `ThemeContext` zur Verfügung
+ */
 export function ThemeProvider({ children }) {
     const [darkMode, setDarkMode] = useState(() => {
         const stored = localStorage.getItem('darkMode');
