@@ -4,8 +4,6 @@ import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
-import { DevSupport } from "@react-buddy/ide-toolbox";
-import { ComponentPreviews, useInitial } from "./dev";
 
 /** main.jsx
  Einstiegspunkt der React-Anwendung unter Verwendung von React 18 mit `createRoot`.
@@ -19,16 +17,11 @@ import { ComponentPreviews, useInitial } from "./dev";
  - Integriert `DevSupport` von `@react-buddy` zur Anzeige von Komponenten-Vorschauen und Initialisierungen während der Entwicklung
  - Lädt globale CSS-Styles über `index.css`
  */
-ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <AuthProvider>
-            <ThemeProvider>
-                <DevSupport ComponentPreviews={ComponentPreviews}
-                            useInitialHook={useInitial}
-                >
-                    <App/>
-                </DevSupport>
-            </ThemeProvider>
-        </AuthProvider>
-    </React.StrictMode>
+  <React.StrictMode>
+    <AuthProvider>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </AuthProvider>
+  </React.StrictMode>
 );
