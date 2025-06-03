@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import {AuthProvider} from './contexts/AuthContext';
-import {ThemeProvider} from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
-import {DevSupport} from "@react-buddy/ide-toolbox";
-import {ComponentPreviews, useInitial} from "./dev";
+import { DevSupport } from "@react-buddy/ide-toolbox";
+import { ComponentPreviews, useInitial } from "./dev";
 
 /** main.jsx
  Einstiegspunkt der React-Anwendung unter Verwendung von React 18 mit `createRoot`.
