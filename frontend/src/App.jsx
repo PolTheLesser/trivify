@@ -23,6 +23,19 @@ import Settings from "./components/Settings";
 import MyQuizzes from "./components/MyQuizzes";
 import { AuthProvider } from './contexts/AuthContext';
 
+/** App
+ Hauptkomponente der Anwendung, die das Routing, das globale Theme (Dark/Light Mode)
+ sowie die Authentifizierungskontexte kapselt. Sie verbindet die visuelle Struktur
+ (Navigation, Seiteninhalte, Footer) mit der interaktiven Benutzerführung.
+
+ Funktionalitäten:
+ - Verwendet React Router für die clientseitige Navigation zwischen allen Seiten (Login, Register, Quiz, etc.)
+ - Schützt bestimmte Routen durch `PrivateRoute` (z. B. Einstellungen, Adminbereich, Quiz-Erstellung)
+ - Reagiert dynamisch auf den Dark-Mode-Zustand via `ThemeContext` und integriert MUI ThemeProvider
+ - Initiale Weiterleitung abhängig vom Login-Status (Token in `localStorage`)
+ - Globale Bereitstellung des Authentifizierungsstatus durch `AuthProvider`
+ - Enthält gemeinsame UI-Bestandteile wie `Navbar` und `Footer` für konsistentes Layout
+ */
 const App = () => {
     const { darkMode } = useContext(ThemeContext);
     const muiTheme = useMemo(() => createTheme({ palette: { mode: darkMode ? "dark" : "light" } }), [darkMode]);
