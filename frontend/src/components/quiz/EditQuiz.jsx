@@ -11,6 +11,27 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import { CustomAutocomplete, CustomSelect } from "../../CustomElements";
 
+/**
+ * EditQuiz-Komponente
+ *
+ * Diese Komponente ermöglicht das Bearbeiten eines bestehenden Quiz mit Titel, Beschreibung,
+ * Kategorien (Tags) und Fragen inklusive verschiedener Fragetypen (Multiple Choice, Wahr/Falsch, Texteingabe).
+ * Daten werden beim Laden aus dem Backend abgefragt und auch im lokalen Speicher zwischengespeichert,
+ * um ungespeicherte Änderungen bei Reloads nicht zu verlieren. Es gibt Validierungen für das Formular
+ * und die Möglichkeit, Fragen hinzuzufügen, zu entfernen oder zurückzusetzen.
+ *
+ * Funktionalitäten:
+ * - Laden eines Quiz und seiner Metadaten (Titel, Beschreibung, Fragen, Kategorien) vom Server
+ * - Zwischenspeicherung der Daten im localStorage zum Schutz vor Datenverlust
+ * - Editieren von Fragen mit verschiedenen Fragetypen und Antworten
+ * - Hinzufügen und Entfernen von Fragen und Antworten
+ * - Auswahl und Validierung von Kategorien (max. 3)
+ * - Formularvalidierung vor Absenden
+ * - Speichern der Änderungen via PUT-Request an die API
+ * - Rücksetzen des Formulars auf Serverzustand mit Bestätigungsdialog
+ * - Fehler- und Erfolgsmeldungen anzeigen
+ * - Navigation nach erfolgreichem Speichern oder Abbrechen
+ */
 const EditQuiz = () => {
     const { id } = useParams();
     const navigate = useNavigate();

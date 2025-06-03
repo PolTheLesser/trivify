@@ -12,6 +12,21 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 
+/**
+ * ForgotPassword-Komponente
+ *
+ * Diese Komponente ermöglicht es Benutzern, ihr Passwort zurückzusetzen, indem sie ihre E-Mail-Adresse eingeben.
+ * Nach Absenden des Formulars wird über den Auth-Kontext eine Passwort-Zurücksetzen-Anfrage ausgelöst.
+ * Bei Erfolg wird der Nutzer zurück zur Login-Seite geleitet, mit einer Erfolgsmeldung im Navigations-State.
+ * Fehler werden innerhalb der Komponente als Fehlermeldung angezeigt.
+ *
+ * Funktionalitäten:
+ * - Eingabe einer E-Mail-Adresse zum Zurücksetzen des Passworts
+ * - Validierung der Eingabe (erforderlich, E-Mail-Format)
+ * - Asynchrone Anfrage zum Zurücksetzen des Passworts über Context-Funktion
+ * - Anzeige von Erfolg- oder Fehlermeldungen
+ * - Navigation zurück zur Login-Seite mit Erfolgshinweis
+ */
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');

@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 export async function fetchTopScores() {
     const response = await axios.get(`/quiz-results/scores/top`);
     return response.data;

@@ -27,6 +27,23 @@ import {useAuth} from '../../contexts/AuthContext';
 import axios from '../../api/api';
 import {CustomSelect, CustomFormControlLabel} from "../../CustomElements";
 
+/**
+ * QuizList-Komponente
+ *
+ * Diese Komponente zeigt eine Liste von Quizzen an, die durch verschiedene Filteroptionen durchsucht und sortiert werden können.
+ * Nutzer können nach Suchbegriffen filtern, Favoriten und noch nicht gespielte Quizze anzeigen, die Mindestanzahl an Fragen festlegen
+ * sowie tägliche Quizze ein- oder ausschließen. Die Sortierung nach Erstellungsdatum (neueste/älteste zuerst) ist ebenfalls möglich.
+ *
+ * Funktionalitäten:
+ * - Laden der Quizdaten und Favoriten (wenn Nutzer eingeloggt)
+ * - Laden der Kategorie-Labels zur besseren Anzeige
+ * - Laden der vom Nutzer bereits gespielten Quizze zur Filterung „noch nie gespielt“
+ * - Synchronisierung der Filter mit URL-Parametern
+ * - Filter- und Sortierlogik basierend auf Nutzer-Eingaben und Status
+ * - Zufällige Quiz-Navigation
+ * - Favoritenstatus toggeln (an/aus)
+ * - UI mit Filterleiste, Quiz-Karten und Lade-/Fehleranzeigen
+ */
 const QuizList = () => {
     const {user} = useAuth();
     const navigate = useNavigate();
