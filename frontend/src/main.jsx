@@ -17,6 +17,7 @@ import './index.css';
  - Integriert `DevSupport` von `@react-buddy` zur Anzeige von Komponenten-Vorschauen und Initialisierungen während der Entwicklung
  - Lädt globale CSS-Styles über `index.css`
  */
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
       <ThemeProvider>
