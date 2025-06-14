@@ -36,18 +36,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set Execution Permissions for Maven Wrapper
-        run: chmod +x ./backend/mvnw
-
-      - name: Setup JDK 21
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
       - name: Replace placeholders in application.yml
         run: |
           envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
@@ -79,6 +67,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Set Execution Permissions for Maven Wrapper
+        run: chmod +x ./backend/mvnw
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
 
       - name: Build Backend
         run: |
