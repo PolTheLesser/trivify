@@ -45,10 +45,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-  maven-build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -78,7 +74,7 @@ jobs:
           key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
 
   docker-build:
-    needs: [setup, maven-build]
+    needs: [setup]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
