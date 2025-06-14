@@ -1,4 +1,4 @@
-name: Build & Push Docker Images
+name: Build & Push Frontend Image
 
 on:
   push:
@@ -36,6 +36,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
   docker-build:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Build Frontend
@@ -45,6 +46,7 @@ jobs:
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
   docker-push:
+    needs: [setup, docker-build]
     runs-on: ubuntu-latest
     steps:
       - name: Push Frontend

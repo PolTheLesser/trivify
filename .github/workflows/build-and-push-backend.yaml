@@ -1,4 +1,4 @@
-name: Build & Push Docker Images
+name: Build & Push Backend Image
 
 on:
   push:
@@ -44,6 +44,7 @@ jobs:
           distribution: 'temurin' # Use the OpenJDK distribution
 
   maven-build:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Replace placeholders in application.yml
@@ -87,6 +88,7 @@ jobs:
           key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
 
   docker-build:
+    needs: [setup, maven-build]
     runs-on: ubuntu-latest
     steps:
       - name: Build Backend
@@ -95,6 +97,7 @@ jobs:
           docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
 
   docker-push:
+    needs: [setup, docker-build]
     runs-on: ubuntu-latest
     steps:
       - name: Push Backend
