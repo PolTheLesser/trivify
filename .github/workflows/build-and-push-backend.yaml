@@ -61,7 +61,7 @@ jobs:
           path: ~/.dependency-check/data
           key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
 
-  docker-build:
+  image-build:
     needs: [setup]
     runs-on: ubuntu-latest
     steps:
