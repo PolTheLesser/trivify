@@ -43,19 +43,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Build Frontend
+      - name: Build and Push Frontend
         run: |
           docker build \
             --build-arg REACT_APP_MAIL=${{ secrets.MAIL_ANSWER_TO }} \
             --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ needs.setup.outputs.tag }} ./frontend
-
-  docker-push:
-    needs: [setup, docker-build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Push Frontend
-        run: docker push lesommer2019/trivify-frontend:${{ needs.setup.outputs.tag }}
+          docker push lesommer2019/trivify-frontend:${{ needs.setup.outputs.tag }}
