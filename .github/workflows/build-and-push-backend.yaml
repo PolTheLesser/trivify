@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Backend
+      - name: Build and Push Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
           docker build -t lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }} ./backend
