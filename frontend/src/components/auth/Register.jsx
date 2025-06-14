@@ -14,6 +14,18 @@ import {
 import {useAuth} from '../../contexts/AuthContext';
 import {PasswordField, CustomFormControlLabel, CustomSwitch } from "../../CustomElements";
 
+/**
+ * Register-Komponente
+ *
+ * Diese Komponente stellt ein Registrierungsformular für neue Benutzer bereit.
+ * Nutzer können sich mit Name, E-Mail, Passwort und optionalen Quiz-Erinnerungen anmelden.
+ *
+ * Funktionalitäten:
+ * - Formularvalidierung (z.B. Passwortbestätigung)
+ * - Fehlerbehandlung und Anzeige von Fehlermeldungen
+ * - Integration mit dem AuthContext zur Registrierung über das Backend
+ * - Erfolgreiche Registrierung leitet zur Login-Seite weiter und zeigt eine Verifizierungsanleitung
+ */
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',

@@ -11,6 +11,19 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+/**
+ * ResetPassword-Komponente
+ *
+ * Diese Komponente ermöglicht es dem Benutzer, ein neues Passwort zu setzen,
+ * nachdem er einen gültigen Token per E-Mail erhalten hat (z. B. durch die "Passwort vergessen"-Funktion).
+ *
+ * Funktionalitäten:
+ * - Überprüfung, ob die beiden eingegebenen Passwörter übereinstimmen
+ * - Senden des neuen Passworts zusammen mit dem Token an den Server
+ * - Anzeige von Ladezustand, Erfolgs- oder Fehlermeldungen
+ * - Weiterleitung zur Login-Seite nach erfolgreicher Passwortänderung
+ *
+ */
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
