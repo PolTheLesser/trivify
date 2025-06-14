@@ -6,9 +6,8 @@ on:
       - '**'
 
 jobs:
-  docker-build:
+  setup:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -44,6 +43,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin' # Use the OpenJDK distribution
 
+  maven-build:
+    runs-on: ubuntu-latest
+    steps:
       - name: Replace placeholders in application.yml
         run: |
           envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
@@ -84,10 +86,16 @@ jobs:
           path: ~/.dependency-check/data
           key: nvd-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
 
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
       - name: Build Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
           docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
 
+  docker-push:
+    runs-on: ubuntu-latest
+    steps:
       - name: Push Backend
         run: docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}

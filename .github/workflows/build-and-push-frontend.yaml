@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  docker-build:
+  setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,11 +35,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
       - name: Build Frontend
         run: |
           docker build --build-arg REACT_APP_MAIL=${{ secrets.MAIL_ANSWER_TO }} \
             --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
             -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
 
+  docker-push:
+    runs-on: ubuntu-latest
+    steps:
       - name: Push Frontend
         run: docker push lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }}
