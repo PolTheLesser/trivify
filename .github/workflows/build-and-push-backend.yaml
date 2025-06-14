@@ -8,6 +8,8 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.vars.outputs.tag }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -41,30 +43,18 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'temurin' # Use the OpenJDK distribution
+          distribution: 'temurin'
 
   maven-build:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Replace placeholders in application.yml
         run: |
           envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application.yml
-          echo "DB_URL=${{ vars.DB_URL }}" >> $GITHUB_OUTPUT
-          echo "SERVER_URL=${{ vars.SERVER_URL }}" >> $GITHUB_OUTPUT
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_OUTPUT
-          echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_OUTPUT
-          echo "MAIL_ANSWER_TO=${{ secrets.MAIL_ANSWER_TO }}" >> $GITHUB_OUTPUT
-          echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> $GITHUB_OUTPUT
-          echo "MAIL_PASS=${{ secrets.MAIL_PASS }}" >> $GITHUB_OUTPUT
-          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_OUTPUT
-          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_OUTPUT
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_OUTPUT
-          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_OUTPUT
-          echo "AI_URL=${{ vars.AI_URL }}" >> $GITHUB_OUTPUT
-          echo "AI_API_KEY=${{ secrets.AI_API_KEY }}" >> $GITHUB_OUTPUT
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_OUTPUT
-
         env:
           DB_URL: ${{ vars.DB_URL }}
           SERVER_URL: ${{ vars.SERVER_URL }}
@@ -91,14 +81,20 @@ jobs:
     needs: [setup, maven-build]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Build Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
-          docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
+          docker build -t lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }} ./backend
 
   docker-push:
     needs: [setup, docker-build]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Push Backend
-        run: docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}
+        run: docker push lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }}
