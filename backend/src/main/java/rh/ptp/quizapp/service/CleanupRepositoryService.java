@@ -121,9 +121,10 @@ public class CleanupRepositoryService {
     @Transactional
     public void completeDeletionRequests() {
         LocalDateTime warningTime = LocalDateTime.now().minusDays(6);
-        List<User> requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_DELETE));
+        List<User> requests = userRepository.findAllByUpdatedAtBeforeAndUserStatusIn(warningTime, List.of(UserStatus.PENDING_DELETE));
 
         for (User request : requests) {
+            request.setUpdatedAt(warningTime);
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
             variables.put("username", request.getName());
@@ -133,7 +134,7 @@ public class CleanupRepositoryService {
         }
 
         LocalDateTime expiryTime = LocalDateTime.now().minusDays(7);
-        requests = userRepository.findAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
+        requests = userRepository.findAllByUpdatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
         for (User request : requests) {
             Map<String, Object> variables = new HashMap<>();
             variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
@@ -143,7 +144,7 @@ public class CleanupRepositoryService {
             emailService.sendEmail(request.getEmail(), "Deine Benutzerdaten wurden gelöscht!", "account-deleted", variables);
             prepareDelete(request.getId());
         }
-        userRepository.deleteAllByCreatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
+        userRepository.deleteAllByUpdatedAtBeforeAndUserStatusIn(expiryTime, List.of(UserStatus.PENDING_DELETE));
     }
 
     /**
