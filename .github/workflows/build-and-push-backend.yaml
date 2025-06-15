@@ -67,5 +67,5 @@ jobs:
       - name: Build and Push Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
-          docker build -t lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }} ./backend
-          docker push lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }}
+          docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
+          docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}

@@ -41,5 +41,5 @@ jobs:
           docker build \
             --build-arg REACT_APP_MAIL=${{ secrets.MAIL_ANSWER_TO }} \
             --build-arg REACT_APP_API_URL=${{ vars.SERVER_URL }}:9090/api \
-            -t lesommer2019/trivify-frontend:${{ needs.setup.outputs.tag }} ./frontend
-          docker push lesommer2019/trivify-frontend:${{ needs.setup.outputs.tag }}
+            -t lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }} ./frontend
+          docker push lesommer2019/trivify-frontend:${{ steps.vars.outputs.tag }}
