@@ -107,22 +107,6 @@ public class QuizService {
                 .collect(Collectors.toList());
 
         quiz.setQuestions(questions);
-        for (int i = 0; i < questions.size(); i++) {
-            QuizQuestion q = questions.get(i);
-            if (q.getAnswers() == null || q.getAnswers().isEmpty()
-                    || q.getAnswers().stream().anyMatch(a -> a == null || a.trim().isEmpty())) {
-                throw new IllegalArgumentException("Alle Antwortmöglichkeiten müssen bei Frage " + (i + 1) + " ausgefüllt sein");
-            }
-
-            long distinctCount = q.getAnswers().stream().distinct().count();
-            if (distinctCount != q.getAnswers().size()) {
-                throw new IllegalArgumentException("Antwortmöglichkeiten dürfen nicht identisch sein bei Frage " + (i + 1));
-            }
-
-            if (!q.getAnswers().contains(q.getCorrectAnswer())) {
-                throw new IllegalArgumentException("Richtige Antwort ist bei Frage " + (i + 1) + " nicht unter den gegebenen Antworten");
-            }
-        }
         return quizRepository.save(quiz);
     }
 
@@ -525,6 +509,11 @@ public class QuizService {
 
                 if (!q.getAnswers().contains(q.getCorrectAnswer())) {
                     throw new IllegalArgumentException("Richtige Antwort ist bei Frage " + (i + 1) + " nicht unter den gegebenen Antworten");
+                }
+
+                long distinctCount = q.getAnswers().stream().distinct().count();
+                if (distinctCount != q.getAnswers().size()) {
+                    throw new IllegalArgumentException("Antwortmöglichkeiten dürfen nicht identisch sein bei Frage " + (i + 1));
                 }
             }
         }
