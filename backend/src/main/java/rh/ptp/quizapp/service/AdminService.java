@@ -65,6 +65,7 @@ public class AdminService {
     public User updateUser(Long id, User userUpdated) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         Map<String, Object> variables = adminEmail(user, userUpdated, 1);
+        if(userUpdated.getId() != 1L) throw new RuntimeException("Der Admin-Benutzer kann nicht aktualisiert werden.");
 
         if (userUpdated.getName() != null) {
             user.setName(userUpdated.getName());
@@ -109,11 +110,15 @@ public class AdminService {
      */
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).get();
-        try {
-            adminEmail(user, user, 2);
-            userRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if(id!= 1L) {
+            try {
+                adminEmail(user, user, 2);
+                userRepository.deleteById(id);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new RuntimeException("Der Admin-Benutzer kann nicht gelöscht werden.");
         }
     }
 
