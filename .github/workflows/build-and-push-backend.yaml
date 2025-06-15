@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  setup:
+  backend-build:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
@@ -48,13 +48,6 @@ jobs:
           AI_URL: ${{ vars.AI_URL }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-
-  image-build:
-    needs: [setup]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
 
       - name: Set Execution Permissions for Maven Wrapper
         run: chmod +x ./backend/mvnw
