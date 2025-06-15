@@ -15,12 +15,10 @@ import java.util.Optional;
  */
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    Optional<User> findByName(String name);
     List<User> findAllByRole(UserRole role);
     boolean existsByEmail(String email);
     List<User> findByDailyQuizReminderIsTrue();
     boolean existsByName(String name);
-    void deleteById(long userId);
-    List<User> findAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> statuses);
-    void deleteAllByCreatedAtBeforeAndUserStatusIn(LocalDateTime dateTime, List<UserStatus> statuses);
-} 
+    List<User> findAllByUpdatedAtBeforeAndUserStatusIn(LocalDateTime warningTime, List<UserStatus> pendingDelete);
+    void deleteAllByUpdatedAtBeforeAndUserStatusIn(LocalDateTime expiryTime, List<UserStatus> pendingDelete);
+}

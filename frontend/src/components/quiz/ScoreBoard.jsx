@@ -51,12 +51,7 @@ const ScoreBoard = ({ userId }) => {
                       )}
                   </div>
               )}
-
-              {/* Hinweis ganz unten */}
-                <br />
-                <br />
-                <br />
-                <br />
+              <br />
               <p className="text-xs text-gray-500 mt-4 text-center">
                   Mehrfache Quiz-Teilnahmen &amp; Teilnahmen an eigenen Quizzen werden nicht
                   gezählt!

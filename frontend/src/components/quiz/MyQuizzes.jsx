@@ -237,7 +237,7 @@ const MeineQuizze = () => {
                        mx: 2,
                        mt: 2
                    }}>
-                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, height: '100%', flexGrow: 1}}>
                     <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
                         <TextField
                             label="Suche"

@@ -156,7 +156,7 @@ const Welcome = () => {
             <Grid container spacing={3} alignItems="stretch">
                 {/* History Calendar */}
                 <Grid item xs={12} md={6}>
-                    <Paper elevation={2} sx={{p: 3, backgroundColor: theme.palette.background.paper}}>
+                    <Paper elevation={2} sx={{p: 3, backgroundColor: theme.palette.background.paper, height: '100%', flexGrow: 1}}>
                         {loading ? (
                             <Box sx={{textAlign: 'center', py: 4}}>
                                 <CircularProgress/>
@@ -228,7 +228,8 @@ const Welcome = () => {
                             backgroundColor: theme.palette.background.paper,
                             display: 'flex',
                             flexDirection: 'column',
-                            height: '100%'
+                            height: '100%',
+                            flexGrow: 1
                         }}
                     >
                         <EmojiEventsIcon sx={{ fontSize: 60, color: 'warning.main', mb: 2, alignSelf: 'center' }} />
@@ -254,7 +255,8 @@ const Welcome = () => {
                             p: 3,
                             backgroundColor: theme.palette.background.paper,
                             cursor: 'pointer',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            flexGrow: 1
                         }}
                     >
                         <EmojiEventsIcon sx={{fontSize: 60, color: 'secondary.main', mb: 2}}/>
@@ -276,7 +278,8 @@ const Welcome = () => {
                             p: 3,
                             backgroundColor: theme.palette.background.paper,
                             cursor: 'pointer',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            flexGrow: 1
                         }}
                     >
                         <CasinoIcon sx={{fontSize: 60, color: 'success.main', mb: 2}}/>
