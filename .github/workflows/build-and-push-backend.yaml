@@ -22,7 +22,7 @@ jobs:
           if [ "$BRANCH" = "main" ]; then
             TAG=latest
           elif [ "$BRANCH" = "hosting" ]; then
-            TAG=stable
+            TAG=dev
           elif [ "$BRANCH" = "dev" ]; then
             TAG=beta
           else

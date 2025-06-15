@@ -205,7 +205,7 @@ const CreateQuiz = () => {
         localStorage.removeItem('quiz_tags');
         localStorage.removeItem('quiz_questions');
         localStorage.removeItem('quiz_categories');
-        navigate('quizzes/my-quizzes');
+        navigate('/quizzes/my-quizzes');
     };
 
     useEffect(() => {
