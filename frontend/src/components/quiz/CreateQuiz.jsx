@@ -205,6 +205,7 @@ const CreateQuiz = () => {
         localStorage.removeItem('quiz_tags');
         localStorage.removeItem('quiz_questions');
         localStorage.removeItem('quiz_categories');
+        navigate('/quizzes/my-quizzes');
     };
 
     useEffect(() => {
@@ -431,7 +432,6 @@ const CreateQuiz = () => {
                             variant="contained"
                             color="error"
                             onClick={handleReset}
-                            navigate="/quizzes/my-quizzes"
                         >
                             Abbrechen
                         </Button>

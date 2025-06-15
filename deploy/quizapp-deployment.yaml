@@ -105,7 +105,7 @@ spec:
               done
       containers:
         - name: backend
-          image: lesommer2019/trivify-backend:stable
+          image: lesommer2019/trivify-backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9090
@@ -180,7 +180,7 @@ spec:
               value: "quizpass"
       containers:
         - name: frontend
-          image: lesommer2019/trivify-frontend:stable
+          image: lesommer2019/trivify-frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
