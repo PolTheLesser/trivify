@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  setup:
+  backend-build:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
@@ -49,13 +49,6 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
-  image-build:
-    needs: [setup]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
       - name: Set Execution Permissions for Maven Wrapper
         run: chmod +x ./backend/mvnw
 
@@ -74,5 +67,5 @@ jobs:
       - name: Build and Push Backend
         run: |
           ./backend/mvnw -f ./backend/pom.xml clean verify -Dnvd.api.key=${{ secrets.NVD_API_KEY }}
-          docker build -t lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }} ./backend
-          docker push lesommer2019/trivify-backend:${{ needs.setup.outputs.tag }}
+          docker build -t lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }} ./backend
+          docker push lesommer2019/trivify-backend:${{ steps.vars.outputs.tag }}
