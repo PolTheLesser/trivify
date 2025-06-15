@@ -94,12 +94,12 @@ public class DailyQuizSchedulerService {
             Map<String, Object> variables = new HashMap<>();
             variables.put("quizUrl", frontendUrl + "/daily-quiz");
             variables.put("logoUrl", frontendUrl + "/icons/logo512.png");
+            LocalDate yesterday = LocalDate.now().minusDays(1);
 
             for (User user : users) {
                 LocalDate lastPlayed = user.getLastDailyQuizPlayed() != null
                         ? user.getLastDailyQuizPlayed().toLocalDate()
                         : null;
-                LocalDate yesterday = LocalDate.now().minusDays(1);
                 boolean missedYesterday = (lastPlayed == null || !lastPlayed.equals(yesterday))
                         && !quizRepository.findByCategoriesAndDate(QuizCategory.DAILY_QUIZ, yesterday).isEmpty();
                 variables.put("username", user.getName());
