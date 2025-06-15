@@ -66,6 +66,7 @@ const Welcome = () => {
                         sx={{
                             p: 3,
                             height: '100%',
+                            flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -91,6 +92,7 @@ const Welcome = () => {
                         sx={{
                             p: 3,
                             height: '100%',
+                            flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
