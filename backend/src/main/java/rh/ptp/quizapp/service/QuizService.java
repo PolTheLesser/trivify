@@ -553,29 +553,25 @@ public class QuizService {
         List<WrongAnswerDTO> wrongs = new ArrayList<>();
 
         for (QuizQuestion q : quiz.getQuestions()) {
-            String userAnswer = answers.get(q.getId());
-            if (userAnswer == null) continue;
-
-            boolean correct = checkAnswer(userAnswer, q.getCorrectAnswer());
-            if (correct) {
+            String ua = answers.get(q.getId());
+            if (ua == null) continue;
+            if (checkAnswer(ua, q.getCorrectAnswer())) {
                 correctCount++;
             } else {
-                wrongs.add(new WrongAnswerDTO(
-                        q.getQuestion(),
-                        userAnswer,
-                        q.getCorrectAnswer()
-                ));
+                wrongs.add(new WrongAnswerDTO(q.getQuestion(), ua, q.getCorrectAnswer()));
             }
         }
 
-        // Persistieren des Ergebnisses, falls gewünscht
-        QuizResult result = new QuizResult();
-        result.setQuiz(quiz);
-        result.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
-        result.setScore(correctCount);
-        result.setMaxPossibleScore(quiz.getQuestions().size());
-        result.setPlayedAt(LocalDateTime.now());
-        quizResultRepository.save(result);
+        // Nur für eingeloggte User speichern:
+        if (userId != null) {
+            QuizResult result = new QuizResult();
+            result.setQuiz(quiz);
+            result.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
+            result.setScore(correctCount);
+            result.setMaxPossibleScore(quiz.getQuestions().size());
+            result.setPlayedAt(LocalDateTime.now());
+            quizResultRepository.save(result);
+        }
 
         QuizFeedbackDTO dto = new QuizFeedbackDTO();
         dto.setScore(correctCount);

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -19,7 +19,6 @@ import {
     Paper,
     Rating,
     Slider,
-    TextField,
     Typography
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
@@ -48,110 +47,126 @@ import { CustomSelect, CustomFormControlLabel } from '../../CustomElements';
 const QuizList = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
 
-    // ─── INITIALIZE FILTER STATES ONCE ────────────────────────────────────────
-    const initial = new URLSearchParams(location.search);
-    const [searchQuery,   setSearchQuery]   = useState(initial.get('query')         || '');
-    const [onlyFavorites, setOnlyFavorites] = useState(user ? initial.get('onlyFavorites') === 'true' : false);
-    const [onlyUnplayed,  setOnlyUnplayed]  = useState(user ? initial.get('onlyUnplayed')  === 'true' : false);
-    const [onlyRated,     setOnlyRated]     = useState(initial.get('onlyRated')      === 'true');
-    const [minQuestions,  setMinQuestions]  = useState(Number(initial.get('minQuestions')) || 0);
-    const [sortOrder,     setSortOrder]     = useState(initial.get('sortOrder')     || 'desc');
-    const [selectedCategory, setSelectedCategory] = useState(initial.get('selectedCategory') || 'all');
-    const [dailyQuizFilter,  setDailyQuizFilter]  = useState(initial.get('dailyQuizFilter')  || 'all');
+    // Filter-States
+    const searchQueryRaw   = searchParams.get('query') || '';
+    const searchQuery      = searchQueryRaw.trim().toLowerCase();
+    const onlyFavorites    = user    ? searchParams.get('onlyFavorites') === 'true' : false;
+    const onlyUnplayed     = user    ? searchParams.get('onlyUnplayed')  === 'true' : false;
+    const onlyRated        = searchParams.get('onlyRated')     === 'true';
+    const minQuestions     = Number(searchParams.get('minQuestions')) || 0;
+    const sortOrder        = searchParams.get('sortOrder')      || 'desc';
+    const selectedCategory = searchParams.get('selectedCategory')|| 'all';
+    const dailyQuizFilter  = searchParams.get('dailyQuizFilter') || 'all';
 
-    // ─── DATA STATES ─────────────────────────────────────────────────────────
-    const [quizzes,         setQuizzes]         = useState([]);
-    const [filteredQuizzes, setFilteredQuizzes] = useState([]);
-    const [playedQuizIds,   setPlayedQuizIds]   = useState(new Set());
-    const [categoryLabels,  setCategoryLabels]  = useState({});
+    // Daten States
+    const [quizzes, setQuizzes]           = useState([]);
+    const [playedQuizIds, setPlayedQuizIds] = useState(new Set());
+    const [categoryLabels, setCategoryLabels] = useState({});
 
-    // ─── UI STATES ───────────────────────────────────────────────────────────
-    const [loading,     setLoading]     = useState(true);
+    // UI States
+    const [loading, setLoading]     = useState(true);
     const [loadingTags, setLoadingTags] = useState(true);
-    const [error,       setError]       = useState('');
+    const [error, setError]         = useState('');
 
-    // ─── FETCH CATEGORY LABELS ───────────────────────────────────────────────
+    // Zufallsquiz-Navigation
+    const handleRandomQuiz = () => {
+        if (!filteredQuizzes.length) return;
+        const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
+        navigate(`/quizzes/${random.id}`);
+    };
+
+    // Filter zurücksetzen
+    const resetFilters = () => {
+        // URL komplett zurücksetzen
+        setSearchParams({}, { replace: true });
+    };
+
+    // Kategorien laden
     useEffect(() => {
-        (async () => {
+        const fetchCategoryLabels = async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
                     axios.get('/categories/values'),
                     axios.get('/categories')
                 ]);
+                const values = valsRes.data;
+                const cats   = catsRes.data;
                 const labels = {};
-                catsRes.data.forEach((cat, i) => {
-                    labels[cat] = valsRes.data[i] || cat;
-                });
+                cats.forEach((cat, i) => labels[cat] = values[i] || cat);
                 setCategoryLabels(labels);
-            } catch (e) {
-                console.error('Fehler beim Laden der Kategorienamen', e);
+            } catch (err) {
+                console.error('Fehler beim Laden der Kategorienamen', err);
             } finally {
                 setLoadingTags(false);
             }
-        })();
+        };
+        fetchCategoryLabels();
     }, []);
 
-    // ─── FETCH PLAYED QUIZZES ─────────────────────────────────────────────────
+    // Gespielte Quizze laden (nur wenn User da)
     useEffect(() => {
         if (!user) return;
-        axios
-            .get('/users/quiz-history')
+        axios.get('/users/quiz-history')
             .then(res => setPlayedQuizIds(new Set(res.data.map(h => h.quizId))))
             .catch(() => console.error('Quiz history load error'));
     }, [user]);
 
-    // ─── FETCH QUIZZES ────────────────────────────────────────────────────────
+    // Quiz-Daten laden
     useEffect(() => {
-        (async () => {
+        const fetchQuizzes = async () => {
             try {
                 const [quizRes, favRes] = user
-                    ? await Promise.all([axios.get('/quizzes'), axios.get('/users/favorites')])
+                    ? await Promise.all([
+                        axios.get('/quizzes'),
+                        axios.get('/users/favorites')
+                    ])
                     : [await axios.get('/quizzes'), { data: [] }];
-                const favSet = new Set(favRes.data);
+                const favoriteIds = new Set(favRes.data || []);
                 const data = quizRes.data.map(q => ({
                     ...q,
-                    isFavorite: favSet.has(q.id),
-                    isDaily:    q.categories.includes('DAILY_QUIZ')
+                    isFavorite: favoriteIds.has(q.id),
+                    isDaily: !!q.dailyQuiz
                 }));
                 setQuizzes(data);
-                setFilteredQuizzes(data);
-            } catch (e) {
-                setError(e.response?.data?.message || 'Fehler beim Laden der Quizze');
+            } catch (err) {
+                setError(err.response?.data?.message || 'Fehler beim Laden der Quizze');
             } finally {
                 setLoading(false);
             }
-        })();
+        };
+        fetchQuizzes();
     }, [user]);
 
-    // ─── CLIENT-SIDE FILTERING ────────────────────────────────────────────────
-    useEffect(() => {
-        if (loadingTags) return;
-        const q = searchQuery.trim().toLowerCase();
-        let filtered = quizzes.filter(qz => {
-            const matchText =
-                qz.title.toLowerCase().includes(q) ||
-                qz.description?.toLowerCase().includes(q) ||
-                qz.categories.some(cat => (categoryLabels[cat] || cat).toLowerCase().includes(q));
-            const matchCat = selectedCategory === 'all' || qz.categories.includes(selectedCategory);
-            return matchText && matchCat;
+    // Filter-Logik
+    const filteredQuizzes = useMemo(() => {
+        if (loadingTags) return [];
+        let list = quizzes.filter(quiz => {
+            const matchesSearch =
+                quiz.title.toLowerCase().includes(searchQuery) ||
+                quiz.description?.toLowerCase().includes(searchQuery) ||
+                quiz.categories.some(cat =>
+                    (categoryLabels[cat] || cat).toLowerCase().includes(searchQuery)
+                );
+            const matchesCategory =
+                selectedCategory === 'all' || quiz.categories.includes(selectedCategory);
+            return matchesSearch && matchesCategory;
         });
-        if (onlyFavorites && user) filtered = filtered.filter(qz => qz.isFavorite);
-        if (onlyUnplayed && user)  filtered = filtered.filter(qz => !playedQuizIds.has(qz.id));
-        if (onlyRated)              filtered = filtered.filter(qz => qz.ratingCount > 0);
-        filtered = filtered.filter(qz => qz.questions.length >= minQuestions);
+        if (onlyFavorites && user) list = list.filter(q => q.isFavorite);
+        if (onlyUnplayed && user) list = list.filter(q => !playedQuizIds.has(q.id));
+        if (onlyRated) list = list.filter(q => q.ratingCount > 0);
+        list = list.filter(q => q.questions.length >= minQuestions);
+        list.sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        });
         if (dailyQuizFilter === 'exclude') {
-            filtered = filtered.filter(qz => !qz.categories.includes('DAILY_QUIZ'));
+            list = list.filter(q => !q.categories.includes('DAILY_QUIZ'));
         }
-        filtered.sort((a, b) => {
-            const da = new Date(a.createdAt), db = new Date(b.createdAt);
-            return sortOrder === 'asc' ? da - db : db - da;
-        });
-        setFilteredQuizzes(filtered);
+        return list;
     }, [
-        searchQuery,
         quizzes,
         categoryLabels,
         loadingTags,
@@ -163,64 +178,33 @@ const QuizList = () => {
         sortOrder,
         playedQuizIds,
         dailyQuizFilter,
-        user
+        user,
+        searchQuery
     ]);
 
-    // ─── MANUAL URL UPDATE ───────────────────────────────────────────────────
-    const applyFilters = () => {
-        const params = new URLSearchParams();
-        if (searchQuery.trim())         params.set('query', searchQuery.trim());
-        if (user && onlyFavorites)      params.set('onlyFavorites', 'true');
-        if (user && onlyUnplayed)       params.set('onlyUnplayed', 'true');
-        if (onlyRated)                  params.set('onlyRated', 'true');
-        if (minQuestions > 0)           params.set('minQuestions', String(minQuestions));
-        if (sortOrder !== 'desc')       params.set('sortOrder', sortOrder);
-        if (selectedCategory !== 'all') params.set('selectedCategory', selectedCategory);
-        if (dailyQuizFilter !== 'all')  params.set('dailyQuizFilter', dailyQuizFilter);
-        setSearchParams(params, { replace: true });
-    };
-
-    const resetFilters = () => {
-        setSearchQuery('');
-        setOnlyFavorites(false);
-        setOnlyUnplayed(false);
-        setOnlyRated(false);
-        setMinQuestions(0);
-        setSortOrder('desc');
-        setDailyQuizFilter('all');
-        setSelectedCategory('all');
-        setSearchParams(new URLSearchParams(), { replace: true });
-    };
-
-    const handleRandomQuiz = () => {
-        if (!filteredQuizzes.length) return;
-        const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
-        navigate(`/quizzes/${random.id}`);
-    };
-
+    // Favoriten umschalten
     const toggleFavorite = async quizId => {
         try {
             const res = await axios.post(`/users/quizzes/${quizId}/favorite`);
-            setQuizzes(prev => prev.map(qz => qz.id === quizId
-                ? { ...qz, isFavorite: res.data.favorited }
-                : qz
-            ));
-        } catch (e) {
-            console.error(e);
+            setQuizzes(prev =>
+                prev.map(q => q.id === quizId ? { ...q, isFavorite: res.data.favorited } : q)
+            );
+        } catch (err) {
+            console.error(err);
         }
     };
 
     if (loading || loadingTags) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+            <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
                 <CircularProgress />
             </Box>
         );
     }
     if (error) {
         return (
-            <Container maxWidth="sm">
-                <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>
+            <Container maxWidth='sm'>
+                <Alert severity='error' sx={{ mt: 4 }}>{error}</Alert>
             </Container>
         );
     }
@@ -302,7 +286,6 @@ const QuizList = () => {
                 </Box>
             </Paper>
 
-            {/* Quiz-Karten */}
             <Grid container spacing={3} sx={{ px: 2, pb: 6 }}>
                 {filteredQuizzes.map(qz => (
                     <Grid item xs={12} sm={6} md={4} key={qz.id} sx={{ display: 'flex' }}>
