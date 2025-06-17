@@ -136,7 +136,7 @@ const DailyQuiz = () => {
             });
 
             const updatedAnswers = {...answers, [currentQuestionIndex]: selectedAnswer};
-            const newScore = await recalculateScore(updatedAnswers); // ✅ Verwende neuen Score
+            const newScore = await recalculateScore(updatedAnswers);
 
             if (currentQuestionIndex < quiz.questions.length - 1) {
                 updateCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -152,7 +152,7 @@ const DailyQuiz = () => {
                     await axios.post('/quiz-results', {
                         userId,
                         quizId,
-                        score: newScore, // ✅ korrekt gespeicherter Score
+                        score: newScore,
                         maxPossibleScore
                     });
                 }

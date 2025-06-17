@@ -68,20 +68,14 @@ const Navbar = () => {
     const handleSearchChange = e => {
         const val = e.target.value;
         setSearchTerm(val);
-        if (location.pathname === '/quizzes') {
-            if (val) setSearchParams({ query: val });
-            else setSearchParams({});
-        }
     };
 
     // Enter im Suchfeld navigiert zur Quizliste mit Query
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchTerm.trim();
-            if (location.pathname !== '/quizzes') {
+            if (location.pathname !== '/quizzes' || q) {
                 navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
-            } else {
-                setSearchParams(q ? { query: q } : {});
             }
         }
     };
