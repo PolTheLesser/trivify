@@ -304,9 +304,9 @@ const AdminUserPanel = () => {
                                     </CardContent>
                                     <CardActions>
                                         <Button variant="contained"
-                                                onClick={() => openEditDialog(u)}>Bearbeiten</Button>
+                                                onClick={() => openEditDialog(u)} disabled={u.id === 1}>Bearbeiten</Button>
                                         <Button variant="contained" color="error"
-                                                onClick={() => openDeleteDialog(u)}>Löschen</Button>
+                                                onClick={() => openDeleteDialog(u)} disabled={u.id === 1}>Löschen</Button>
                                     </CardActions>
                                 </Card>
                             </Grid>

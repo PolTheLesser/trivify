@@ -354,9 +354,9 @@ const MeineQuizze = () => {
                                 <Button variant="contained" color="primary" size="small"
                                         onClick={() => navigate(`/quizzes/${quiz.id}`)}>Spielen</Button>
                                 <Button variant="contained" color="primary" size="small"
-                                        onClick={() => navigate(`/quizzes/edit/${quiz.id}`)}>Bearbeiten</Button>
+                                        onClick={() => navigate(`/quizzes/edit/${quiz.id}`)} disabled={quiz.creator?.id === 1}>Bearbeiten</Button>
                                 <Button variant="contained" size="small" color="error"
-                                        onClick={() => confirmDelete(quiz.id)}>Löschen</Button>
+                                        onClick={() => confirmDelete(quiz.id)} disabled={quiz.creator?.id === 1}>Löschen</Button>
                             </CardActions>
                         </Card>
                     </Grid>
