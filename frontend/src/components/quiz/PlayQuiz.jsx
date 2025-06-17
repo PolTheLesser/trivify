@@ -1,6 +1,6 @@
 // src/components/PlayQuiz.jsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -17,8 +17,8 @@ import {
     Typography
 } from '@mui/material';
 import axios from '../../api/api';
-import { useAuth } from '../../contexts/AuthContext';
-import { CustomFormControlLabel } from '../../CustomElements';
+import {useAuth} from '../../contexts/AuthContext';
+import {CustomFormControlLabel} from '../../CustomElements';
 
 /**
  * PlayQuiz-Komponente
@@ -40,9 +40,9 @@ import { CustomFormControlLabel } from '../../CustomElements';
  * - Fehlerbehandlung und Ladezustände während der API-Kommunikation
  */
 const PlayQuiz = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const {user, logout} = useAuth();
 
     const storageKey = `quiz-${id}-answers`;
     const savedIndex = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
@@ -77,9 +77,9 @@ const PlayQuiz = () => {
         fetchQuiz();
     }, [id]);
 
-    const updateAnswer = (idx, val) => {
+    const updateAnswer = (questionId, answer) => {
         setAnswers(prev => {
-            const next = { ...prev, [idx]: val };
+            const next = {...prev, [questionId]: answer};
             localStorage.setItem(storageKey, JSON.stringify(next));
             return next;
         });
@@ -129,8 +129,8 @@ const PlayQuiz = () => {
         if (stars < 1) return;
         setSubmitting(true);
         try {
-            await axios.post(`/quizzes/${quiz.id}/rate`, { rating: stars });
-            navigate('/quizzes', { state: { justRated: true } });
+            await axios.post(`/quizzes/${quiz.id}/rate`, {rating: stars});
+            navigate('/quizzes', {state: {justRated: true}});
         } catch {
             setError('Fehler beim Absenden der Bewertung');
             setSubmitting(false);
@@ -140,7 +140,7 @@ const PlayQuiz = () => {
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     }
@@ -172,7 +172,7 @@ const PlayQuiz = () => {
 
     return (
         <Container maxWidth="md">
-            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+            <Paper elevation={3} sx={{p: 4, mt: 4}}>
                 {showResults ? (
                     <>
                         <Typography variant="h4" gutterBottom>
@@ -187,12 +187,12 @@ const PlayQuiz = () => {
                         </Typography>
 
                         {wrongAnswers.length > 0 && (
-                            <Box sx={{ mt: 3 }}>
+                            <Box sx={{mt: 3}}>
                                 <Typography variant="h6" gutterBottom>
                                     Falsche Antworten:
                                 </Typography>
                                 {wrongAnswers.map((wrong, idx) => (
-                                    <Box key={idx} sx={{ mb: 2 }}>
+                                    <Box key={idx} sx={{mb: 2}}>
                                         <Typography variant="body1">
                                             <strong>Frage:</strong> {wrong.question}
                                         </Typography>
@@ -208,14 +208,14 @@ const PlayQuiz = () => {
                         )}
 
                         {!isDailyQuiz && user && quiz.creator?.id !== user.id && (
-                            <Box sx={{ mt: 4 }}>
+                            <Box sx={{mt: 4}}>
                                 <Typography variant="h6">Bewerte dieses Quiz:</Typography>
                                 <Rating
                                     name="after-quiz-rating"
                                     value={stars}
                                     onChange={(_, val) => setStars(val)}
                                 />
-                                <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                                <Box sx={{mt: 4, display: 'flex', gap: 2}}>
                                     <Button
                                         variant="contained"
                                         onClick={submitRating}
@@ -228,7 +228,7 @@ const PlayQuiz = () => {
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                        <Box sx={{mt: 2, textAlign: 'center'}}>
                             <Button variant="contained" onClick={() => navigate('/quizzes')}>
                                 Zurück zur Quiz-Liste
                             </Button>
@@ -239,7 +239,7 @@ const PlayQuiz = () => {
                         <Typography variant="h5" gutterBottom>
                             {quiz.title}
                         </Typography>
-                        <LinearProgress variant="determinate" value={progress} sx={{ mb: 3 }} />
+                        <LinearProgress variant="determinate" value={progress} sx={{mb: 3}}/>
                         <Typography variant="body1" gutterBottom>
                             Frage {currentQuestionIndex + 1} von {quiz.questions.length}
                         </Typography>
@@ -247,25 +247,25 @@ const PlayQuiz = () => {
                             {question.question}
                         </Typography>
 
-                        <FormControl component="fieldset" sx={{ mt: 2 }}>
+                        <FormControl component="fieldset" sx={{mt: 2}}>
                             {isTextInput ? (
                                 <TextField
                                     fullWidth
                                     label="Deine Antwort"
-                                    value={answers[currentQuestionIndex] || ''}
-                                    onChange={e => updateAnswer(currentQuestionIndex, e.target.value)}
+                                    value={answers[Q.id] || ''}
+                                    onChange={e => updateAnswer(Q.id, e.target.value)}
                                     autoFocus
                                 />
                             ) : (
                                 <RadioGroup
-                                    value={answers[currentQuestionIndex] || ''}
-                                    onChange={e => updateAnswer(currentQuestionIndex, e.target.value)}
+                                    value={answers[Q.id] || ''}
+                                    onChange={e => updateAnswer(Q.id, e.target.value)}
                                 >
                                     {question.answers.map((ans, idx) => (
                                         <CustomFormControlLabel
                                             key={idx}
                                             value={ans}
-                                            control={<Radio />}
+                                            control={<Radio/>}
                                             label={ans}
                                         />
                                     ))}
@@ -273,7 +273,7 @@ const PlayQuiz = () => {
                             )}
                         </FormControl>
 
-                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+                        <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
                             <Button
                                 variant="outlined"
                                 color="secondary"
@@ -292,15 +292,15 @@ const PlayQuiz = () => {
                             </Button>
                         </Box>
 
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
                             <Button variant="outlined" color="error" onClick={handleCancel}>
                                 Abbrechen
                             </Button>
                         </Box>
 
                         {isDailyQuiz && (
-                            <Box sx={{ mt: 3 }}>
-                                <Alert severity="warning" sx={{ mb: 3 }}>
+                            <Box sx={{mt: 3}}>
+                                <Alert severity="warning" sx={{mb: 3}}>
                                     Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
                                 </Alert>
                             </Box>

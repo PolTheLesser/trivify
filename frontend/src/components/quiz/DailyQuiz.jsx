@@ -73,9 +73,9 @@ const DailyQuiz = () => {
         fetchDailyQuiz();
     }, []);
 
-    const updateAnswer = (idx, val) => {
+    const updateAnswer = (questionId, answer) => {
         setAnswers(prev => {
-            const next = { ...prev, [idx]: val };
+            const next = {...prev, [questionId]: answer};
             localStorage.setItem(storageKey, JSON.stringify(next));
             return next;
         });
@@ -211,8 +211,8 @@ const DailyQuiz = () => {
 
                         <FormControl component="fieldset" sx={{ mt: 2 }}>
                             <RadioGroup
-                                value={answers[currentQuestionIndex] || ''}
-                                onChange={e => updateAnswer(currentQuestionIndex, e.target.value)}
+                                value={answers[Q.id] || ''}
+                                onChange={e => updateAnswer(Q.id, e.target.value)}
                             >
                                 {currentQuestion.answers.map((answer, idx) => (
                                     <CustomFormControlLabel
