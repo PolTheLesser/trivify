@@ -78,9 +78,14 @@ const Navbar = () => {
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchTerm.trim();
-            navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
+            if (location.pathname !== '/quizzes') {
+                navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
+            } else {
+                setSearchParams(q ? { query: q } : {});
+            }
         }
     };
+
 
     // Dark Mode toggle
     const handleToggle = () => {
