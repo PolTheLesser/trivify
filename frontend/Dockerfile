@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Upgrade npm before installing dependencies
-RUN npm install -g npm@11.4.1
+RUN npm install -g npm@11.4.2
 
 # Install dependencies
 RUN npm install
