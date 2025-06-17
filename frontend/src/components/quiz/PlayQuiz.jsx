@@ -1,4 +1,3 @@
-// src/components/quiz/PlayQuiz.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -88,7 +87,9 @@ const PlayQuiz = () => {
         localStorage.setItem(`${storageKey}-currentQuestionIndex`, idx);
     };
 
-    const handleNext = () => updateCurrentQuestionIndex(currentQuestionIndex + 1);
+    const handleNext = () => {
+        updateCurrentQuestionIndex(currentQuestionIndex + 1);
+    };
 
     const handleFinish = async () => {
         try {
@@ -131,21 +132,27 @@ const PlayQuiz = () => {
         }
     };
 
-    if (loading) return (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-            <CircularProgress />
-        </Box>
-    );
-    if (error) return (
-        <Container>
-            <Alert severity="error">{error}</Alert>
-        </Container>
-    );
-    if (!quiz) return (
-        <Container>
-            <Alert severity="error">Quiz nicht gefunden</Alert>
-        </Container>
-    );
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                <CircularProgress />
+            </Box>
+        );
+    }
+    if (error) {
+        return (
+            <Container>
+                <Alert severity="error">{error}</Alert>
+            </Container>
+        );
+    }
+    if (!quiz) {
+        return (
+            <Container>
+                <Alert severity="error">Quiz nicht gefunden</Alert>
+            </Container>
+        );
+    }
 
     const question = quiz.questions[currentQuestionIndex];
     const isLast = currentQuestionIndex === quiz.questions.length - 1;
@@ -163,14 +170,15 @@ const PlayQuiz = () => {
                     <>
                         <Typography variant="h4" gutterBottom>Quiz beendet!</Typography>
                         <Typography variant="h5" gutterBottom>
-                            Dein Ergebnis: {score} von {quiz.questions.length} {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
+                            Dein Ergebnis: {score} von {quiz.questions.length}{' '}
+                            {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
                         </Typography>
                         <Typography variant="body1" gutterBottom>
                             Prozent: {((score / quiz.questions.length) * 100).toFixed(1)}%
                         </Typography>
                         {wrongAnswers.length > 0 && (
                             <Box sx={{ mt: 3 }}>
-                                <Typography variant="h6" gutterBottom>Falsche Antworten:</Typography>
+                                <Typography variant="h6">Falsche Antworten:</Typography>
                                 {wrongAnswers.map((wrong, idx) => (
                                     <Box key={idx} sx={{ mb: 2 }}>
                                         <Typography variant="body1"><strong>Frage:</strong> {wrong.question}</Typography>
@@ -222,19 +230,32 @@ const PlayQuiz = () => {
                                 </RadioGroup>
                             )}
                         </FormControl>
+
                         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
-                            <Button variant="outlined" onClick={() => updateCurrentQuestionIndex(currentQuestionIndex - 1)} disabled={currentQuestionIndex === 0}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => updateCurrentQuestionIndex(currentQuestionIndex - 1)}
+                                disabled={currentQuestionIndex === 0}
+                            >
                                 Zurück
                             </Button>
-                            <Button variant="contained" on Click={isLast ? handleFinish : handleNext} disabled={!answers[question.id]}>
+                            <Button
+                                variant="contained"
+                                onClick={isLast ? handleFinish : handleNext}
+                                disabled={!answers[question.id]}
+                            >
                                 {isLast ? 'Beenden' : 'Weiter'}
                             </Button>
                         </Box>
+
                         <Box sx={{ mt: 2, textAlign: 'center' }}>
                             <Button variant="outlined" color="error" onClick={handleCancel}>Abbrechen</Button>
                         </Box>
+
                         {isDailyQuiz && (
-                            <Alert severity="warning" sx={{ mt: 3 }}>Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.</Alert>
+                            <Alert severity="warning" sx={{ mt: 3 }}>
+                                Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                            </Alert>
                         )}
                     </>
                 )}
