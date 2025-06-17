@@ -347,7 +347,6 @@ public class QuizService {
         QuizResultDTO result = new QuizResultDTO();
         result.setCorrect(isCorrect);
         result.setUserAnswer(userAnswer);
-        result.setCorrectAnswer(question.getCorrectAnswer());
         result.setQuestion(question.getQuestion());
         result.setAnswers(question.getAnswers());
 
