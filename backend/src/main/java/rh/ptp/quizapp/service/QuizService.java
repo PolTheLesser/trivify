@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -129,7 +130,7 @@ public class QuizService {
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
         List<QuizCategory> newCategories = quizDTO.getCategories();
-        if (quiz.getCategories().contains(QuizCategory.DAILY_QUIZ)){
+        if (quiz.getCategories().contains(QuizCategory.DAILY_QUIZ)) {
             newCategories.add(QuizCategory.DAILY_QUIZ);
         }
         quiz.setCategories(newCategories);
@@ -312,7 +313,7 @@ public class QuizService {
     public QuizQuestion findQuestionById(Long questionId) {
         log.debug("Suche Frage mit ID: {}", questionId);
         return quizQuestionRepository.findById(questionId)
-               .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
+                .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
     }
 
     /**
@@ -529,9 +530,57 @@ public class QuizService {
         boolean bypassEdit = userRepository.findById(userId)
                 .map(u -> u.getRole() == UserRole.ROLE_ADMIN)
                 .orElse(false);
-        if(quiz.getCreator().getId()==1L) {
+        if (quiz.getCreator().getId() == 1L) {
             bypassEdit = false;
         }
         return bypassEdit;
+    }
+
+    /**
+     * Bewertet ein Quiz basierend auf den Antworten des Benutzers.
+     *
+     * @param quizId  ID des Quizzes.
+     * @param answers Map von Frage-ID zu Benutzerantwort.
+     * @param userId  ID des Benutzers, der das Quiz spielt.
+     * @return Ein DTO mit dem Ergebnis der Bewertung.
+     */
+    @Transactional
+    public QuizFeedbackDTO evaluateQuiz(Long quizId, Map<Long, String> answers, Long userId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
+
+        int correctCount = 0;
+        List<WrongAnswerDTO> wrongs = new ArrayList<>();
+
+        for (QuizQuestion q : quiz.getQuestions()) {
+            String userAnswer = answers.get(q.getId());
+            if (userAnswer == null) continue;
+
+            boolean correct = checkAnswer(userAnswer, q.getCorrectAnswer());
+            if (correct) {
+                correctCount++;
+            } else {
+                wrongs.add(new WrongAnswerDTO(
+                        q.getQuestion(),
+                        userAnswer,
+                        q.getCorrectAnswer()
+                ));
+            }
+        }
+
+        // Persistieren des Ergebnisses, falls gewünscht
+        QuizResult result = new QuizResult();
+        result.setQuiz(quiz);
+        result.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
+        result.setScore(correctCount);
+        result.setMaxPossibleScore(quiz.getQuestions().size());
+        result.setPlayedAt(LocalDateTime.now());
+        quizResultRepository.save(result);
+
+        QuizFeedbackDTO dto = new QuizFeedbackDTO();
+        dto.setScore(correctCount);
+        dto.setMaxScore(quiz.getQuestions().size());
+        dto.setWrongAnswers(wrongs);
+        return dto;
     }
 }

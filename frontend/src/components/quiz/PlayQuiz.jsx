@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+// src/components/PlayQuiz.jsx
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -16,8 +17,8 @@ import {
     Typography
 } from '@mui/material';
 import axios from '../../api/api';
-import {useAuth} from '../../contexts/AuthContext';
-import {CustomFormControlLabel} from '../../CustomElements'
+import { useAuth } from '../../contexts/AuthContext';
+import { CustomFormControlLabel } from '../../CustomElements';
 
 /**
  * PlayQuiz-Komponente
@@ -39,150 +40,34 @@ import {CustomFormControlLabel} from '../../CustomElements'
  * - Fehlerbehandlung und Ladezustände während der API-Kommunikation
  */
 const PlayQuiz = () => {
-    const {id} = useParams();
-    const {user} = useAuth();
-    const [showResults, setShowResults] = useState(false);
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [quiz, setQuiz] = useState(null);
+    const { user, logout } = useAuth();
+
     const storageKey = `quiz-${id}-answers`;
     const savedIndex = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() => {
-        return savedIndex !== null ? Number(savedIndex) : 0;
-    });
+
+    const [quiz, setQuiz] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [answers, setAnswers] = useState(() => {
         const saved = localStorage.getItem(storageKey);
         return saved ? JSON.parse(saved) : {};
     });
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(
+        savedIndex !== null ? Number(savedIndex) : 0
+    );
+    const [showResults, setShowResults] = useState(false);
     const [score, setScore] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [wrongAnswers, setWrongAnswers] = useState([]);
     const [stars, setStars] = useState(0);
     const [submitting, setSubmitting] = useState(false);
-    const userId = user?.id;
-    const quizId = quiz?.id;
-    const maxPossibleScore = quiz?.questions.length;
-    const isDailyQuiz = quiz?.categories.includes("DAILY_QUIZ") || false;
-
-    const handleAnswerSelect = (e) => {
-        updateAnswer(currentQuestionIndex, e.target.value);
-    };
-
-    const handleTextChange = (e) => {
-        updateAnswer(currentQuestionIndex, e.target.value);
-    };
-
-    const recalculateScore = async (answersObject) => {
-        let correctCount = 0;
-        const updatedWrongAnswers = [];
-
-        for (let i = 0; i < quiz.questions.length; i++) {
-            const question = quiz.questions[i];
-            const userAnswer = answersObject[i];
-            if (!userAnswer) continue;
-
-            try {
-                const res = await axios.post(
-                    `/${quiz.id}/submit`,
-                    {questionId: question.id, answer: userAnswer}
-                );
-
-                if (res.data.correct) {
-                    correctCount += 1;
-                } else {
-                    updatedWrongAnswers.push({
-                        question: question.question,
-                        selectedAnswer: userAnswer,
-                        correctAnswer: res.data.correctAnswer || question.correctAnswer || 'N/V'
-                    });
-                }
-            } catch (err) {
-                console.error('Fehler bei Re-Scoring:', err);
-            }
-        }
-
-        setScore(correctCount);
-        setWrongAnswers(updatedWrongAnswers);
-        return correctCount;
-    };
-
-    const handleNext = async () => {
-        const selectedAnswer = answers[currentQuestionIndex];
-        if (!selectedAnswer) return;
-
-        const updatedAnswers = {...answers};
-        const question = quiz.questions[currentQuestionIndex];
-
-        try {
-            await axios.post(
-                `/${quiz.id}/submit`,
-                {questionId: question.id, answer: selectedAnswer}
-            );
-
-            // Neu berechnen, auch für korrigierte Antworten
-            const newScore = await recalculateScore(updatedAnswers);
-
-            if (currentQuestionIndex === quiz.questions.length - 1) {
-                setShowResults(true);
-
-                if (user) {
-                    try {
-                        await axios.post('/quiz-results', {
-                            userId,
-                            quizId,
-                            score: newScore,
-                            maxPossibleScore
-                        });
-                        console.log('Score gespeichert:', newScore);
-                    } catch (error) {
-                        console.error('Fehler beim Speichern des Scores:', error);
-                    }
-                }
-
-                localStorage.removeItem(storageKey);
-                localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
-            } else {
-                updateCurrentQuestionIndex(prev => prev + 1);
-            }
-
-        } catch (err) {
-            setError('Fehler beim Einreichen der Antwort');
-        }
-    };
-
-    const handlePrevious = () => {
-        if (currentQuestionIndex > 0) {
-            updateCurrentQuestionIndex(prev => prev - 1);
-        }
-    };
-
-    const handleCancel = () => {
-        localStorage.removeItem(storageKey);
-        localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
-        navigate('/quizzes');
-    }
-
-    const updateAnswer = (questionIndex, answer) => {
-        setAnswers(prev => {
-            const updated = {...prev, [questionIndex]: answer};
-            localStorage.setItem(storageKey, JSON.stringify(updated));
-            return updated;
-        });
-    };
-
-    const updateCurrentQuestionIndex = (updater) => {
-        setCurrentQuestionIndex(prevIndex => {
-            const newIndex = typeof updater === 'function' ? updater(prevIndex) : updater;
-            localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIndex);
-            return newIndex;
-        });
-    };
 
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
-                const response = await axios.get(`/${id}`);
-                setQuiz(response.data);
+                const res = await axios.get(`/${id}`);
+                setQuiz(res.data);
             } catch (err) {
                 setError(err.response?.data?.message || 'Quiz konnte nicht geladen werden');
             } finally {
@@ -192,11 +77,71 @@ const PlayQuiz = () => {
         fetchQuiz();
     }, [id]);
 
+    const updateAnswer = (idx, val) => {
+        setAnswers(prev => {
+            const next = { ...prev, [idx]: val };
+            localStorage.setItem(storageKey, JSON.stringify(next));
+            return next;
+        });
+    };
+
+    const updateCurrentQuestionIndex = newIdx => {
+        setCurrentQuestionIndex(newIdx);
+        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIdx);
+    };
+
+    const handleNext = () => {
+        updateCurrentQuestionIndex(currentQuestionIndex + 1);
+    };
+
+    const handleFinish = async () => {
+        try {
+            const res = await axios.post(
+                `/${quiz.id}/submit-all`,
+                { quizId: quiz.id, answers }
+            );
+            setScore(res.data.score);
+            setWrongAnswers(res.data.wrongAnswers);
+            setShowResults(true);
+
+            if (user) {
+                await axios.post('/quiz-results', {
+                    userId: user.id,
+                    quizId: quiz.id,
+                    score: res.data.score,
+                    maxPossibleScore: res.data.maxScore
+                });
+            }
+
+            localStorage.removeItem(storageKey);
+            localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
+        } catch {
+            setError('Fehler beim Absenden des Quiz');
+        }
+    };
+
+    const handleCancel = () => {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(`${storageKey}-currentQuestionIndex`);
+        navigate('/quizzes');
+    };
+
+    const submitRating = async () => {
+        if (stars < 1) return;
+        setSubmitting(true);
+        try {
+            await axios.post(`/quizzes/${quiz.id}/rate`, { rating: stars });
+            navigate('/quizzes', { state: { justRated: true } });
+        } catch {
+            setError('Fehler beim Absenden der Bewertung');
+            setSubmitting(false);
+        }
+    };
 
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                <CircularProgress/>
+                <CircularProgress />
             </Box>
         );
     }
@@ -216,178 +161,154 @@ const PlayQuiz = () => {
             </Container>
         );
     }
-    // Rating ans Backend senden
-    const submitRating = async () => {
-        if (stars < 1) return;
-        setSubmitting(true);
-        try {
-            await axios.post(`/quizzes/${quiz.id}/rate`, {rating: stars});
-            // Optional: nach dem Raten zurück zur Liste
-            navigate('/quizzes', {state: {justRated: true}});
-        } catch (err) {
-            setError(err.response?.data?.message || 'Fehler beim Absenden der Bewertung');
-            setSubmitting(false);
-        }
-    };
-
-    if (showResults) {
-        return (
-            <Container maxWidth="sm">
-                <Paper elevation={3} sx={{p: 4, mt: 4}}>
-                    <Typography variant="h4" gutterBottom>
-                        Quiz beendet!
-                    </Typography>
-                    <Typography variant="h5" gutterBottom>
-                        Dein
-                        Ergebnis: {score} von {quiz.questions.length} {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Prozent: {((score / quiz.questions.length) * 100).toFixed(1)}%
-                    </Typography>
-                    {wrongAnswers.length > 0 && (
-                        <Box sx={{mt: 3}}>
-                            <Typography variant="h6" gutterBottom>
-                                Falsche Antworten:
-                            </Typography>
-                            {wrongAnswers.map((wrongAnswer, index) => (
-                                <Box key={index} sx={{mb: 2}}>
-                                    <Typography variant="body1">
-                                        <strong>Frage:</strong> {wrongAnswer.question}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                        <strong>Deine Antwort:</strong> {wrongAnswer.selectedAnswer}
-                                    </Typography>
-                                    <Typography variant="body1">
-                                        <strong>Korrekte Antwort:</strong> {wrongAnswer.correctAnswer}
-                                    </Typography>
-                                </Box>
-                            ))}
-                        </Box>
-                    )}
-                    {user && quiz.creator?.id !== user.id ? (
-                        <Box sx={{mt: 4}}>
-                            <Typography variant="h6">Bewerte dieses Quiz:</Typography>
-                            <Rating
-                                name="after-quiz-rating"
-                                value={stars}
-                                onChange={(_, val) => setStars(val)}
-                            />
-                            <br/>
-                            <Box sx={{mt: 4, display: 'flex', gap: 2}}>
-                                <Button
-                                    variant="contained"
-                                    onClick={submitRating}
-                                    disabled={stars < 1 || submitting}
-                                >
-                                    Absenden
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => navigate("/quizzes")}
-                                >
-                                    Zurück zur Quiz-Liste
-                                </Button>
-                            </Box>
-                        </Box>
-                    ) : (
-                        <Box sx={{mt: 4}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => navigate("/quizzes")}
-                            >
-                                Zurück zur Quiz-Liste
-                            </Button>
-                        </Box>
-                    )}
-                </Paper>
-            </Container>
-        );
-    }
 
     const question = quiz.questions[currentQuestionIndex];
-    // Debug: welche Daten kommen an?
-    console.log('Aktuelle Frage:', question);
-    console.log('question.type:', question.type);
-
-    // Entscheide, ob wir Text-Input oder Radio-Buttons zeigen
+    const isLast = currentQuestionIndex === quiz.questions.length - 1;
+    const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
     const isTextInput =
         question.type === 'TEXT_INPUT' ||
-        question.type === 'TEXT' ||           // falls dein Backend "TEXT" liefert
+        question.type === 'TEXT' ||
         (Array.isArray(question.answers) && question.answers.length === 0);
-
-    const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
+    const isDailyQuiz = quiz.categories.includes('DAILY_QUIZ');
 
     return (
         <Container maxWidth="md">
-            <Paper elevation={3} sx={{p: 4, mt: 4}}>
-                <Typography variant="h5" gutterBottom>
-                    {quiz.title}
-                </Typography>
-                <LinearProgress variant="determinate" value={progress} sx={{mb: 3}}/>
-                <Typography variant="body1" gutterBottom>
-                    Frage {currentQuestionIndex + 1} von {quiz.questions.length}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    {question.question}
-                </Typography>
-
-                <FormControl component="fieldset" sx={{mt: 2}}>
-                    {isTextInput ? (
-                        <TextField
-                            fullWidth
-                            label="Deine Antwort"
-                            value={answers[currentQuestionIndex] || ''}
-                            onChange={handleTextChange}
-                            autoFocus
-                        />
-                    ) : (
-                        <RadioGroup value={answers[currentQuestionIndex] || ''} onChange={handleAnswerSelect}>
-                            {question.answers.map((answer, idx) => (
-                                <CustomFormControlLabel
-                                    key={idx}
-                                    value={answer}
-                                    control={<Radio/>}
-                                    label={answer}
-                                />
-                            ))}
-                        </RadioGroup>
-                    )}
-                </FormControl>
-
-                <Box sx={{mt: 3, display: "flex", justifyContent: "space-between"}}>
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={handlePrevious}
-                        disabled={currentQuestionIndex === 0}
-                    >
-                        Zurück
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        disabled={!answers[currentQuestionIndex]}
-                    >
-                        {currentQuestionIndex === quiz.questions.length - 1 ? "Beenden" : "Weiter"}
-                    </Button>
-                </Box>
-                <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
-                    <Button variant="outlined" color="error" onClick={handleCancel}>
-                        Abbrechen
-                    </Button>
-                </Box>
-                {isDailyQuiz && (
+            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+                {showResults ? (
                     <>
-                        <br/>
-                        <Alert severity="warning" sx={{mb: 3}}>
-                            Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
-                        </Alert>
-                        <br/>
+                        <Typography variant="h4" gutterBottom>
+                            Quiz beendet!
+                        </Typography>
+                        <Typography variant="h5" gutterBottom>
+                            Dein Ergebnis: {score} von {quiz.questions.length}{' '}
+                            {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
+                        </Typography>
+                        <Typography variant="body1" gutterBottom>
+                            Prozent: {((score / quiz.questions.length) * 100).toFixed(1)}%
+                        </Typography>
+
+                        {wrongAnswers.length > 0 && (
+                            <Box sx={{ mt: 3 }}>
+                                <Typography variant="h6" gutterBottom>
+                                    Falsche Antworten:
+                                </Typography>
+                                {wrongAnswers.map((wrong, idx) => (
+                                    <Box key={idx} sx={{ mb: 2 }}>
+                                        <Typography variant="body1">
+                                            <strong>Frage:</strong> {wrong.question}
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            <strong>Deine Antwort:</strong> {wrong.userAnswer}
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            <strong>Korrekte Antwort:</strong> {wrong.correctAnswer}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
+
+                        {!isDailyQuiz && user && quiz.creator?.id !== user.id && (
+                            <Box sx={{ mt: 4 }}>
+                                <Typography variant="h6">Bewerte dieses Quiz:</Typography>
+                                <Rating
+                                    name="after-quiz-rating"
+                                    value={stars}
+                                    onChange={(_, val) => setStars(val)}
+                                />
+                                <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={submitRating}
+                                        disabled={stars < 1 || submitting}
+                                    >
+                                        Absenden
+                                    </Button>
+                                    <Button onClick={() => navigate('/quizzes')}>Zurück zur Quiz-Liste</Button>
+                                </Box>
+                            </Box>
+                        )}
+
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Button variant="contained" onClick={() => navigate('/quizzes')}>
+                                Zurück zur Quiz-Liste
+                            </Button>
+                        </Box>
                     </>
-                )} </Paper>
+                ) : (
+                    <>
+                        <Typography variant="h5" gutterBottom>
+                            {quiz.title}
+                        </Typography>
+                        <LinearProgress variant="determinate" value={progress} sx={{ mb: 3 }} />
+                        <Typography variant="body1" gutterBottom>
+                            Frage {currentQuestionIndex + 1} von {quiz.questions.length}
+                        </Typography>
+                        <Typography variant="h6" gutterBottom>
+                            {question.question}
+                        </Typography>
+
+                        <FormControl component="fieldset" sx={{ mt: 2 }}>
+                            {isTextInput ? (
+                                <TextField
+                                    fullWidth
+                                    label="Deine Antwort"
+                                    value={answers[currentQuestionIndex] || ''}
+                                    onChange={e => updateAnswer(currentQuestionIndex, e.target.value)}
+                                    autoFocus
+                                />
+                            ) : (
+                                <RadioGroup
+                                    value={answers[currentQuestionIndex] || ''}
+                                    onChange={e => updateAnswer(currentQuestionIndex, e.target.value)}
+                                >
+                                    {question.answers.map((ans, idx) => (
+                                        <CustomFormControlLabel
+                                            key={idx}
+                                            value={ans}
+                                            control={<Radio />}
+                                            label={ans}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            )}
+                        </FormControl>
+
+                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => updateCurrentQuestionIndex(currentQuestionIndex - 1)}
+                                disabled={currentQuestionIndex === 0}
+                            >
+                                Zurück
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={isLast ? handleFinish : handleNext}
+                                disabled={!answers[currentQuestionIndex]}
+                            >
+                                {isLast ? 'Beenden' : 'Weiter'}
+                            </Button>
+                        </Box>
+
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                            <Button variant="outlined" color="error" onClick={handleCancel}>
+                                Abbrechen
+                            </Button>
+                        </Box>
+
+                        {isDailyQuiz && (
+                            <Box sx={{ mt: 3 }}>
+                                <Alert severity="warning" sx={{ mb: 3 }}>
+                                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
+                                </Alert>
+                            </Box>
+                        )}
+                    </>
+                )}
+            </Paper>
         </Container>
     );
 };

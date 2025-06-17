@@ -204,26 +204,27 @@ public class QuizController {
     }
 
     /**
-     * Übermittelt eine Antwort auf eine Quizfrage und überprüft diese.
+     * Übermittelt alle Antworten eines Quizzes und bewertet diese.
      *
-     * @param quizId    Die ID des Quizzes.
-     * @param answerDto Die gegebene Antwort.
-     * @return Das Ergebnis als {@link QuizResultDTO}.
+     * @param quizId       Die ID des Quizzes.
+     * @param submission   Die Antworten des Benutzers.
+     * @param userDetails  Die Authentifizierungsdaten des Benutzers.
+     * @return Das Feedback zum Quiz als {@link QuizFeedbackDTO}.
      */
-    @PostMapping("/{quizId}/submit")
-public ResponseEntity<?> submitAnswer(@PathVariable Long quizId,
-                                      @RequestBody AnswerDTO answerDto) {
-    try {
-        QuizResultDTO result = quizService.checkAnswer(answerDto.getQuestionId(),
-                                                      answerDto.getAnswer());
-        return ResponseEntity.ok(result);
-    } catch (Exception e) {
-        logger.error("Fehler beim Überprüfen der Antwort:", e);
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", e.getMessage()));
+    @PostMapping("/{quizId}/submit-all")
+    public ResponseEntity<QuizFeedbackDTO> submitAll(
+            @PathVariable Long quizId,
+            @RequestBody QuizSubmissionDTO submission,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // optional: nur angemeldete User?
+        Long userId = userDetails != null
+                ? userRepository.findByEmail(userDetails.getUsername()).get().getId()
+                : null;
+
+        QuizFeedbackDTO feedback = quizService.evaluateQuiz(quizId, submission.getAnswers(), userId);
+        return ResponseEntity.ok(feedback);
     }
-}
 
     /**
      * Ermöglicht einem Benutzer, ein Quiz zu bewerten, sofern er nicht der Ersteller ist.
