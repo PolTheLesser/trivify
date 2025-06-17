@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -19,13 +19,14 @@ import {
     Paper,
     Rating,
     Slider,
+    TextField,
     Typography
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import {useAuth} from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import axios from '../../api/api';
-import {CustomSelect, CustomFormControlLabel} from "../../CustomElements";
+import { CustomSelect, CustomFormControlLabel } from '../../CustomElements';
 
 /**
  * QuizList-Komponente
@@ -45,195 +46,109 @@ import {CustomSelect, CustomFormControlLabel} from "../../CustomElements";
  * - UI mit Filterleiste, Quiz-Karten und Lade-/Fehleranzeigen
  */
 const QuizList = () => {
-    const {user} = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Filter-States initialisieren mit URL-Werten, user-only Filter nur wenn user da ist
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
-    const [onlyFavorites, setOnlyFavorites] = useState(() => user ? searchParams.get('onlyFavorites') === 'true' : false);
-    const [onlyUnplayed, setOnlyUnplayed] = useState(() => user ? searchParams.get('onlyUnplayed') === 'true' : false);
-    const [onlyRated, setOnlyRated] = useState(searchParams.get('onlyRated') === 'true');
-    const [minQuestions, setMinQuestions] = useState(Number(searchParams.get('minQuestions')) || 0);
-    const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'desc');
-    const [selectedCategory] = useState(searchParams.get('selectedCategory') || 'all');
-    const [dailyQuizFilter, setDailyQuizFilter] = useState(searchParams.get('dailyQuizFilter') || 'all');
+    // ─── INITIALIZE FILTER STATES ONCE ────────────────────────────────────────
+    const initial = new URLSearchParams(location.search);
+    const [searchQuery,   setSearchQuery]   = useState(initial.get('query')         || '');
+    const [onlyFavorites, setOnlyFavorites] = useState(user ? initial.get('onlyFavorites') === 'true' : false);
+    const [onlyUnplayed,  setOnlyUnplayed]  = useState(user ? initial.get('onlyUnplayed')  === 'true' : false);
+    const [onlyRated,     setOnlyRated]     = useState(initial.get('onlyRated')      === 'true');
+    const [minQuestions,  setMinQuestions]  = useState(Number(initial.get('minQuestions')) || 0);
+    const [sortOrder,     setSortOrder]     = useState(initial.get('sortOrder')     || 'desc');
+    const [selectedCategory, setSelectedCategory] = useState(initial.get('selectedCategory') || 'all');
+    const [dailyQuizFilter,  setDailyQuizFilter]  = useState(initial.get('dailyQuizFilter')  || 'all');
 
-    // Daten States
-    const [quizzes, setQuizzes] = useState([]);
+    // ─── DATA STATES ─────────────────────────────────────────────────────────
+    const [quizzes,         setQuizzes]         = useState([]);
     const [filteredQuizzes, setFilteredQuizzes] = useState([]);
-    const [playedQuizIds, setPlayedQuizIds] = useState(new Set());
-    const [categoryLabels, setCategoryLabels] = useState({});
+    const [playedQuizIds,   setPlayedQuizIds]   = useState(new Set());
+    const [categoryLabels,  setCategoryLabels]  = useState({});
 
-    // UI States
-    const [loading, setLoading] = useState(true);
+    // ─── UI STATES ───────────────────────────────────────────────────────────
+    const [loading,     setLoading]     = useState(true);
     const [loadingTags, setLoadingTags] = useState(true);
-    const [error, setError] = useState('');
+    const [error,       setError]       = useState('');
 
-    // Zufallsquiz-Navigation
-    const handleRandomQuiz = () => {
-        if (!filteredQuizzes.length) return;
-        const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
-        navigate(`/quizzes/${random.id}`);
-    };
-
-    // Filter zurücksetzen
-    const resetFilters = () => {
-        setSearchQuery('');
-        setOnlyFavorites(false);
-        setOnlyRated(false);
-        setMinQuestions(0);
-        setSortOrder('desc');
-    };
-
-    // Wenn sich die URL ändert: searchQuery updaten
+    // ─── FETCH CATEGORY LABELS ───────────────────────────────────────────────
     useEffect(() => {
-        setSearchQuery(searchParams.get('query') || '');
-    }, [searchParams]);
-
-    // Wenn User weg ist: user-only Filter zurücksetzen und aus URL entfernen
-    useEffect(() => {
-        if (!user) {
-            setOnlyFavorites(false);
-            setOnlyUnplayed(false);
-
-            const params = Object.fromEntries([...searchParams]);
-            delete params.onlyFavorites;
-            delete params.onlyUnplayed;
-            setSearchParams(params, {replace: true});
-        }
-    }, [user, searchParams, setSearchParams]);
-
-    // URL synchronisieren mit Filter-States, user-only Filter nur wenn User da ist
-    useEffect(() => {
-        const params = {};
-
-        if (searchQuery) params.query = searchQuery;
-
-        if (user) {
-            if (onlyFavorites) params.onlyFavorites = 'true';
-            if (onlyUnplayed) params.onlyUnplayed = 'true';
-        }
-
-        if (onlyRated) params.onlyRated = 'true';
-        if (minQuestions) params.minQuestions = minQuestions.toString();
-        if (sortOrder !== 'desc') params.sortOrder = sortOrder;
-        if (selectedCategory !== 'all') params.selectedCategory = selectedCategory;
-        if (dailyQuizFilter !== 'all') params.dailyQuizFilter = dailyQuizFilter;
-
-        setSearchParams(params, {replace: true});
-    }, [
-        searchQuery,
-        onlyFavorites,
-        onlyUnplayed,
-        onlyRated,
-        minQuestions,
-        sortOrder,
-        selectedCategory,
-        dailyQuizFilter,
-        user,
-        setSearchParams
-    ]);
-
-    // Kategorien laden
-    useEffect(() => {
-        const fetchCategoryLabels = async () => {
+        (async () => {
             try {
                 const [valsRes, catsRes] = await Promise.all([
-                    axios.get(`/categories/values`),
-                    axios.get(`/categories`)
+                    axios.get('/categories/values'),
+                    axios.get('/categories')
                 ]);
-
-                const values = valsRes.data;
-                const cats = catsRes.data;
-
                 const labels = {};
-                cats.forEach((cat, index) => {
-                    labels[cat] = values[index] || cat;
+                catsRes.data.forEach((cat, i) => {
+                    labels[cat] = valsRes.data[i] || cat;
                 });
-
                 setCategoryLabels(labels);
-            } catch (err) {
-                console.error('Fehler beim Laden der Kategorienamen', err);
+            } catch (e) {
+                console.error('Fehler beim Laden der Kategorienamen', e);
             } finally {
                 setLoadingTags(false);
             }
-        };
-
-        fetchCategoryLabels();
+        })();
     }, []);
 
-    // Gespielte Quizze laden (nur wenn User da)
+    // ─── FETCH PLAYED QUIZZES ─────────────────────────────────────────────────
     useEffect(() => {
         if (!user) return;
         axios
-            .get(`/users/quiz-history`)
+            .get('/users/quiz-history')
             .then(res => setPlayedQuizIds(new Set(res.data.map(h => h.quizId))))
             .catch(() => console.error('Quiz history load error'));
     }, [user]);
 
-    // Quiz-Daten laden (inkl. Favoriten, wenn User da)
+    // ─── FETCH QUIZZES ────────────────────────────────────────────────────────
     useEffect(() => {
-        const fetchQuizzes = async () => {
+        (async () => {
             try {
                 const [quizRes, favRes] = user
-                    ? await Promise.all([
-                        axios.get(`/quizzes`),
-                        axios.get(`/users/favorites`)
-                    ])
-                    : [await axios.get(`/quizzes`), {data: []}];
-
-                const favoriteIds = new Set(favRes.data || []);
+                    ? await Promise.all([axios.get('/quizzes'), axios.get('/users/favorites')])
+                    : [await axios.get('/quizzes'), { data: [] }];
+                const favSet = new Set(favRes.data);
                 const data = quizRes.data.map(q => ({
                     ...q,
-                    isFavorite: favoriteIds.has(q.id),
-                    isDaily: !!q.dailyQuiz
+                    isFavorite: favSet.has(q.id),
+                    isDaily:    q.categories.includes('DAILY_QUIZ')
                 }));
                 setQuizzes(data);
                 setFilteredQuizzes(data);
-            } catch (err) {
-                setError(err.response?.data?.message || 'Fehler beim Laden der Quizze');
+            } catch (e) {
+                setError(e.response?.data?.message || 'Fehler beim Laden der Quizze');
             } finally {
                 setLoading(false);
             }
-        };
-        fetchQuizzes();
+        })();
     }, [user]);
 
-    // Filter anwenden, wenn sich Filter/Quizzes/Kategorien/Spielstatus ändern
+    // ─── CLIENT-SIDE FILTERING ────────────────────────────────────────────────
     useEffect(() => {
         if (loadingTags) return;
         const q = searchQuery.trim().toLowerCase();
-
-        let filtered = quizzes.filter(quiz => {
-            const matchesSearch =
-                quiz.title.toLowerCase().includes(q) ||
-                quiz.description?.toLowerCase().includes(q) ||
-                quiz.categories.some(cat =>
-                    (categoryLabels[cat] || cat).toLowerCase().includes(q)
-                );
-
-            const matchesCategory =
-                selectedCategory === 'all' || quiz.categories.includes(selectedCategory);
-
-            return matchesSearch && matchesCategory;
+        let filtered = quizzes.filter(qz => {
+            const matchText =
+                qz.title.toLowerCase().includes(q) ||
+                qz.description?.toLowerCase().includes(q) ||
+                qz.categories.some(cat => (categoryLabels[cat] || cat).toLowerCase().includes(q));
+            const matchCat = selectedCategory === 'all' || qz.categories.includes(selectedCategory);
+            return matchText && matchCat;
         });
-
-        if (onlyFavorites && user) filtered = filtered.filter(q => q.isFavorite);
-        if (onlyUnplayed && user) filtered = filtered.filter(q => !playedQuizIds.has(q.id));
-        if (onlyRated) filtered = filtered.filter(q => q.ratingCount > 0);
-        filtered = filtered.filter(q => q.questions.length >= minQuestions);
-
-        filtered.sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-
+        if (onlyFavorites && user) filtered = filtered.filter(qz => qz.isFavorite);
+        if (onlyUnplayed && user)  filtered = filtered.filter(qz => !playedQuizIds.has(qz.id));
+        if (onlyRated)              filtered = filtered.filter(qz => qz.ratingCount > 0);
+        filtered = filtered.filter(qz => qz.questions.length >= minQuestions);
         if (dailyQuizFilter === 'exclude') {
-            filtered = filtered.filter(q => !q.categories.includes('DAILY_QUIZ'));
+            filtered = filtered.filter(qz => !qz.categories.includes('DAILY_QUIZ'));
         }
-
+        filtered.sort((a, b) => {
+            const da = new Date(a.createdAt), db = new Date(b.createdAt);
+            return sortOrder === 'asc' ? da - db : db - da;
+        });
         setFilteredQuizzes(filtered);
     }, [
         searchQuery,
@@ -251,171 +166,171 @@ const QuizList = () => {
         user
     ]);
 
-    // Favoriten umschalten
+    // ─── MANUAL URL UPDATE ───────────────────────────────────────────────────
+    const applyFilters = () => {
+        const params = new URLSearchParams();
+        if (searchQuery.trim())         params.set('query', searchQuery.trim());
+        if (user && onlyFavorites)      params.set('onlyFavorites', 'true');
+        if (user && onlyUnplayed)       params.set('onlyUnplayed', 'true');
+        if (onlyRated)                  params.set('onlyRated', 'true');
+        if (minQuestions > 0)           params.set('minQuestions', String(minQuestions));
+        if (sortOrder !== 'desc')       params.set('sortOrder', sortOrder);
+        if (selectedCategory !== 'all') params.set('selectedCategory', selectedCategory);
+        if (dailyQuizFilter !== 'all')  params.set('dailyQuizFilter', dailyQuizFilter);
+        setSearchParams(params, { replace: true });
+    };
+
+    const resetFilters = () => {
+        setSearchQuery('');
+        setOnlyFavorites(false);
+        setOnlyUnplayed(false);
+        setOnlyRated(false);
+        setMinQuestions(0);
+        setSortOrder('desc');
+        setDailyQuizFilter('all');
+        setSelectedCategory('all');
+        setSearchParams(new URLSearchParams(), { replace: true });
+    };
+
+    const handleRandomQuiz = () => {
+        if (!filteredQuizzes.length) return;
+        const random = filteredQuizzes[Math.floor(Math.random() * filteredQuizzes.length)];
+        navigate(`/quizzes/${random.id}`);
+    };
+
     const toggleFavorite = async quizId => {
         try {
-            const res = await axios.post(
-                `/users/quizzes/${quizId}/favorite`
-            );
-            setQuizzes(prev =>
-                prev.map(q => (q.id === quizId ? {...q, isFavorite: res.data.favorited} : q))
-            );
-        } catch (err) {
-            console.error(err);
+            const res = await axios.post(`/users/quizzes/${quizId}/favorite`);
+            setQuizzes(prev => prev.map(qz => qz.id === quizId
+                ? { ...qz, isFavorite: res.data.favorited }
+                : qz
+            ));
+        } catch (e) {
+            console.error(e);
         }
     };
 
     if (loading || loadingTags) {
         return (
-            <Box display='flex' justifyContent='center' alignItems='center' minHeight='60vh'>
-                <CircularProgress/>
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                <CircularProgress />
             </Box>
         );
     }
-
     if (error) {
         return (
-            <Container maxWidth='sm'>
-                <Alert severity='error' sx={{mt: 4}}>{error}</Alert>
+            <Container maxWidth="sm">
+                <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>
             </Container>
         );
     }
 
     return (
-        <Box sx={{width: '100%', maxWidth: '100vw', overflowX: 'hidden'}}>
+        <Box sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
             {/* Filterleiste */}
-            <Paper
-                elevation={2}
-                sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2}}
+            <Paper elevation={2}
+                   sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4, px: 2, py: 3, mx: 2, mt: 2 }}
             >
-                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                    <Box sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2}}>
-                        {user && (
-                            <>
-                                <CustomFormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={onlyFavorites}
-                                            onChange={e => setOnlyFavorites(e.target.checked)}
-                                        />
-                                    }
-                                    label="Nur Favoriten"
-                                />
-                                <CustomFormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={onlyUnplayed}
-                                            onChange={e => setOnlyUnplayed(e.target.checked)}
-                                        />
-                                    }
-                                    label="Noch nie gespielt"
-                                />
-                            </>
-                        )}
-
-                        <CustomFormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={onlyRated}
-                                    onChange={e => setOnlyRated(e.target.checked)}
-                                />
-                            }
-                            label="Nur bewertete"
-                        />
-
-                        <FormControl size="small" sx={{minWidth: 200}}>
-                            <InputLabel>Tägliche Quizze</InputLabel>
-                            <CustomSelect
-                                value={dailyQuizFilter}
-                                label="Tägliche Quizze"
-                                onChange={e => setDailyQuizFilter(e.target.value)}
-                            >
-                                <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
-                                <MenuItem value="all">Alle Quizze</MenuItem>
-                            </CustomSelect>
-                        </FormControl>
-
-                        <Box sx={{width: 150}}>
-                            <Typography gutterBottom>≥ Fragen</Typography>
-                            <Slider
-                                value={minQuestions}
-                                onChange={(e, v) => setMinQuestions(v)}
-                                valueLabelDisplay="auto"
-                                min={0}
-                                max={20}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
+                    <TextField
+                        size="small"
+                        label="Suche"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && applyFilters()}
+                    />
+                    {user && (
+                        <>
+                            <CustomFormControlLabel
+                                control={<Checkbox checked={onlyFavorites}
+                                                   onChange={e => setOnlyFavorites(e.target.checked)} />}
+                                label="Nur Favoriten"
                             />
-                        </Box>
+                            <CustomFormControlLabel
+                                control={<Checkbox checked={onlyUnplayed}
+                                                   onChange={e => setOnlyUnplayed(e.target.checked)} />}
+                                label="Noch nie gespielt"
+                            />
+                        </>
+                    )}
+                    <CustomFormControlLabel
+                        control={<Checkbox checked={onlyRated}
+                                           onChange={e => setOnlyRated(e.target.checked)} />}
+                        label="Nur bewertete"
+                    />
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                        <InputLabel>Tägliche Quizze</InputLabel>
+                        <CustomSelect
+                            value={dailyQuizFilter}
+                            label="Tägliche Quizze"
+                            onChange={e => setDailyQuizFilter(e.target.value)}
+                        >
+                            <MenuItem value="all">Alle Quizze</MenuItem>
+                            <MenuItem value="exclude">Keine täglichen Quizze</MenuItem>
+                        </CustomSelect>
+                    </FormControl>
+                    <Box sx={{ width: 150 }}>
+                        <Typography gutterBottom>≥ Fragen</Typography>
+                        <Slider
+                            value={minQuestions}
+                            onChange={(e, v) => setMinQuestions(v)}
+                            valueLabelDisplay="auto"
+                            min={0} max={20}
+                        />
+                    </Box>
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                        <InputLabel>Sortieren</InputLabel>
+                        <CustomSelect
+                            value={sortOrder}
+                            label="Sortieren"
+                            onChange={e => setSortOrder(e.target.value)}
+                        >
+                            <MenuItem value="desc">Neueste zuerst</MenuItem>
+                            <MenuItem value="asc">Älteste zuerst</MenuItem>
+                        </CustomSelect>
+                    </FormControl>
+                </Box>
 
-                        <FormControl size="small" sx={{minWidth: 150}}>
-                            <InputLabel>Sortieren</InputLabel>
-                            <CustomSelect
-                                value={sortOrder}
-                                label="Sortieren"
-                                onChange={e => setSortOrder(e.target.value)}
-                            >
-                                <MenuItem value="desc">Neueste zuerst</MenuItem>
-                                <MenuItem value="asc">Älteste zuerst</MenuItem>
-                            </CustomSelect>
-                        </FormControl>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button variant="contained" onClick={applyFilters}>Filter anwenden</Button>
+                        <Button variant="outlined" color="error" onClick={resetFilters}>Zurücksetzen</Button>
                     </Box>
-                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
-                            Zufälliges Quiz
-                        </Button>
-                        {/* Roter Zurücksetzen-Button rechts */}
-                        <Button variant="contained" color="error" onClick={resetFilters}>
-                            Filter zurücksetzen
-                        </Button>
-                    </Box>
+                    <Button variant="contained" onClick={handleRandomQuiz} disabled={!filteredQuizzes.length}>
+                        Zufälliges Quiz
+                    </Button>
                 </Box>
             </Paper>
 
-            <Grid container spacing={3} sx={{px: 2, pb: 6}}>
-                {filteredQuizzes.map(q => (
-                    <Grid item xs={12} sm={6} md={4} key={q.id} sx={{display: 'flex'}}>
-                        <Card
-                            sx={{
-                                position: 'relative',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                flexGrow: 1,
-                                height: '100%'
-                            }}
-                        >
-                            <Box sx={{position: 'absolute', top: 2, right: 2}}>
-                                {user && (
-                                    <IconButton
-                                        size="small"
-                                        color="warning"
-                                        onClick={() => toggleFavorite(q.id)}
-                                    >
-                                        {q.isFavorite ? <StarIcon/> : <StarBorderIcon/>}
-                                    </IconButton>
-                                )}
-                            </Box>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom>
-                                    {q.title}
-                                </Typography>
+            {/* Quiz-Karten */}
+            <Grid container spacing={3} sx={{ px: 2, pb: 6 }}>
+                {filteredQuizzes.map(qz => (
+                    <Grid item xs={12} sm={6} md={4} key={qz.id} sx={{ display: 'flex' }}>
+                        <Card sx={{ position: 'relative', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                            {user && (
+                                <IconButton
+                                    size="small"
+                                    color="warning"
+                                    sx={{ position: 'absolute', top: 8, right: 8 }}
+                                    onClick={() => toggleFavorite(qz.id)}
+                                >
+                                    {qz.isFavorite ? <StarIcon /> : <StarBorderIcon />}
+                                </IconButton>
+                            )}
+                            <CardContent sx={{ flexGrow: 1 }}>
+                                <Typography variant="h6" gutterBottom>{qz.title}</Typography>
                                 <Typography variant="body2" color="text.secondary" paragraph>
-                                    {q.description}
+                                    {qz.description}
                                 </Typography>
-                                <Box sx={{display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2}}>
-                                    {q.categories?.map(cat => (
-                                        <Chip
-                                            key={cat}
-                                            label={categoryLabels[cat] || cat}
-                                            size="small"
-                                            color="primary"
-                                        />
+                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                                    {qz.categories.map(cat => (
+                                        <Chip key={cat} label={categoryLabels[cat] || cat} size="small" color="primary" />
                                     ))}
                                 </Box>
-                                {q.ratingCount > 0 ? (
-                                    <Box sx={{display: 'flex', alignItems: 'center', mb: 1}}>
-                                        <Rating value={q.avgRating} precision={0.1} readOnly size="small"/>
-                                        <Typography variant="body2" sx={{ml: 1}}>
-                                            ({q.ratingCount})
-                                        </Typography>
+                                {qz.ratingCount > 0 ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                        <Rating value={qz.avgRating} precision={0.1} readOnly size="small" />
+                                        <Typography variant="body2" sx={{ ml: 1 }}>({qz.ratingCount})</Typography>
                                     </Box>
                                 ) : (
                                     <Typography variant="body2" color="text.secondary" mb={1}>
@@ -423,12 +338,8 @@ const QuizList = () => {
                                     </Typography>
                                 )}
                             </CardContent>
-                            <CardActions sx={{mt: 'auto', justifyContent: 'center', pb: 2}}>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => navigate(`/quizzes/${q.id}`)}
-                                >
+                            <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
+                                <Button variant="contained" color="primary" onClick={() => navigate(`/quizzes/${qz.id}`)}>
                                     Spielen
                                 </Button>
                             </CardActions>

@@ -217,12 +217,15 @@ public class QuizController {
             @RequestBody QuizSubmissionDTO submission,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // optional: nur angemeldete User?
         Long userId = userDetails != null
                 ? userRepository.findByEmail(userDetails.getUsername()).get().getId()
                 : null;
 
-        QuizFeedbackDTO feedback = quizService.evaluateQuiz(quizId, submission.getAnswers(), userId);
+        QuizFeedbackDTO feedback = quizService.evaluateQuiz(
+                quizId,
+                submission.getAnswers(),
+                userId
+        );
         return ResponseEntity.ok(feedback);
     }
 

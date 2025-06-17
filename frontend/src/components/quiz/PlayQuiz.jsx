@@ -96,10 +96,9 @@ const PlayQuiz = () => {
 
     const handleFinish = async () => {
         try {
-            const res = await axios.post(
-                `/${quiz.id}/submit-all`,
-                { quizId: quiz.id, answers }
-            );
+            const res = await axios.post(`/${quiz.id}/submit-all`, {
+                answers
+            });
             setScore(res.data.score);
             setWrongAnswers(res.data.wrongAnswers);
             setShowResults(true);

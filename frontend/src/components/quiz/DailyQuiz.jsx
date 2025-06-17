@@ -92,16 +92,15 @@ const DailyQuiz = () => {
 
     const handleFinish = async () => {
         try {
-            const res = await axios.post(
-                `/${quiz.id}/submit-all`,
-                { quizId: quiz.id, answers }
-            );
+            const res = await axios.post(`/${quiz.id}/submit-all`, {
+                answers
+            });
             setScore(res.data.score);
             setWrongAnswers(res.data.wrongAnswers);
             setShowResults(true);
 
             if (user) {
-                await axios.post('/daily/completion-status', { userId: user.id });
+                await axios.get('/daily/completion-status', { userId: user.id });
                 await axios.post('/quiz-results', {
                     userId: user.id,
                     quizId: quiz.id,

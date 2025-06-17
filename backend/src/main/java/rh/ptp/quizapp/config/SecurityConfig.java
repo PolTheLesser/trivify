@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/quizzes", "/api/quizzes/my-quizzes", "/api/quizzes/daily").permitAll()
                         .requestMatchers("/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/daily/completion-status").permitAll()
                         .requestMatchers("/api/quizzes/{id}").permitAll()
                         .requestMatchers("/api/{id}/submit-all").permitAll()
                         .requestMatchers("/api/quizzes/{id}/submit").permitAll()
