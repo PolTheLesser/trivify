@@ -292,14 +292,15 @@ const QuizList = () => {
                     <Grid item xs={12} sm={6} md={4} key={q.id} sx={{ display: 'flex' }}>
                         <Card sx={{ position: 'relative', display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%' }}>
                             {user && (
-                                <IconButton
-                                    size="small"
-                                    color="warning"
-                                    sx={{ position: 'absolute', top: 8, right: 8 }}
-                                    onClick={() => toggleFavorite(q.id)}
-                                >
-                                    {q.isFavorite ? <StarIcon /> : <StarBorderIcon />}
-                                </IconButton>
+                                <Box sx={{ position: 'absolute', top: 2, right: 2 }}>
+                                    <IconButton
+                                        size="small"
+                                        color="warning"
+                                        onClick={() => toggleFavorite(q.id)}
+                                    >
+                                        {q.isFavorite ? <StarIcon /> : <StarBorderIcon />}
+                                    </IconButton>
+                                </Box>
                             )}
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography variant="h6" gutterBottom>{q.title}</Typography>

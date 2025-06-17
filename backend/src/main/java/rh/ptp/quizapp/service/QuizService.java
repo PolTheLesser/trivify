@@ -123,7 +123,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && !bypassEdit(userId, quiz)) {
+        if (!quiz.getCreator().getId().equals(userId) && !bypassProtection(userId, quiz)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz bearbeiten");
         }
 
@@ -166,7 +166,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && !bypassEdit(userId, quiz)) {
+        if (!quiz.getCreator().getId().equals(userId) && !bypassProtection(userId, quiz)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
@@ -526,11 +526,11 @@ public class QuizService {
      * @param userId ID des Benutzers.
      * @return true, wenn der Benutzer ein Administrator ist, sonst false, wenn der Ersteller des Quizzes nicht der Admin ist.
      */
-    private boolean bypassEdit(Long userId, Quiz quiz) {
+    private boolean bypassProtection(Long userId, Quiz quiz) {
         boolean bypassEdit = userRepository.findById(userId)
                 .map(u -> u.getRole() == UserRole.ROLE_ADMIN)
                 .orElse(false);
-        if (quiz.getCreator().getId() == 1L) {
+        if (quiz.getCreator().getId() == 1L && userId != 1L) {
             bypassEdit = false;
         }
         return bypassEdit;
