@@ -65,7 +65,7 @@ public class AdminService {
     public User updateUser(Long id, User userUpdated) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         Map<String, Object> variables = adminEmail(user, userUpdated, 1);
-        if(userUpdated.getId() != 1L) throw new RuntimeException("Der Admin-Benutzer kann nicht aktualisiert werden.");
+        if(userUpdated.getId() == 1L) throw new RuntimeException("Der Admin-Benutzer kann nicht aktualisiert werden.");
 
         if (userUpdated.getName() != null) {
             user.setName(userUpdated.getName());
