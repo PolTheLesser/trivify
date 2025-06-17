@@ -1,6 +1,6 @@
-// src/components/PlayQuiz.jsx
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+// src/components/quiz/PlayQuiz.jsx
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -17,8 +17,8 @@ import {
     Typography
 } from '@mui/material';
 import axios from '../../api/api';
-import {useAuth} from '../../contexts/AuthContext';
-import {CustomFormControlLabel} from '../../CustomElements';
+import { useAuth } from '../../contexts/AuthContext';
+import { CustomFormControlLabel } from '../../CustomElements';
 
 /**
  * PlayQuiz-Komponente
@@ -40,12 +40,11 @@ import {CustomFormControlLabel} from '../../CustomElements';
  * - Fehlerbehandlung und Ladezustände während der API-Kommunikation
  */
 const PlayQuiz = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
-    const {user, logout} = useAuth();
-
+    const { user, logout } = useAuth();
     const storageKey = `quiz-${id}-answers`;
-    const savedIndex = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
+    const savedIdx = localStorage.getItem(`${storageKey}-currentQuestionIndex`);
 
     const [quiz, setQuiz] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -55,7 +54,7 @@ const PlayQuiz = () => {
         return saved ? JSON.parse(saved) : {};
     });
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(
-        savedIndex !== null ? Number(savedIndex) : 0
+        savedIdx !== null ? Number(savedIdx) : 0
     );
     const [showResults, setShowResults] = useState(false);
     const [score, setScore] = useState(0);
@@ -64,7 +63,7 @@ const PlayQuiz = () => {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        const fetchQuiz = async () => {
+        (async () => {
             try {
                 const res = await axios.get(`/${id}`);
                 setQuiz(res.data);
@@ -73,32 +72,27 @@ const PlayQuiz = () => {
             } finally {
                 setLoading(false);
             }
-        };
-        fetchQuiz();
+        })();
     }, [id]);
 
     const updateAnswer = (questionId, answer) => {
         setAnswers(prev => {
-            const next = {...prev, [questionId]: answer};
+            const next = { ...prev, [questionId]: answer };
             localStorage.setItem(storageKey, JSON.stringify(next));
             return next;
         });
     };
 
-    const updateCurrentQuestionIndex = newIdx => {
-        setCurrentQuestionIndex(newIdx);
-        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIdx);
+    const updateCurrentQuestionIndex = idx => {
+        setCurrentQuestionIndex(idx);
+        localStorage.setItem(`${storageKey}-currentQuestionIndex`, idx);
     };
 
-    const handleNext = () => {
-        updateCurrentQuestionIndex(currentQuestionIndex + 1);
-    };
+    const handleNext = () => updateCurrentQuestionIndex(currentQuestionIndex + 1);
 
     const handleFinish = async () => {
         try {
-            const res = await axios.post(`/${quiz.id}/submit-all`, {
-                answers
-            });
+            const res = await axios.post(`/${quiz.id}/submit-all`, { answers });
             setScore(res.data.score);
             setWrongAnswers(res.data.wrongAnswers);
             setShowResults(true);
@@ -129,37 +123,29 @@ const PlayQuiz = () => {
         if (stars < 1) return;
         setSubmitting(true);
         try {
-            await axios.post(`/quizzes/${quiz.id}/rate`, {rating: stars});
-            navigate('/quizzes', {state: {justRated: true}});
+            await axios.post(`/quizzes/${quiz.id}/rate`, { rating: stars });
+            navigate('/quizzes', { state: { justRated: true } });
         } catch {
             setError('Fehler beim Absenden der Bewertung');
             setSubmitting(false);
         }
     };
 
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                <CircularProgress/>
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Container>
-                <Alert severity="error">{error}</Alert>
-            </Container>
-        );
-    }
-
-    if (!quiz) {
-        return (
-            <Container>
-                <Alert severity="error">Quiz nicht gefunden</Alert>
-            </Container>
-        );
-    }
+    if (loading) return (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+            <CircularProgress />
+        </Box>
+    );
+    if (error) return (
+        <Container>
+            <Alert severity="error">{error}</Alert>
+        </Container>
+    );
+    if (!quiz) return (
+        <Container>
+            <Alert severity="error">Quiz nicht gefunden</Alert>
+        </Container>
+    );
 
     const question = quiz.questions[currentQuestionIndex];
     const isLast = currentQuestionIndex === quiz.questions.length - 1;
@@ -172,138 +158,83 @@ const PlayQuiz = () => {
 
     return (
         <Container maxWidth="md">
-            <Paper elevation={3} sx={{p: 4, mt: 4}}>
+            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
                 {showResults ? (
                     <>
-                        <Typography variant="h4" gutterBottom>
-                            Quiz beendet!
-                        </Typography>
+                        <Typography variant="h4" gutterBottom>Quiz beendet!</Typography>
                         <Typography variant="h5" gutterBottom>
-                            Dein Ergebnis: {score} von {quiz.questions.length}{' '}
-                            {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
+                            Dein Ergebnis: {score} von {quiz.questions.length} {quiz.questions.length === 1 ? 'Punkt' : 'Punkten'}
                         </Typography>
                         <Typography variant="body1" gutterBottom>
                             Prozent: {((score / quiz.questions.length) * 100).toFixed(1)}%
                         </Typography>
-
                         {wrongAnswers.length > 0 && (
-                            <Box sx={{mt: 3}}>
-                                <Typography variant="h6" gutterBottom>
-                                    Falsche Antworten:
-                                </Typography>
+                            <Box sx={{ mt: 3 }}>
+                                <Typography variant="h6" gutterBottom>Falsche Antworten:</Typography>
                                 {wrongAnswers.map((wrong, idx) => (
-                                    <Box key={idx} sx={{mb: 2}}>
-                                        <Typography variant="body1">
-                                            <strong>Frage:</strong> {wrong.question}
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <strong>Deine Antwort:</strong> {wrong.userAnswer}
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <strong>Korrekte Antwort:</strong> {wrong.correctAnswer}
-                                        </Typography>
+                                    <Box key={idx} sx={{ mb: 2 }}>
+                                        <Typography variant="body1"><strong>Frage:</strong> {wrong.question}</Typography>
+                                        <Typography variant="body1"><strong>Deine Antwort:</strong> {wrong.userAnswer}</Typography>
+                                        <Typography variant="body1"><strong>Korrekte Antwort:</strong> {wrong.correctAnswer}</Typography>
                                     </Box>
                                 ))}
                             </Box>
                         )}
-
                         {!isDailyQuiz && user && quiz.creator?.id !== user.id && (
-                            <Box sx={{mt: 4}}>
+                            <Box sx={{ mt: 4 }}>
                                 <Typography variant="h6">Bewerte dieses Quiz:</Typography>
-                                <Rating
-                                    name="after-quiz-rating"
-                                    value={stars}
-                                    onChange={(_, val) => setStars(val)}
-                                />
-                                <Box sx={{mt: 4, display: 'flex', gap: 2}}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={submitRating}
-                                        disabled={stars < 1 || submitting}
-                                    >
+                                <Rating value={stars} onChange={(_, v) => setStars(v)} />
+                                <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                                    <Button variant="contained" onClick={submitRating} disabled={stars < 1 || submitting}>
                                         Absenden
                                     </Button>
-                                    <Button onClick={() => navigate('/quizzes')}>Zurück zur Quiz-Liste</Button>
+                                    <Button onClick={() => navigate('/quizzes')}>Zurück</Button>
                                 </Box>
                             </Box>
                         )}
-
-                        <Box sx={{mt: 2, textAlign: 'center'}}>
-                            <Button variant="contained" onClick={() => navigate('/quizzes')}>
-                                Zurück zur Quiz-Liste
-                            </Button>
+                        <Box sx={{ mt: 3, textAlign: 'center' }}>
+                            <Button onClick={() => navigate('/quizzes')}>Zurück zur Quiz-Liste</Button>
                         </Box>
                     </>
                 ) : (
                     <>
-                        <Typography variant="h5" gutterBottom>
-                            {quiz.title}
-                        </Typography>
-                        <LinearProgress variant="determinate" value={progress} sx={{mb: 3}}/>
-                        <Typography variant="body1" gutterBottom>
-                            Frage {currentQuestionIndex + 1} von {quiz.questions.length}
-                        </Typography>
-                        <Typography variant="h6" gutterBottom>
-                            {question.question}
-                        </Typography>
-
-                        <FormControl component="fieldset" sx={{mt: 2}}>
+                        <Typography variant="h5" gutterBottom>{quiz.title}</Typography>
+                        <LinearProgress variant="determinate" value={progress} sx={{ mb: 2 }} />
+                        <Typography>Frage {currentQuestionIndex + 1} von {quiz.questions.length}</Typography>
+                        <Typography variant="h6" gutterBottom>{question.question}</Typography>
+                        <FormControl component="fieldset" sx={{ mt: 2 }}>
                             {isTextInput ? (
                                 <TextField
                                     fullWidth
                                     label="Deine Antwort"
-                                    value={answers[Q.id] || ''}
-                                    onChange={e => updateAnswer(Q.id, e.target.value)}
+                                    value={answers[question.id] || ''}
+                                    onChange={e => updateAnswer(question.id, e.target.value)}
                                     autoFocus
                                 />
                             ) : (
                                 <RadioGroup
-                                    value={answers[Q.id] || ''}
-                                    onChange={e => updateAnswer(Q.id, e.target.value)}
+                                    value={answers[question.id] || ''}
+                                    onChange={e => updateAnswer(question.id, e.target.value)}
                                 >
-                                    {question.answers.map((ans, idx) => (
-                                        <CustomFormControlLabel
-                                            key={idx}
-                                            value={ans}
-                                            control={<Radio/>}
-                                            label={ans}
-                                        />
+                                    {question.answers.map((ans, i) => (
+                                        <CustomFormControlLabel key={i} value={ans} control={<Radio />} label={ans} />
                                     ))}
                                 </RadioGroup>
                             )}
                         </FormControl>
-
-                        <Box sx={{mt: 3, display: 'flex', justifyContent: 'space-between'}}>
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                onClick={() => updateCurrentQuestionIndex(currentQuestionIndex - 1)}
-                                disabled={currentQuestionIndex === 0}
-                            >
+                        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+                            <Button variant="outlined" onClick={() => updateCurrentQuestionIndex(currentQuestionIndex - 1)} disabled={currentQuestionIndex === 0}>
                                 Zurück
                             </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={isLast ? handleFinish : handleNext}
-                                disabled={!answers[currentQuestionIndex]}
-                            >
+                            <Button variant="contained" on Click={isLast ? handleFinish : handleNext} disabled={!answers[question.id]}>
                                 {isLast ? 'Beenden' : 'Weiter'}
                             </Button>
                         </Box>
-
-                        <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
-                            <Button variant="outlined" color="error" onClick={handleCancel}>
-                                Abbrechen
-                            </Button>
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Button variant="outlined" color="error" onClick={handleCancel}>Abbrechen</Button>
                         </Box>
-
                         {isDailyQuiz && (
-                            <Box sx={{mt: 3}}>
-                                <Alert severity="warning" sx={{mb: 3}}>
-                                    Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
-                                </Alert>
-                            </Box>
+                            <Alert severity="warning" sx={{ mt: 3 }}>Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.</Alert>
                         )}
                     </>
                 )}

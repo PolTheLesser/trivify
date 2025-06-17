@@ -1,3 +1,4 @@
+// src/components/quiz/DailyQuiz.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -60,47 +61,42 @@ const DailyQuiz = () => {
     const [wrongAnswers, setWrongAnswers] = useState([]);
 
     useEffect(() => {
-        const fetchDailyQuiz = async () => {
+        (async () => {
             try {
-                const response = await axios.get('/daily');
-                setQuiz(response.data);
+                const res = await axios.get('/daily');
+                setQuiz(res.data);
             } catch (err) {
                 setError(err.response?.data?.message || 'Fehler beim Laden des täglichen Quiz');
             } finally {
                 setLoading(false);
             }
-        };
-        fetchDailyQuiz();
+        })();
     }, []);
 
     const updateAnswer = (questionId, answer) => {
         setAnswers(prev => {
-            const next = {...prev, [questionId]: answer};
+            const next = { ...prev, [questionId]: answer };
             localStorage.setItem(storageKey, JSON.stringify(next));
             return next;
         });
     };
 
-    const updateCurrentQuestionIndex = newIdx => {
-        setCurrentQuestionIndex(newIdx);
-        localStorage.setItem(`${storageKey}-currentQuestionIndex`, newIdx);
+    const updateCurrentQuestionIndex = idx => {
+        setCurrentQuestionIndex(idx);
+        localStorage.setItem(`${storageKey}-currentQuestionIndex`, idx);
     };
 
-    const handleNext = () => {
-        updateCurrentQuestionIndex(currentQuestionIndex + 1);
-    };
+    const handleNext = () => updateCurrentQuestionIndex(currentQuestionIndex + 1);
 
     const handleFinish = async () => {
         try {
-            const res = await axios.post(`/${quiz.id}/submit-all`, {
-                answers
-            });
+            const res = await axios.post(`/${quiz.id}/submit-all`, { answers });
             setScore(res.data.score);
             setWrongAnswers(res.data.wrongAnswers);
             setShowResults(true);
 
             if (user) {
-                await axios.get('/daily/completion-status', { userId: user.id });
+                await axios.get('/daily/completion-status', { params: { userId: user.id } });
                 await axios.post('/quiz-results', {
                     userId: user.id,
                     quizId: quiz.id,
@@ -122,33 +118,21 @@ const DailyQuiz = () => {
         navigate('/quizzes');
     };
 
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ px: 2 }}>
-                <Alert severity="error" sx={{ mt: 4 }}>
-                    {error}
-                </Alert>
-            </Box>
-        );
-    }
-
-    if (!quiz || quiz.questions.length === 0) {
-        return (
-            <Box sx={{ px: 2 }}>
-                <Alert severity="info" sx={{ mt: 4 }}>
-                    Kein tägliches Quiz verfügbar. Bitte später wiederkommen!
-                </Alert>
-            </Box>
-        );
-    }
+    if (loading) return (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+            <CircularProgress />
+        </Box>
+    );
+    if (error) return (
+        <Box sx={{ px: 2 }}>
+            <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>
+        </Box>
+    );
+    if (!quiz || !quiz.questions.length) return (
+        <Box sx={{ px: 2 }}>
+            <Alert severity="info" sx={{ mt: 4 }}>Kein tägliches Quiz verfügbar.</Alert>
+        </Box>
+    );
 
     const currentQuestion = quiz.questions[currentQuestionIndex];
     const isLast = currentQuestionIndex === quiz.questions.length - 1;
@@ -157,16 +141,12 @@ const DailyQuiz = () => {
     return (
         <Box sx={{ px: 2, maxWidth: '100vw', overflowX: 'hidden' }}>
             <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-                <Typography variant="h4" gutterBottom>
-                    Tägliches Quiz
-                </Typography>
+                <Typography variant="h4" gutterBottom>Tägliches Quiz</Typography>
                 <LinearProgress variant="determinate" value={progress} sx={{ mb: 3 }} />
 
                 {showResults ? (
                     <>
-                        <Typography variant="h5" gutterBottom>
-                            Quiz beendet!
-                        </Typography>
+                        <Typography variant="h5" gutterBottom>Quiz beendet!</Typography>
                         <Typography variant="h6" gutterBottom>
                             Dein Ergebnis: {score} von {quiz.questions.length} Punkten
                         </Typography>
@@ -175,29 +155,18 @@ const DailyQuiz = () => {
                         </Typography>
                         {wrongAnswers.length > 0 && (
                             <Box sx={{ mt: 3 }}>
-                                <Typography variant="h6" gutterBottom>
-                                    Falsche Antworten:
-                                </Typography>
+                                <Typography variant="h6" gutterBottom>Falsche Antworten:</Typography>
                                 {wrongAnswers.map((wrong, idx) => (
                                     <Box key={idx} sx={{ mb: 2 }}>
-                                        <Typography variant="body1">
-                                            <strong>Frage:</strong> {wrong.question}
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <strong>Deine Antwort:</strong> {wrong.userAnswer}
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <strong>Korrekte Antwort:</strong> {wrong.correctAnswer}
-                                        </Typography
-                                        >
+                                        <Typography variant="body1"><strong>Frage:</strong> {wrong.question}</Typography>
+                                        <Typography variant="body1"><strong>Deine Antwort:</strong> {wrong.userAnswer}</Typography>
+                                        <Typography variant="body1"><strong>Korrekte Antwort:</strong> {wrong.correctAnswer}</Typography>
                                     </Box>
                                 ))}
                             </Box>
                         )}
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                            <Button variant="contained" onClick={() => navigate('/quizzes')}>
-                                Zurück zur Quiz-Liste
-                            </Button>
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Button variant="contained" onClick={() => navigate('/quizzes')}>Zurück zur Quiz-Liste</Button>
                         </Box>
                     </>
                 ) : (
@@ -205,26 +174,22 @@ const DailyQuiz = () => {
                         <Typography variant="h6" gutterBottom>
                             Frage {currentQuestionIndex + 1} von {quiz.questions.length}
                         </Typography>
-                        <Typography variant="body1" paragraph>
-                            {currentQuestion.question}
-                        </Typography>
-
+                        <Typography variant="body1" paragraph>{currentQuestion.question}</Typography>
                         <FormControl component="fieldset" sx={{ mt: 2 }}>
                             <RadioGroup
-                                value={answers[Q.id] || ''}
-                                onChange={e => updateAnswer(Q.id, e.target.value)}
+                                value={answers[currentQuestion.id] || ''}
+                                onChange={e => updateAnswer(currentQuestion.id, e.target.value)}
                             >
-                                {currentQuestion.answers.map((answer, idx) => (
+                                {currentQuestion.answers.map((ans, i) => (
                                     <CustomFormControlLabel
-                                        key={idx}
-                                        value={answer}
+                                        key={i}
+                                        value={ans}
                                         control={<Radio />}
-                                        label={answer}
+                                        label={ans}
                                     />
                                 ))}
                             </RadioGroup>
                         </FormControl>
-
                         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
                             <Button
                                 variant="outlined"
@@ -238,23 +203,15 @@ const DailyQuiz = () => {
                                 variant="contained"
                                 color="primary"
                                 onClick={isLast ? handleFinish : handleNext}
-                                disabled={!answers[currentQuestionIndex]}
+                                disabled={!answers[currentQuestion.id]}
                             >
                                 {isLast ? 'Fertig' : 'Weiter'}
                             </Button>
                         </Box>
-
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                            <Button variant="outlined" color="error" onClick={handleCancel}>
-                                Abbrechen
-                            </Button>
+                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Button variant="outlined" color="error" onClick={handleCancel}>Abbrechen</Button>
                         </Box>
-
-                        <Box sx={{ mt: 3 }}>
-                            <Alert severity="warning" sx={{ mb: 3 }}>
-                                Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.
-                            </Alert>
-                        </Box>
+                        <Alert severity="warning" sx={{ mt: 3 }}>Hinweis: Die Fragen werden von einer KI generiert und können Fehler enthalten.</Alert>
                     </>
                 )}
             </Paper>
