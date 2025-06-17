@@ -348,6 +348,7 @@ public class QuizService {
         result.setCorrect(isCorrect);
         result.setUserAnswer(userAnswer);
         result.setQuestion(question.getQuestion());
+        result.setCorrectAnswer(question.getCorrectAnswer());
         result.setAnswers(question.getAnswers());
 
         return result;
