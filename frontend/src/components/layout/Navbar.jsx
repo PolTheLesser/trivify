@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link as RouterLink, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
     AppBar,
     Toolbar,
@@ -42,62 +42,58 @@ const Navbar = () => {
     // Hooks ganz oben aufrufen, nicht konditional
     const navigate = useNavigate();
     const location = useLocation();
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [searchTerm, setSearchTerm] = useState('');
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const { user, logout } = useAuth();
 
-    // User Menu State
+    const [searchTerm, setSearchTerm] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
-    const isUserMenuOpen = Boolean(anchorEl);
-    const handleUserMenuOpen = e => setAnchorEl(e.currentTarget);
-    const handleUserMenuClose = () => setAnchorEl(null);
-
-    // Mobile Menu State
     const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
+
+    const isUserMenuOpen   = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileAnchorEl);
-    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
-    const handleMobileMenuClose = () => setMobileAnchorEl(null);
 
-    // URL-Query → local State synchronisieren
+    // initial sync of input from URL (e.g. when coming back via browser)
     useEffect(() => {
-        setSearchTerm(searchParams.get('query') || '');
-    }, [searchParams]);
+        if (location.pathname === '/quizzes') {
+            const params = new URLSearchParams(location.search);
+            setSearchTerm(params.get('query') || '');
+        } else {
+            setSearchTerm('');
+        }
+    }, [location.pathname, location.search]);
 
-    // Suchfeld Eingabe
     const handleSearchChange = e => {
-        const val = e.target.value;
-        setSearchTerm(val);
+        setSearchTerm(e.target.value);
     };
 
-    // Enter im Suchfeld navigiert zur Quizliste mit Query
     const handleSearchKeyDown = e => {
         if (e.key === 'Enter') {
             const q = searchTerm.trim();
-            if (location.pathname !== '/quizzes' || q) {
-                navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
-            }
+            navigate(`/quizzes${q ? `?query=${encodeURIComponent(q)}` : ''}`);
         }
     };
 
-
-    // Dark Mode toggle
-    const handleToggle = () => {
+    const handleToggleTheme = () => {
         setDarkMode(!darkMode);
     };
+
+    const handleUserMenuOpen   = e => setAnchorEl(e.currentTarget);
+    const handleUserMenuClose  = () => setAnchorEl(null);
+    const handleMobileMenuOpen = e => setMobileAnchorEl(e.currentTarget);
+    const handleMobileMenuClose= () => setMobileAnchorEl(null);
 
     return (
         <>
             <AppBar position="static">
                 <Toolbar>
-                    {/* Logo / Burger auf xs */}
+                    {/* logo / burger on xs */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
                         <IconButton size="large" onClick={handleMobileMenuOpen} color="inherit">
                             <img src="/icons/logo512.png" alt="Trivify" style={{ height: 64, width: 64 }} />
                         </IconButton>
                     </Box>
 
-                    {/* Brand auf md+ */}
+                    {/* brand on md+ */}
                     <Typography
                         component={RouterLink}
                         to="/"
@@ -112,7 +108,7 @@ const Navbar = () => {
                         <img src="/icons/logo512.png" alt="Trivify" style={{ height: 40 }} />
                     </Typography>
 
-                    {/* Nav Buttons auf md+ */}
+                    {/* nav buttons on md+ */}
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, mx: 'auto', alignItems: 'center' }}>
                         <Button component={RouterLink} to="/quizzes" color="inherit">Quizze</Button>
                         <Button component={RouterLink} to="/daily-quiz" color="inherit">Tägliches Quiz (KI)</Button>
@@ -126,7 +122,7 @@ const Navbar = () => {
                         )}
                     </Box>
 
-                    {/* Suchfeld */}
+                    {/* search field */}
                     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
                         <TextField
                             size="small"
@@ -153,41 +149,33 @@ const Navbar = () => {
                         />
                     </Box>
 
-                    {/* Dark Mode Toggle */}
-                    <IconButton color="inherit" onClick={handleToggle} sx={{ mr: 1, borderRadius: '50%', width: 40, height: 40 }}>
+                    {/* theme toggle */}
+                    <IconButton color="inherit" onClick={handleToggleTheme} sx={{ mr: 1, borderRadius: '50%', width: 40, height: 40 }}>
                         {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
 
-                    {/* User Icon */}
-                    {user ? (
-                        <IconButton
-                            size="medium"
-                            aria-label="account of current user"
-                            aria-controls="user-menu"
-                            aria-haspopup="true"
-                            onClick={handleUserMenuOpen}
-                            color="inherit"
-                            sx={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'purple', color: 'white' }}
-                        >
-                            {user.name.charAt(0).toUpperCase()}
-                        </IconButton>
-                    ) : (
-                        <IconButton
-                            size="medium"
-                            aria-label="account of current user"
-                            aria-controls="user-menu"
-                            aria-haspopup="true"
-                            onClick={handleUserMenuOpen}
-                            color="inherit"
-                            sx={{ width: 40, height: 40, borderRadius: '50%' }}
-                        >
-                            <AccountCircle sx={{ width: 40, height: 40 }} />
-                        </IconButton>
-                    )}
+                    {/* user icon */}
+                    <IconButton
+                        size="medium"
+                        aria-controls="user-menu"
+                        aria-haspopup="true"
+                        onClick={handleUserMenuOpen}
+                        color="inherit"
+                        sx={{
+                            width: 40, height: 40, borderRadius: '50%',
+                            backgroundColor: user ? 'purple' : undefined,
+                            color: user ? 'white' : undefined
+                        }}
+                    >
+                        {user
+                            ? user.name.charAt(0).toUpperCase()
+                            : <AccountCircle sx={{ width: 40, height: 40 }} />
+                        }
+                    </IconButton>
                 </Toolbar>
             </AppBar>
 
-            {/* Mobile Menu */}
+            {/* mobile menu */}
             <Menu
                 anchorEl={mobileAnchorEl}
                 open={isMobileMenuOpen}
@@ -212,7 +200,7 @@ const Navbar = () => {
                 )}
             </Menu>
 
-            {/* User Account Menu */}
+            {/* user account menu */}
             <Menu
                 id="user-menu"
                 anchorEl={anchorEl}
