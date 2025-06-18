@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,14 +123,14 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && !bypassEdit(userId, quiz)) {
+        if (!quiz.getCreator().getId().equals(userId) && !bypassProtection(userId, quiz)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz bearbeiten");
         }
 
         quiz.setTitle(quizDTO.getTitle());
         quiz.setDescription(quizDTO.getDescription());
         List<QuizCategory> newCategories = quizDTO.getCategories();
-        if (quiz.getCategories().contains(QuizCategory.DAILY_QUIZ)){
+        if (quiz.getCategories().contains(QuizCategory.DAILY_QUIZ)) {
             newCategories.add(QuizCategory.DAILY_QUIZ);
         }
         quiz.setCategories(newCategories);
@@ -165,7 +166,7 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
 
-        if (!quiz.getCreator().getId().equals(userId) && !bypassEdit(userId, quiz)) {
+        if (!quiz.getCreator().getId().equals(userId) && !bypassProtection(userId, quiz)) {
             throw new RuntimeException("Nur der Ersteller kann das Quiz löschen");
         }
 
@@ -312,7 +313,7 @@ public class QuizService {
     public QuizQuestion findQuestionById(Long questionId) {
         log.debug("Suche Frage mit ID: {}", questionId);
         return quizQuestionRepository.findById(questionId)
-               .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
+                .orElseThrow(() -> new EntityNotFoundException("QuizQuestion not found"));
     }
 
     /**
@@ -525,13 +526,57 @@ public class QuizService {
      * @param userId ID des Benutzers.
      * @return true, wenn der Benutzer ein Administrator ist, sonst false, wenn der Ersteller des Quizzes nicht der Admin ist.
      */
-    private boolean bypassEdit(Long userId, Quiz quiz) {
+    private boolean bypassProtection(Long userId, Quiz quiz) {
         boolean bypassEdit = userRepository.findById(userId)
                 .map(u -> u.getRole() == UserRole.ROLE_ADMIN)
                 .orElse(false);
-        if(quiz.getCreator().getId()==1L) {
+        if (quiz.getCreator().getId() == 1L && userId != 1L) {
             bypassEdit = false;
         }
         return bypassEdit;
+    }
+
+    /**
+     * Bewertet ein Quiz basierend auf den Antworten des Benutzers.
+     *
+     * @param quizId  ID des Quizzes.
+     * @param answers Map von Frage-ID zu Benutzerantwort.
+     * @param userId  ID des Benutzers, der das Quiz spielt.
+     * @return Ein DTO mit dem Ergebnis der Bewertung.
+     */
+    @Transactional
+    public QuizFeedbackDTO evaluateQuiz(Long quizId, Map<Long, String> answers, Long userId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz nicht gefunden"));
+
+        int correctCount = 0;
+        List<WrongAnswerDTO> wrongs = new ArrayList<>();
+
+        for (QuizQuestion q : quiz.getQuestions()) {
+            String ua = answers.get(q.getId());
+            if (ua == null) continue;
+            if (checkAnswer(ua, q.getCorrectAnswer())) {
+                correctCount++;
+            } else {
+                wrongs.add(new WrongAnswerDTO(q.getQuestion(), ua, q.getCorrectAnswer()));
+            }
+        }
+
+        // Nur für eingeloggte User speichern:
+        if (userId != null) {
+            QuizResult result = new QuizResult();
+            result.setQuiz(quiz);
+            result.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden")));
+            result.setScore(correctCount);
+            result.setMaxPossibleScore(quiz.getQuestions().size());
+            result.setPlayedAt(LocalDateTime.now());
+            quizResultRepository.save(result);
+        }
+
+        QuizFeedbackDTO dto = new QuizFeedbackDTO();
+        dto.setScore(correctCount);
+        dto.setMaxScore(quiz.getQuestions().size());
+        dto.setWrongAnswers(wrongs);
+        return dto;
     }
 }
