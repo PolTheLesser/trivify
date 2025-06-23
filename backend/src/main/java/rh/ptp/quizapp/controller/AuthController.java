@@ -41,8 +41,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            authService.register(request);
-            return ResponseEntity.ok().body(new MessageResponse("Bitte überprüfen Sie Ihre E-Mail-Adresse, um Ihre Registrierung abzuschließen."));
+            String response = authService.register(request);
+            return ResponseEntity.ok().body(new MessageResponse(response));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         } catch (Exception e) {

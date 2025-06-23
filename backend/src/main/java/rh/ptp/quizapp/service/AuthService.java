@@ -51,7 +51,7 @@ public class AuthService {
      * @return Angelegter Benutzer mit verschlüsseltem Passwort und PENDING_VERIFICATION Status
      * @throws RuntimeException bei existierendem Benutzernamen
      */
-    public User register(RegisterRequest request) {
+    public String register(RegisterRequest request) {
         if (userRepository.existsByName(request.getName())) {
             throw new RuntimeException("Benutzername ist bereits vergeben");
         }
@@ -65,6 +65,7 @@ public class AuthService {
             variables.put("username", user.getName());
             variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
             emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
+            return "Ein Account mit dieser Email existiert bereits, überprüfen Sie Ihre E-Mail-Adresse, um das Passwort zurückzusetzen.";
         }
 
         User pendingUser = new User()
@@ -76,7 +77,7 @@ public class AuthService {
 
         pendingUser = userRepository.save(pendingUser);
         createAuthenticationToken(pendingUser);
-        return pendingUser;
+        return "Bitte überprüfen Sie Ihre E-Mail-Adresse, um Ihre Registrierung abzuschließen.";
     }
 
     /**
