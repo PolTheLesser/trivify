@@ -65,7 +65,7 @@ public class AuthService {
             variables.put("username", user.getName());
             variables.put("resetUrl", frontendUrl + "/reset-password/" + token);
             emailService.sendEmail(user.getEmail(), "Passwort zurücksetzen", "password-reset-email", variables);
-            return "Ein Account mit dieser Email existiert bereits. Überprüfen Sie Ihre E-Mail-Adresse, um das Passwort zurückzusetzen.";
+            return "Ein Account mit dieser Email existiert bereits. Bitte überprüfen Sie Ihre E-Mail-Adresse, um das Passwort zurückzusetzen.";
         }
 
         User pendingUser = new User()
